@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Power System Simulation TOC-RST | 22kV Distribution System</title>
+<style>
+:root {
+  --bg:#060d1f; --panel:#0c1629; --panel2:#0f1e35; --border:#1a3354;
+  --text:#7aa8d2; --bright:#ddeeff; --dim:#445566;
+  --green:#00e676; --yellow:#ffd740; --red:#ff5252; --red2:#ff1744;
+  --blue:#40c4ff; --blue2:#1565c0; --orange:#ff9800; --orange2:#e65100;
+  --purple:#ce93d8; --teal:#1de9b6; --cyan:#00e5ff;
+  --gblue:rgba(64,196,255,.45); --ggreen:rgba(0,230,118,.4); --gorange:rgba(255,152,0,.45);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;font-size:12px;overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;touch-action:pan-y;}
+img,canvas,svg{max-width:100%;display:block;}
+button{touch-action:manipulation;}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#0a1020}
+::-webkit-scrollbar-thumb{background:#1a3050;border-radius:3px}
+
+/* ── HEADER ── */
+header{background:linear-gradient(90deg,#070f24,#0d1e3a);border-bottom:1px solid var(--border);
+  padding:10px 18px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:500;gap:12px;}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#007acc,#00bcd4);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:900;color:#fff;box-shadow:0 0 18px var(--gblue);flex-shrink:0;}
+h1{font-size:15px;font-weight:700;color:var(--bright);line-height:1.2;}
+h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.8;}
+.header-center{display:flex;align-items:center;gap:8px;}
+.mode-label{font-size:10px;color:var(--dim);white-space:nowrap;}
+.btn{padding:5px 14px;border-radius:5px;border:1.5px solid;cursor:pointer;font-size:11px;
+  font-weight:700;transition:all .2s;background:transparent;letter-spacing:.4px;white-space:nowrap;}
+.btn-n{border-color:var(--green);color:var(--green);}
+.btn-n:hover,.btn-n.active{background:var(--green);color:#000;box-shadow:0 0 14px var(--ggreen);}
+.btn-e{border-color:var(--orange);color:var(--orange);}
+.btn-e:hover,.btn-e.active{background:var(--orange);color:#000;box-shadow:0 0 14px var(--gorange);}
+.btn-f{border-color:var(--red);color:var(--red);}
+.btn-f:hover,.btn-f.active{background:var(--red2);color:#fff;box-shadow:0 0 14px rgba(255,82,82,.5);}
+.clock{font-family:'Courier New',monospace;font-size:13px;color:var(--teal);
+  background:rgba(29,233,182,.08);padding:4px 10px;border-radius:4px;
+  border:1px solid rgba(29,233,182,.2);white-space:nowrap;}
+
+/* ── STATS BAR ── */
+.stats-bar{display:flex;gap:8px;padding:8px 18px;background:rgba(0,0,0,.35);
+  border-bottom:1px solid var(--border);overflow-x:auto;flex-wrap:wrap;align-items:stretch;}
+.stat{background:var(--panel);border:1px solid var(--border);border-radius:8px;
+  padding:7px 13px;min-width:120px;flex:1 1 120px;transition:border-color .3s;}
+.stat:hover{border-color:var(--blue);}
+.stat-name{font-size:9px;text-transform:uppercase;letter-spacing:1px;opacity:.55;margin-bottom:2px;}
+.stat-val{font-size:19px;font-weight:700;line-height:1;}
+.stat-sub{font-size:9px;opacity:.55;margin-top:2px;}
+.s-blue{color:var(--blue);} .s-green{color:var(--green);} .s-orange{color:var(--orange);}
+.s-yellow{color:var(--yellow);} .s-red{color:var(--red);}
+
+/* ── ALERT STRIP ── */
+.alert-strip{display:none;background:rgba(255,82,82,.12);border-bottom:1px solid var(--red);
+  padding:5px 18px;font-size:10px;color:var(--red);align-items:center;gap:8px;}
+.alert-strip.show{display:flex;}
+.alert-dot{width:8px;height:8px;border-radius:50%;background:var(--red);
+  animation:blink .6s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── MAIN ── */
+.main{padding:14px 18px;overflow-x:auto;}
+.sections-grid{display:grid;grid-template-columns:1fr 1fr 1.8fr;gap:12px;}
+
+/* ── AREA COLUMN ── */
+.area{background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  padding:12px;position:relative;transition:border-color .3s;}
+.area-header{font-size:11px;font-weight:700;padding:5px 10px;margin-bottom:10px;
+  border-radius:6px;display:flex;align-items:center;gap:6px;letter-spacing:.5px;}
+.a12 .area-header{background:rgba(64,196,255,.1);color:var(--blue);border:1px solid rgba(64,196,255,.25);}
+.a11 .area-header{background:rgba(0,230,118,.1);color:var(--green);border:1px solid rgba(0,230,118,.25);}
+.a1314 .area-header{background:rgba(206,147,216,.1);color:var(--purple);border:1px solid rgba(206,147,216,.25);}
+
+/* ── PEA SOURCE ── */
+.pea-block{background:linear-gradient(135deg,#001535,#001f50);border:2px solid var(--blue);
+  border-radius:10px;padding:9px 12px;text-align:center;margin-bottom:10px;
+  box-shadow:0 0 22px var(--gblue);position:relative;overflow:hidden;cursor:default;}
+.pea-block::after{content:'';position:absolute;top:-40%;left:-40%;width:180%;height:180%;
+  background:radial-gradient(circle,rgba(64,196,255,.07) 0%,transparent 70%);
+  animation:peaPulse 2.5s ease-in-out infinite;}
+@keyframes peaPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.5}}
+.pea-kv{font-size:20px;font-weight:900;color:var(--blue);text-shadow:0 0 14px var(--blue);}
+.pea-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1px;opacity:.65;margin-top:1px;}
+.pea-status{font-size:10px;margin-top:3px;display:flex;align-items:center;justify-content:center;gap:4px;}
+
+
+/* ── COMPONENT BOX ── */
+.comp{border-radius:8px;padding:8px 10px;margin-bottom:6px;position:relative;
+  transition:all .25s;cursor:pointer;border:1px solid;}
+.comp:hover{transform:translateY(-2px);filter:brightness(1.18);z-index:10;}
+.comp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.comp-id{font-size:12px;font-weight:700;}
+.comp-cap{font-size:9px;opacity:.65;}
+.comp-row2{display:flex;justify-content:space-between;font-size:9px;margin-bottom:3px;opacity:.8;}
+.load-bar{height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin:3px 0;}
+.load-fill{height:100%;border-radius:3px;transition:width .7s ease,background .7s;}
+.fill-g{background:linear-gradient(90deg,#00c853,#00e676);}
+.fill-y{background:linear-gradient(90deg,#f9a825,#ffd740);}
+.fill-r{background:linear-gradient(90deg,#c62828,#ff5252);animation:blinkR .7s infinite;}
+@keyframes blinkR{0%,100%{opacity:1}50%{opacity:.5}}
+.load-pct{font-size:10px;font-weight:700;text-align:right;}
+
+/* Component themes */
+.c-tr{background:linear-gradient(135deg,#001828,#002540);border-color:#006080 !important;}
+.c-tr .comp-id{color:var(--teal);}
+.c-mdb{background:linear-gradient(135deg,#001a1a,#003030);border-color:#007070 !important;}
+.c-mdb .comp-id{color:#4ee0e0;}
+.c-emdb{background:linear-gradient(135deg,#001400,#002200);border-color:#005040 !important;}
+.c-emdb .comp-id{color:var(--green);}
+.c-gen{background:linear-gradient(135deg,#1c0c00,#2e1800);border-color:#704000 !important;}
+.c-gen .comp-id{color:var(--orange);}
+.c-gen.running{border-color:var(--orange) !important;box-shadow:0 0 12px var(--gorange);}
+
+/* Status LED */
+.led{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px;vertical-align:middle;}
+.led-on{background:var(--green);box-shadow:0 0 5px var(--green);}
+.led-off{background:#2a3a4a;}
+.led-fault{background:var(--red);box-shadow:0 0 5px var(--red);animation:blink .5s infinite;}
+.led-gen{background:var(--orange);box-shadow:0 0 5px var(--orange);}
+
+/* Layout helpers */
+.comp-pair{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;}
+.comp-quad{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.divider{border:none;border-top:1px dashed #1a3050;margin:8px 0;}
+.gen-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--orange);
+  opacity:.7;text-align:center;margin:4px 0 6px;}
+.section-label{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);
+  margin:6px 0 4px;padding-left:2px;}
+
+/* Generator brand + PM info row */
+.gen-info-row{display:flex;justify-content:space-between;align-items:center;
+  margin-top:4px;padding:3px 5px;border-radius:4px;
+  background:rgba(255,152,0,.07);border:1px solid rgba(255,152,0,.18);}
+.gen-brand{font-size:9px;color:var(--orange);font-weight:600;letter-spacing:.3px;}
+.gen-pm{font-size:9px;color:rgba(255,152,0,.65);}
+
+/* Alert badge */
+.alert-badge{background:rgba(255,82,82,.15);border:1px solid var(--red);border-radius:4px;
+  padding:2px 6px;font-size:9px;color:var(--red);display:inline-flex;align-items:center;gap:3px;
+  margin-top:3px;}
+.alert-badge .a-dot{width:5px;height:5px;border-radius:50%;background:var(--red);
+  animation:blink .5s infinite;}
+
+/* Canvas overlay */
+#flowCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100;}
+
+/* Detail panel */
+.detail{position:fixed;right:16px;top:80px;background:#0c1629;border:1px solid var(--blue);
+  border-radius:10px;padding:14px;width:230px;box-shadow:0 8px 30px rgba(0,0,0,.6);
+  display:none;z-index:600;font-size:11px;}
+.detail.show{display:block;}
+.detail-close{float:right;cursor:pointer;color:var(--red);font-size:15px;line-height:1;margin-left:8px;}
+.detail-title{font-size:13px;font-weight:700;color:var(--bright);margin-bottom:10px;padding-top:2px;}
+.d-row{display:flex;justify-content:space-between;margin-bottom:5px;padding-bottom:5px;
+  border-bottom:1px solid #1a3050;}
+.d-row:last-child{border-bottom:none;margin-bottom:0;}
+.d-key{opacity:.65;}
+.d-val{font-weight:600;color:var(--bright);}
+.detail-bar{height:8px;background:#1a2a3a;border-radius:4px;margin:6px 0 3px;overflow:hidden;}
+.detail-fill{height:100%;border-radius:4px;transition:width .5s;}
+
+/* Legend */
+.legend{display:flex;gap:14px;padding:6px 18px;background:rgba(0,0,0,.25);
+  border-top:1px solid var(--border);flex-wrap:wrap;font-size:9px;}
+.l-item{display:flex;align-items:center;gap:5px;}
+.l-dot{width:10px;height:4px;border-radius:2px;}
+
+/* Mode overlay for fault mode */
+.fault-flash{position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(255,23,68,.03);pointer-events:none;z-index:90;display:none;
+  animation:faultPulse 1.5s ease-in-out infinite;}
+@keyframes faultPulse{0%,100%{opacity:0}50%{opacity:1}}
+.fault-flash.show{display:block;}
+
+/* Spinning gear for GEN running */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;animation:spin 1.5s linear infinite;}
+
+/* Tooltip */
+.tip{position:absolute;background:#0c1629;border:1px solid var(--blue);border-radius:6px;
+  padding:6px 10px;font-size:10px;z-index:700;pointer-events:none;white-space:nowrap;
+  box-shadow:0 4px 16px rgba(0,0,0,.5);display:none;}
+.tip.show{display:block;}
+
+.pea-fault{border-color:var(--red) !important;box-shadow:0 0 20px rgba(255,82,82,.4) !important;}
+.pea-fault .pea-kv{color:var(--red);text-shadow:0 0 14px var(--red);}
+
+/* ══ RESPONSIVE ══════════════════════════════════════ */
+
+/* ── Large desktop (≤1400px) ── */
+@media (max-width:1400px){
+  .sections-grid{grid-template-columns:1fr 1fr;min-width:0;}
+  .area.a1314{grid-column:1 / -1;}
+}
+
+/* ── Tablet landscape (≤1024px) ── */
+@media (max-width:1024px){
+  header{flex-wrap:wrap;padding:8px 14px;gap:8px;}
+  .header-center{order:3;width:100%;justify-content:center;flex-wrap:wrap;}
+  .clock{order:2;}
+  .main{padding:12px 14px;}
+  #genSimSection{padding:0 14px 20px;}
+  .gs-grid{grid-template-columns:1fr !important;}
+  .detail{right:10px;left:10px;width:auto;top:auto;bottom:10px;
+    max-height:50vh;overflow-y:auto;}
+  .stats-bar{flex-wrap:wrap;padding:6px 14px;}
+  .stat{min-width:110px;}
+}
+
+/* ── Tablet portrait (≤768px) ── */
+@media (max-width:768px){
+  .sections-grid{grid-template-columns:1fr;min-width:0;}
+  .area.a1314{grid-column:auto;}
+  header{padding:8px 12px;}
+  .logo-icon{width:34px;height:34px;font-size:18px;}
+  h1{font-size:13px;}
+  h1 span{font-size:10px;}
+  .btn{padding:5px 11px;font-size:10px;}
+  .mode-label{font-size:9px;}
+  .main{padding:10px 12px;}
+  #genSimSection{padding:0 12px 18px;}
+  .stat{min-width:100px;padding:6px 10px;}
+  .stat-val{font-size:17px;}
+  .detail{right:8px;left:8px;top:auto;bottom:8px;max-height:45vh;overflow-y:auto;}
+  .comp-pair{grid-template-columns:1fr 1fr;}
+  .comp-quad{grid-template-columns:1fr 1fr;}
+  #gsCanvas{height:320px !important;}
+}
+
+/* ── Mobile landscape / large phone (≤600px) ── */
+@media (max-width:600px){
+  header{padding:7px 10px;gap:6px;}
+  .logo-icon{width:32px;height:32px;font-size:16px;}
+  h1{font-size:12px;}
+  h1 span{font-size:9px;}
+  .header-center{gap:5px;}
+  .btn{padding:4px 9px;font-size:10px;}
+  .mode-label{display:none;}
+  .clock{display:none;}
+  .main{padding:8px;}
+  .stats-bar{padding:5px 8px;gap:5px;}
+  .stat{min-width:90px;padding:5px 8px;flex:1 1 90px;}
+  .stat-val{font-size:15px;}
+  .stat-name,.stat-sub{font-size:8px;}
+  .comp{padding:7px 8px;}
+  .comp-pair{grid-template-columns:1fr 1fr;gap:5px;}
+  .comp-quad{grid-template-columns:1fr 1fr;gap:5px;}
+  #genSimSection{padding:0 8px 14px;}
+  .gs-header{flex-direction:column;align-items:flex-start;gap:6px !important;}
+  .gs-controls{width:100%;justify-content:flex-start !important;flex-wrap:wrap;gap:6px !important;}
+  .gs-subtext{font-size:9px;}
+  .legend{padding:5px 8px;gap:7px;}
+  .alert-strip{padding:4px 8px;font-size:9px;}
+  .detail{right:4px;left:4px;top:auto;bottom:4px;max-height:42vh;overflow-y:auto;}
+}
+
+/* ── Mobile portrait (≤480px) ── */
+@media (max-width:480px){
+  .comp-pair{grid-template-columns:1fr;}
+  .comp-quad{grid-template-columns:1fr 1fr;}
+  .stat-val{font-size:14px;}
+  .stat{min-width:80px;flex:1 1 80px;}
+  .gs-subtext{display:none;}
+  h1{font-size:11px;}
+  .logo-icon{width:30px;height:30px;font-size:15px;}
+  .btn{padding:4px 8px;font-size:9px;}
+  .pea-kv{font-size:17px;}
+}
+
+/* ── Very small phone (≤360px) ── */
+@media (max-width:360px){
+  .logo{gap:6px;}
+  h1{font-size:10px;}
+  .btn{padding:3px 7px;font-size:9px;letter-spacing:0;}
+  .stats-bar{padding:4px 6px;gap:4px;}
+  .stat{min-width:72px;padding:4px 7px;flex:1 1 72px;}
+  .stat-val{font-size:13px;}
+  .main{padding:6px;}
+  .legend{display:none;}
+  .gs-controls button{padding:5px 12px !important;font-size:10px !important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── CANVAS ── -->
+<canvas id="flowCanvas"></canvas>
+<div class="fault-flash" id="faultFlash"></div>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div>
+      <h1>Power System Simulation TOC-RST<span>22kV Distribution System — Transformer &amp; Generator</span></h1>
+    </div>
+  </div>
+  <div class="header-center">
+    <span class="mode-label">โหมดการทำงาน :</span>
+    <button class="btn btn-n active" id="btnNormal" onclick="setMode('normal')">🔵 ปกติ (PEA)</button>
+    <button class="btn btn-e" id="btnEmerg" onclick="setMode('emergency')">🟠 GENERATOR</button>
+    <button class="btn btn-f" id="btnFault" onclick="setMode('fault')">🔴 ไฟดับ</button>
+  </div>
+  <div class="clock" id="clock">--:--:--</div>
+</header>
+
+<!-- ── ALERT STRIP ── -->
+<div class="alert-strip" id="alertStrip">
+  <div class="alert-dot"></div>
+  <strong>⚠ ALERT:</strong>
+  <span id="alertMsg">Single Generator overload detected — Area 12 (91.1%) &amp; Area 13-14 (92.6%) exceed 80% threshold when running on single GEN.</span>
+</div>
+
+<!-- ── STATS BAR ── -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-name">โหมดปัจจุบัน</div>
+    <div class="stat-val s-blue" id="statMode">NORMAL</div>
+    <div class="stat-sub" id="statModeSub">PEA 22kV Active</div>
+  </div>
+  <div class="stat">
+    <div class="stat-name">Total TR Load</div>
+    <div class="stat-val s-blue">4,996 <span style="font-size:11px">KVA</span></div>
+    <div class="stat-sub">จาก 14,000 KVA (35.7%)</div>
+  </div>
+  <div class="stat">
+    <div class="stat-name">Total TR Power</div>
+    <div class="stat-val s-green">5,494 <span style="font-size:11px">KW</span></div>
+    <div class="stat-sub">จาก 11,200 KW max</div>
+  </div>
+  <div class="stat">
+    <div class="stat-name">Total GEN Load</div>
+    <div class="stat-val s-orange">4,811 <span style="font-size:11px">KW</span></div>
+    <div class="stat-sub">จาก 11,200 KW max (42.9%)</div>
+  </div>
+  <div class="stat">
+    <div class="stat-name">Transformers</div>
+    <div class="stat-val s-green">8 <span style="font-size:11px">Units</span></div>
+    <div class="stat-sub">TR7,TR8,TR1,TR2,TR3,TR5,TR4,TR6</div>
+  </div>
+  <div class="stat">
+    <div class="stat-name">Generators</div>
+    <div class="stat-val s-orange">7 <span style="font-size:11px">Units</span></div>
+    <div class="stat-sub">GEN1–GEN7 (Standby)</div>
+  </div>
+  <div class="stat">
+    <div class="stat-name">Single GEN Risk</div>
+    <div class="stat-val s-red">2 <span style="font-size:11px">Areas</span></div>
+    <div class="stat-sub">A12: 91.1% | A13-14: 92.6%</div>
+  </div>
+</div>
+
+<!-- ── MAIN DIAGRAM ── -->
+<div class="main">
+<div class="sections-grid">
+
+  <!-- ════ AREA 12 ════ -->
+  <div class="area a12" id="area12">
+    <div class="area-header">
+      <span>⚡</span> Area 12 (MDB 12)
+    </div>
+
+    <!-- PEA Source -->
+    <div class="pea-block" id="pea12">
+      <div class="pea-kv">22 kV</div>
+      <div class="pea-lbl">การไฟฟ้าฯ (PEA)</div>
+      <div class="pea-status">
+        <span class="led led-on" id="pea12-led"></span>
+        <span id="pea12-txt">จ่ายไฟปกติ</span>
+      </div>
+    </div>
+
+    <!-- TRs -->
+    <div class="section-label">🔄 Transformer (Step Down: 22kV → 400V)</div>
+    <div class="comp-pair">
+      <div class="comp c-tr" id="tr7" onclick="showDetail('tr7')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr7-led"></span>TR7</span><span class="comp-cap">2,000 KVA / 1,600 KW</span></div>
+        <div class="comp-row2"><span>Used: 761 KVA</span><span>MDB12A → 697 KW</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" id="tr7-bar" style="width:38.1%"></div></div>
+        <div class="load-pct" id="tr7-pct"><span style="color:var(--green)">38.1%</span> Load</div>
+      </div>
+      <div class="comp c-tr" id="tr8" onclick="showDetail('tr8')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr8-led"></span>TR8</span><span class="comp-cap">2,000 KVA / 1,600 KW</span></div>
+        <div class="comp-row2"><span>Used: 825 KVA</span><span>MDB12B → 761 KW</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" id="tr8-bar" style="width:41.3%"></div></div>
+        <div class="load-pct" id="tr8-pct"><span style="color:var(--green)">41.3%</span> Load</div>
+      </div>
+    </div>
+
+    <!-- MDBs -->
+    <div class="section-label">🔌 Main Distribution Board (400V)</div>
+    <div class="comp-pair">
+      <div class="comp c-mdb" id="mdb12a" onclick="showDetail('mdb12a')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb12a-led"></span>MDB12A</span></div>
+        <div class="comp-row2"><span>Load: 697 KW</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:43.6%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">697 KW</span></div>
+      </div>
+      <div class="comp c-mdb" id="mdb12b" onclick="showDetail('mdb12b')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb12b-led"></span>MDB12B</span></div>
+        <div class="comp-row2"><span>Load: 761 KW</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:47.6%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">761 KW</span></div>
+      </div>
+    </div>
+
+    <!-- EMDBs -->
+    <div class="section-label">🏭 Emergency Distribution Board</div>
+    <div class="comp-quad">
+      <div class="comp c-emdb" id="emdb12a1" onclick="showDetail('emdb12a1')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb12a1-led"></span>EMDB12A1</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:55%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">297 KW</span></div>
+      </div>
+      <div class="comp c-emdb" id="emdb12a2" onclick="showDetail('emdb12a2')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb12a2-led"></span>EMDB12A2</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:75%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">400 KW</span></div>
+      </div>
+      <div class="comp c-emdb" id="emdb12b1" onclick="showDetail('emdb12b1')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb12b1-led"></span>EMDB12B1</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:35%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">186 KW</span></div>
+      </div>
+      <div class="comp c-emdb" id="emdb12b2" onclick="showDetail('emdb12b2')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb12b2-led"></span>EMDB12B2</span></div>
+        <div class="load-bar"><div class="load-fill fill-y" style="width:75%"></div></div>
+        <div class="load-pct"><span style="color:var(--yellow)">575 KW</span></div>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="gen-label">🔋 Emergency Generator (Backup Power)</div>
+
+    <!-- GENs -->
+    <div class="comp-pair">
+      <div class="comp c-gen" id="gen1" onclick="showDetail('gen1')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-off" id="gen1-led"></span>GEN1</span><span class="comp-cap">2,000 KVA</span></div>
+        <div class="comp-row2"><span>1,600 KW max</span><span id="gen1-load-txt">Standby</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" id="gen1-bar" style="width:0%"></div></div>
+        <div class="load-pct" id="gen1-pct"><span style="color:var(--dim)">0%</span></div>
+        <div class="gen-info-row"><span class="gen-brand">🏭 Cummins</span><span class="gen-pm">🔧 PM: 26 Nov 2024</span></div>
+        <div class="alert-badge" style="display:none" id="gen1-alert"><span class="a-dot"></span>Single: 91.1% ⚠</div>
+      </div>
+      <div class="comp c-gen" id="gen2" onclick="showDetail('gen2')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-off" id="gen2-led"></span>GEN2</span><span class="comp-cap">2,000 KVA</span></div>
+        <div class="comp-row2"><span>1,600 KW max</span><span id="gen2-load-txt">Standby</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" id="gen2-bar" style="width:0%"></div></div>
+        <div class="load-pct" id="gen2-pct"><span style="color:var(--dim)">0%</span></div>
+        <div class="gen-info-row"><span class="gen-brand">🏭 Cummins</span><span class="gen-pm">🔧 PM: 02 Mar 2025</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ AREA 11 ════ -->
+  <div class="area a11" id="area11">
+    <div class="area-header">
+      <span>⚡</span> Area 11 (MDB 11)
+    </div>
+
+    <div class="pea-block" id="pea11">
+      <div class="pea-kv">22 kV</div>
+      <div class="pea-lbl">การไฟฟ้าฯ (PEA)</div>
+      <div class="pea-status">
+        <span class="led led-on" id="pea11-led"></span>
+        <span id="pea11-txt">จ่ายไฟปกติ</span>
+      </div>
+    </div>
+
+    <div class="section-label">🔄 Transformer (Step Down: 22kV → 400V)</div>
+    <div class="comp-pair">
+      <div class="comp c-tr" id="tr1" onclick="showDetail('tr1')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr1-led"></span>TR1</span><span class="comp-cap">1,500 KVA / 1,200 KW</span></div>
+        <div class="comp-row2"><span>Used: 463 KVA</span><span>MDB11A → 463 KW</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" id="tr1-bar" style="width:30.9%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">30.9%</span> Load</div>
+      </div>
+      <div class="comp c-tr" id="tr2" onclick="showDetail('tr2')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr2-led"></span>TR2</span><span class="comp-cap">1,500 KVA / 1,200 KW</span></div>
+        <div class="comp-row2"><span>Used: 400 KVA</span><span>MDB11B → 400 KW</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" id="tr2-bar" style="width:26.7%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">26.7%</span> Load</div>
+      </div>
+    </div>
+
+    <div class="section-label">🔌 Main Distribution Board (400V)</div>
+    <div class="comp-pair">
+      <div class="comp c-mdb" id="mdb11a" onclick="showDetail('mdb11a')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb11a-led"></span>MDB11A</span></div>
+        <div class="comp-row2"><span>Load: 463 KW</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:38.6%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">463 KW</span></div>
+      </div>
+      <div class="comp c-mdb" id="mdb11b" onclick="showDetail('mdb11b')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb11b-led"></span>MDB11B</span></div>
+        <div class="comp-row2"><span>Load: 400 KW</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:33.3%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">400 KW</span></div>
+      </div>
+    </div>
+
+    <div class="section-label">🏭 Emergency Distribution Board</div>
+    <div class="comp-pair">
+      <div class="comp c-emdb" id="emdb11a" onclick="showDetail('emdb11a')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb11a-led"></span>EMDB11A</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:82.5%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">495 KW</span></div>
+      </div>
+      <div class="comp c-emdb" id="emdb11b" onclick="showDetail('emdb11b')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb11b-led"></span>EMDB11B</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:66.7%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">400 KW</span></div>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="gen-label">🔋 Emergency Generator (Backup Power)</div>
+    <div style="margin-bottom:4px;font-size:9px;color:var(--green);text-align:center;">
+      ✅ Single GEN: 72.1% — ปลอดภัย (ต่ำกว่า 80%)
+    </div>
+    <div class="comp-pair">
+      <div class="comp c-gen" id="gen3" onclick="showDetail('gen3')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-off" id="gen3-led"></span>GEN3</span><span class="comp-cap">1,500 KVA</span></div>
+        <div class="comp-row2"><span>1,200 KW max</span><span id="gen3-load-txt">Standby</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" id="gen3-bar" style="width:0%"></div></div>
+        <div class="load-pct" id="gen3-pct"><span style="color:var(--dim)">0%</span></div>
+        <div class="gen-info-row"><span class="gen-brand">🏭 MTU</span><span class="gen-pm">🔧 PM: 23 Dec 2024</span></div>
+      </div>
+      <div class="comp c-gen" id="gen4" onclick="showDetail('gen4')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-off" id="gen4-led"></span>GEN4</span><span class="comp-cap">1,500 KVA</span></div>
+        <div class="comp-row2"><span>1,200 KW max</span><span id="gen4-load-txt">Standby</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" id="gen4-bar" style="width:0%"></div></div>
+        <div class="load-pct" id="gen4-pct"><span style="color:var(--dim)">0%</span></div>
+        <div class="gen-info-row"><span class="gen-brand">🏭 Cummins</span><span class="gen-pm">🔧 PM: 26 Nov 2024</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ AREA 13-14 ════ -->
+  <div class="area a1314" id="area1314">
+    <div class="area-header">
+      <span>⚡</span> Area 13-14 (MDB 13-14)
+    </div>
+
+    <div class="pea-block" id="pea1314">
+      <div class="pea-kv">22 kV</div>
+      <div class="pea-lbl">การไฟฟ้าฯ (PEA)</div>
+      <div class="pea-status">
+        <span class="led led-on" id="pea1314-led"></span>
+        <span id="pea1314-txt">จ่ายไฟปกติ</span>
+      </div>
+    </div>
+
+    <div class="section-label">🔄 Transformer (Step Down: 22kV → 400V)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:6px;">
+      <div class="comp c-tr" id="tr3" onclick="showDetail('tr3')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr3-led"></span>TR3</span><span class="comp-cap">1,500 KVA</span></div>
+        <div class="comp-row2"><span>493 KVA</span><span>MDB13A</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:32.9%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">32.9%</span></div>
+      </div>
+      <div class="comp c-tr" id="tr5" onclick="showDetail('tr5')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr5-led"></span>TR5</span><span class="comp-cap">2,000 KVA</span></div>
+        <div class="comp-row2"><span>899 KVA</span><span>MDB14A</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:45%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">45.0%</span></div>
+      </div>
+      <div class="comp c-tr" id="tr4" onclick="showDetail('tr4')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr4-led"></span>TR4</span><span class="comp-cap">1,500 KVA</span></div>
+        <div class="comp-row2"><span>520 KVA</span><span>MDB13B</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:34.7%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">34.7%</span></div>
+      </div>
+      <div class="comp c-tr" id="tr6" onclick="showDetail('tr6')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr6-led"></span>TR6</span><span class="comp-cap">2,000 KVA</span></div>
+        <div class="comp-row2"><span>635 KVA</span><span>MDB14B</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:31.8%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">31.8%</span></div>
+      </div>
+    </div>
+
+    <div class="section-label">🔌 Main Distribution Board (400V)</div>
+    <div class="comp-quad">
+      <div class="comp c-mdb" id="mdb13a" onclick="showDetail('mdb13a')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb13a-led"></span>MDB13A</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:40.8%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">490 KW</span></div>
+      </div>
+      <div class="comp c-mdb" id="mdb14a" onclick="showDetail('mdb14a')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb14a-led"></span>MDB14A</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:52.7%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">843 KW</span></div>
+      </div>
+      <div class="comp c-mdb" id="mdb13b" onclick="showDetail('mdb13b')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb13b-led"></span>MDB13B</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:43.3%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">519 KW</span></div>
+      </div>
+      <div class="comp c-mdb" id="mdb14b" onclick="showDetail('mdb14b')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb14b-led"></span>MDB14B</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:38%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">608 KW</span></div>
+      </div>
+    </div>
+
+    <div class="section-label">🏭 Emergency Distribution Board</div>
+    <div class="comp-quad">
+      <div class="comp c-emdb" id="emdb13a" onclick="showDetail('emdb13a')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb13a-led"></span>EMDB13A</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:80%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">490 KW</span></div>
+      </div>
+      <div class="comp c-emdb" id="emdb14a1" onclick="showDetail('emdb14a1')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb14a1-led"></span>EMDB14A1</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" style="width:65%"></div></div>
+        <div class="load-pct"><span style="color:var(--green)">400 KW</span></div>
+      </div>
+      <div class="comp c-emdb" id="emdb14a2" onclick="showDetail('emdb14a2')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb14a2-led"></span>EMDB14A2</span></div>
+        <div class="load-bar"><div class="load-fill fill-y" style="width:72%"></div></div>
+        <div class="load-pct"><span style="color:var(--yellow)">443 KW</span></div>
+      </div>
+      <div class="comp c-emdb" id="emdb13b" onclick="showDetail('emdb13b')">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb13b-led"></span>EMDB13B</span></div>
+        <div class="load-bar"><div class="load-fill fill-y" style="width:85%"></div></div>
+        <div class="load-pct"><span style="color:var(--yellow)">519 KW</span></div>
+      </div>
+      <div class="comp c-emdb" id="emdb14b" onclick="showDetail('emdb14b')" style="grid-column:span 2;">
+        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb14b-led"></span>EMDB14B</span></div>
+        <div class="load-bar"><div class="load-fill fill-y" style="width:76%"></div></div>
+        <div class="load-pct"><span style="color:var(--yellow)">608 KW</span></div>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="gen-label">🔋 Emergency Generator (Backup Power)</div>
+    <div style="margin-bottom:4px;font-size:9px;color:var(--red);text-align:center;animation:blink .8s infinite;">
+      ⚠ Single GEN: 92.6% — เกิน 80% (ต้องใช้ทั้งสอง GEN)
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;align-items:stretch;">
+      <div class="comp c-gen" id="gen5" onclick="showDetail('gen5')" style="margin-bottom:0;">
+        <div class="comp-head"><span class="comp-id"><span class="led led-off" id="gen5-led"></span>GEN5</span><span class="comp-cap">2,500 KVA</span></div>
+        <div class="comp-row2"><span>2,000 KW max</span><span id="gen5-load-txt">Standby</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" id="gen5-bar" style="width:0%"></div></div>
+        <div class="load-pct" id="gen5-pct"><span style="color:var(--dim)">0%</span></div>
+        <div class="gen-info-row"><span class="gen-brand">🏭 Cummins</span><span class="gen-pm">🔧 PM: 28 Nov 2024</span></div>
+        <div class="alert-badge" style="display:none" id="gen5-alert"><span class="a-dot"></span>Single: 92.6% ⚠</div>
+      </div>
+      <div class="comp c-gen" id="gen6" onclick="showDetail('gen6')" style="margin-bottom:0;">
+        <div class="comp-head"><span class="comp-id"><span class="led led-off" id="gen6-led"></span>GEN6</span><span class="comp-cap">2,500 KVA</span></div>
+        <div class="comp-row2"><span>2,000 KW max</span><span id="gen6-load-txt">Standby</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" id="gen6-bar" style="width:0%"></div></div>
+        <div class="load-pct" id="gen6-pct"><span style="color:var(--dim)">0%</span></div>
+        <div class="gen-info-row"><span class="gen-brand">🏭 Cummins</span><span class="gen-pm">🔧 PM: 30 Nov 2024</span></div>
+      </div>
+      <div class="comp c-gen" id="gen7" onclick="showDetail('gen7')" style="margin-bottom:0;">
+        <div class="comp-head"><span class="comp-id"><span class="led led-off" id="gen7-led"></span>GEN7</span><span class="comp-cap">2,000 KVA</span></div>
+        <div class="comp-row2"><span>1,600 KW max</span><span id="gen7-load-txt">Standby</span></div>
+        <div class="load-bar"><div class="load-fill fill-g" id="gen7-bar" style="width:0%"></div></div>
+        <div class="load-pct" id="gen7-pct"><span style="color:var(--dim)">0%</span></div>
+        <div class="gen-info-row"><span class="gen-brand">🏭 Cummins</span><span class="gen-pm">🔧 PM: 27 Nov 2024</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end sections-grid -->
+</div><!-- end main -->
+
+<!-- ── LEGEND ── -->
+<div class="legend">
+  <div class="l-item"><div class="l-dot" style="background:var(--blue)"></div>สาย 22kV PEA (Normal)</div>
+  <div class="l-item"><div class="l-dot" style="background:var(--teal)"></div>Transformer Output (400V)</div>
+  <div class="l-item"><div class="l-dot" style="background:var(--green)"></div>Distribution (Load &lt;70%)</div>
+  <div class="l-item"><div class="l-dot" style="background:var(--yellow)"></div>Distribution (Load 70-80%)</div>
+  <div class="l-item"><div class="l-dot" style="background:var(--red)"></div>Overload (&gt;80%)</div>
+  <div class="l-item"><div class="l-dot" style="background:var(--orange)"></div>Generator (Emergency)</div>
+  <div class="l-item" style="margin-left:auto;font-size:9px;color:var(--dim)">
+    แหล่งข้อมูล: ไฟล์ Excel — การทำงาน Transformer and Generator.xlsx
+  </div>
+</div>
+
+<!-- ── DETAIL PANEL ── -->
+<div class="detail" id="detailPanel">
+  <span class="detail-close" onclick="closeDetail()">✕</span>
+  <div class="detail-title" id="detailTitle">—</div>
+  <div id="detailBody"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════════
+const DB = {
+  tr7:  {name:'TR7',  type:'tr',  kva:2000, kw:1600, usedKva:761,  usedKw:697,  pct:38.1, area:'12'},
+  tr8:  {name:'TR8',  type:'tr',  kva:2000, kw:1600, usedKva:825,  usedKw:761,  pct:41.3, area:'12'},
+  tr1:  {name:'TR1',  type:'tr',  kva:1500, kw:1200, usedKva:463,  usedKw:463,  pct:30.9, area:'11'},
+  tr2:  {name:'TR2',  type:'tr',  kva:1500, kw:1200, usedKva:400,  usedKw:400,  pct:26.7, area:'11'},
+  tr3:  {name:'TR3',  type:'tr',  kva:1500, kw:1200, usedKva:493,  usedKw:490,  pct:32.9, area:'1314'},
+  tr5:  {name:'TR5',  type:'tr',  kva:2000, kw:1600, usedKva:899,  usedKw:843,  pct:45.0, area:'1314'},
+  tr4:  {name:'TR4',  type:'tr',  kva:1500, kw:1200, usedKva:520,  usedKw:519,  pct:34.7, area:'1314'},
+  tr6:  {name:'TR6',  type:'tr',  kva:2000, kw:1600, usedKva:635,  usedKw:608,  pct:31.8, area:'1314'},
+  mdb12a:{name:'MDB12A',type:'mdb',kw:697,  area:'12'},
+  mdb12b:{name:'MDB12B',type:'mdb',kw:761,  area:'12'},
+  mdb11a:{name:'MDB11A',type:'mdb',kw:463,  area:'11'},
+  mdb11b:{name:'MDB11B',type:'mdb',kw:400,  area:'11'},
+  mdb13a:{name:'MDB13A',type:'mdb',kw:490,  area:'1314'},
+  mdb14a:{name:'MDB14A',type:'mdb',kw:843,  area:'1314'},
+  mdb13b:{name:'MDB13B',type:'mdb',kw:519,  area:'1314'},
+  mdb14b:{name:'MDB14B',type:'mdb',kw:608,  area:'1314'},
+  emdb12a1:{name:'EMDB12A1',type:'emdb',kw:297, area:'12'},
+  emdb12a2:{name:'EMDB12A2',type:'emdb',kw:400, area:'12'},
+  emdb12b1:{name:'EMDB12B1',type:'emdb',kw:186, area:'12'},
+  emdb12b2:{name:'EMDB12B2',type:'emdb',kw:575, area:'12'},
+  emdb11a: {name:'EMDB11A', type:'emdb',kw:495, area:'11'},
+  emdb11b: {name:'EMDB11B', type:'emdb',kw:400, area:'11'},
+  emdb13a: {name:'EMDB13A', type:'emdb',kw:490, area:'1314'},
+  emdb14a1:{name:'EMDB14A1',type:'emdb',kw:400, area:'1314'},
+  emdb14a2:{name:'EMDB14A2',type:'emdb',kw:443, area:'1314'},
+  emdb13b: {name:'EMDB13B', type:'emdb',kw:519, area:'1314'},
+  emdb14b: {name:'EMDB14B', type:'emdb',kw:608, area:'1314'},
+  gen1:{name:'GEN1',type:'gen',kva:2000,kw:1600,actual:697,  pct:43.6,singlePct:91.1,brand:'Cummins',lastPM:'26 Nov 2024',covers:['emdb12a1','emdb12a2']},
+  gen2:{name:'GEN2',type:'gen',kva:2000,kw:1600,actual:761,  pct:47.6,singlePct:null, brand:'Cummins',lastPM:'02 Mar 2025',covers:['emdb12b1','emdb12b2']},
+  gen3:{name:'GEN3',type:'gen',kva:1500,kw:1200,actual:495,  pct:41.3,singlePct:72.1, brand:'MTU',    lastPM:'23 Dec 2024',covers:['emdb11a']},
+  gen4:{name:'GEN4',type:'gen',kva:1500,kw:1200,actual:370,  pct:30.8,singlePct:null, brand:'Cummins',lastPM:'26 Nov 2024',covers:['emdb11b']},
+  gen5:{name:'GEN5',type:'gen',kva:2500,kw:2000,actual:890,  pct:44.5,singlePct:92.6, brand:'Cummins',lastPM:'28 Nov 2024',covers:['emdb13a','emdb14a1']},
+  gen6:{name:'GEN6',type:'gen',kva:2500,kw:2000,actual:962,  pct:48.1,singlePct:null, brand:'Cummins',lastPM:'30 Nov 2024',covers:['emdb14a2','emdb13b']},
+  gen7:{name:'GEN7',type:'gen',kva:2000,kw:1600,actual:636,  pct:39.8,singlePct:39.8, brand:'Cummins',lastPM:'27 Nov 2024',covers:['emdb14b']},
+};
+
+// ══════════════════════════════════════════════════
+//  CONNECTIONS (normal mode: PEA → TR → MDB → EMDB)
+// ══════════════════════════════════════════════════
+const CONNECTIONS_NORMAL = [
+  // Area 12
+  {f:'pea12',t:'tr7',   col:'#40c4ff',w:2.5,n:4},
+  {f:'pea12',t:'tr8',   col:'#40c4ff',w:2.5,n:4},
+  {f:'tr7',  t:'mdb12a',col:'#1de9b6',w:2,n:3},
+  {f:'tr8',  t:'mdb12b',col:'#1de9b6',w:2,n:3},
+  {f:'mdb12a',t:'emdb12a1',col:'#00e676',w:1.5,n:2},
+  {f:'mdb12a',t:'emdb12a2',col:'#00e676',w:1.5,n:2},
+  {f:'mdb12b',t:'emdb12b1',col:'#00e676',w:1.5,n:2},
+  {f:'mdb12b',t:'emdb12b2',col:'#00e676',w:1.5,n:2},
+  // Area 11
+  {f:'pea11',t:'tr1',   col:'#40c4ff',w:2.5,n:4},
+  {f:'pea11',t:'tr2',   col:'#40c4ff',w:2.5,n:4},
+  {f:'tr1',  t:'mdb11a',col:'#1de9b6',w:2,n:3},
+  {f:'tr2',  t:'mdb11b',col:'#1de9b6',w:2,n:3},
+  {f:'mdb11a',t:'emdb11a',col:'#00e676',w:1.5,n:2},
+  {f:'mdb11b',t:'emdb11b',col:'#00e676',w:1.5,n:2},
+  // Area 13-14
+  {f:'pea1314',t:'tr3', col:'#40c4ff',w:2.5,n:4},
+  {f:'pea1314',t:'tr5', col:'#40c4ff',w:2.5,n:4},
+  {f:'pea1314',t:'tr4', col:'#40c4ff',w:2.5,n:4},
+  {f:'pea1314',t:'tr6', col:'#40c4ff',w:2.5,n:4},
+  {f:'tr3',t:'mdb13a',  col:'#1de9b6',w:2,n:3},
+  {f:'tr5',t:'mdb14a',  col:'#1de9b6',w:2,n:3},
+  {f:'tr4',t:'mdb13b',  col:'#1de9b6',w:2,n:3},
+  {f:'tr6',t:'mdb14b',  col:'#1de9b6',w:2,n:3},
+  {f:'mdb13a',t:'emdb13a', col:'#00e676',w:1.5,n:2},
+  {f:'mdb14a',t:'emdb14a1',col:'#00e676',w:1.5,n:2},
+  {f:'mdb14a',t:'emdb14a2',col:'#00e676',w:1.5,n:2},
+  {f:'mdb13b',t:'emdb13b', col:'#00e676',w:1.5,n:2},
+  {f:'mdb14b',t:'emdb14b', col:'#00e676',w:1.5,n:2},
+];
+
+const CONNECTIONS_EMERG = [
+  {f:'gen1',t:'emdb12a1',col:'#ff9800',w:2.5,n:4},
+  {f:'gen1',t:'emdb12a2',col:'#ff9800',w:2.5,n:4},
+  {f:'gen2',t:'emdb12b1',col:'#ff9800',w:2.5,n:4},
+  {f:'gen2',t:'emdb12b2',col:'#ff9800',w:2.5,n:4},
+  {f:'gen3',t:'emdb11a', col:'#ff9800',w:2.5,n:4},
+  {f:'gen4',t:'emdb11b', col:'#ff9800',w:2.5,n:4},
+  {f:'gen5',t:'emdb13a', col:'#ff9800',w:2.5,n:4},
+  {f:'gen5',t:'emdb14a1',col:'#ff9800',w:2.5,n:4},
+  {f:'gen6',t:'emdb14a2',col:'#ff9800',w:2.5,n:4},
+  {f:'gen6',t:'emdb13b', col:'#ff9800',w:2.5,n:4},
+  {f:'gen7',t:'emdb14b', col:'#ff9800',w:2.5,n:4},
+];
+
+// ══════════════════════════════════════════════════
+//  CANVAS PARTICLE ANIMATION
+// ══════════════════════════════════════════════════
+const canvas = document.getElementById('flowCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let animFrame;
+let currentMode = 'normal';
+
+function resize() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+function getCenter(id, side) {
+  const el = document.getElementById(id);
+  if (!el) return null;
+  const r = el.getBoundingClientRect();
+  if (side === 'bottom') return {x: r.left + r.width/2, y: r.bottom};
+  if (side === 'top')    return {x: r.left + r.width/2, y: r.top};
+  if (side === 'left')   return {x: r.left,              y: r.top + r.height/2};
+  if (side === 'right')  return {x: r.right,             y: r.top + r.height/2};
+  return {x: r.left + r.width/2, y: r.top + r.height/2};
+}
+
+function bezierPath(from, to, steps) {
+  const pts = [];
+  const dy = to.y - from.y;
+  const isUpward = dy < 0;
+  const cx1x = from.x, cy1 = from.y + (isUpward ? dy*0.4 : dy*0.4);
+  const cx2x = to.x,   cy2 = from.y + (isUpward ? dy*0.6 : dy*0.6);
+  for (let i = 0; i <= steps; i++) {
+    const t = i/steps, u = 1-t;
+    pts.push({
+      x: u*u*u*from.x + 3*u*u*t*cx1x + 3*u*t*t*cx2x + t*t*t*to.x,
+      y: u*u*u*from.y + 3*u*u*t*cy1  + 3*u*t*t*cy2  + t*t*t*to.y
+    });
+  }
+  return pts;
+}
+
+// ── Per-frame path cache ── cleared each frame so particles track live DOM positions
+const _pathCache = {};
+
+function getPath(fromId, toId) {
+  const key = fromId + '|' + toId;
+  if (_pathCache[key]) return _pathCache[key];
+  const fEl = document.getElementById(fromId);
+  const tEl = document.getElementById(toId);
+  if (!fEl || !tEl) return null;
+  const fr = fEl.getBoundingClientRect();
+  const tr = tEl.getBoundingClientRect();
+  const from = {x: fr.left + fr.width/2, y: fr.bottom};
+  const to   = {x: tr.left + tr.width/2, y: tr.top};
+  _pathCache[key] = bezierPath(from, to, 24);
+  return _pathCache[key];
+}
+
+class Particle {
+  constructor(fromId, toId, color, speed, offset) {
+    this.fromId = fromId;   // store element IDs — NOT a pre-baked path
+    this.toId   = toId;
+    this.color  = color;
+    this.speed  = speed;
+    this.t      = offset;
+    this.size   = 2.5 + Math.random() * 0.8;
+    this.alpha  = 0.72 + Math.random() * 0.28;
+  }
+  update() {
+    this.t += this.speed;
+    if (this.t > 1) this.t = 0;
+  }
+  draw() {
+    // Fetch LIVE path from cache each frame → follows elements during scroll/resize
+    const path = getPath(this.fromId, this.toId);
+    if (!path || path.length < 2) return;
+    const n   = path.length - 1;
+    const idx = Math.min(Math.floor(this.t * n), n - 1);
+    const seg = this.t * n - idx;
+    const a   = path[idx], b = path[idx + 1] || a;
+    const px  = a.x + (b.x - a.x) * seg;
+    const py  = a.y + (b.y - a.y) * seg;
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    ctx.beginPath();
+    ctx.arc(px, py, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = this.color;
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function buildParticles(connections) {
+  particles = [];
+  connections.forEach(c => {
+    for (let i = 0; i < c.n; i++) {
+      // Spread particles evenly; store IDs not paths
+      particles.push(new Particle(c.f, c.t, c.col, 0.007 + Math.random()*0.005, i / c.n));
+    }
+  });
+}
+
+function drawStaticLine(path, color, width) {
+  if (!path || path.length < 2) return;
+  ctx.beginPath();
+  ctx.moveTo(path[0].x, path[0].y);
+  for (let i = 1; i < path.length; i++) ctx.lineTo(path[i].x, path[i].y);
+  ctx.strokeStyle = color + '35';
+  ctx.lineWidth = width;
+  ctx.setLineDash([7, 5]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+let lastTime = 0;
+function animate(ts) {
+  animFrame = requestAnimationFrame(animate);
+  if (ts - lastTime < 16) return;
+  lastTime = ts;
+
+  // Flush cache → next getPath() calls will measure real DOM positions
+  Object.keys(_pathCache).forEach(k => delete _pathCache[k]);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const activeConns = (currentMode === 'emergency' || currentMode === 'fault')
+                      ? CONNECTIONS_EMERG : CONNECTIONS_NORMAL;
+
+  // Draw static dashed lines — getPath() fills the cache
+  activeConns.forEach(c => drawStaticLine(getPath(c.f, c.t), c.col, c.w));
+
+  // Particles call getPath() which hits the now-warm cache
+  particles.forEach(p => { p.update(); p.draw(); });
+}
+
+function startAnimation(mode) {
+  if (animFrame) cancelAnimationFrame(animFrame);
+  currentMode = mode;
+  const activeConns = mode === 'emergency' || mode === 'fault' ? CONNECTIONS_EMERG : CONNECTIONS_NORMAL;
+  setTimeout(() => { buildParticles(activeConns); animate(0); }, 100);
+}
+
+// ══════════════════════════════════════════════════
+//  MODE SWITCHING
+// ══════════════════════════════════════════════════
+function setMode(m) {
+  currentMode = m;
+  document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+
+  const peaIds = ['pea12','pea11','pea1314'];
+  const trIds  = ['tr7','tr8','tr1','tr2','tr3','tr5','tr4','tr6'];
+  const mdbIds = ['mdb12a','mdb12b','mdb11a','mdb11b','mdb13a','mdb14a','mdb13b','mdb14b'];
+  const genIds = ['gen1','gen2','gen3','gen4','gen5','gen6','gen7'];
+  const allComponents = [...trIds, ...mdbIds,
+    'emdb12a1','emdb12a2','emdb12b1','emdb12b2','emdb11a','emdb11b',
+    'emdb13a','emdb14a1','emdb14a2','emdb13b','emdb14b'];
+
+  document.getElementById('faultFlash').classList.remove('show');
+
+  if (m === 'normal') {
+    document.getElementById('btnNormal').classList.add('active');
+    document.getElementById('statMode').textContent = 'NORMAL';
+    document.getElementById('statMode').className = 'stat-val s-blue';
+    document.getElementById('statModeSub').textContent = 'PEA 22kV Active';
+    document.getElementById('alertStrip').classList.remove('show');
+
+    peaIds.forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.remove('pea-fault');
+      document.getElementById(id+'-led').className = 'led led-on';
+      document.getElementById(id+'-txt').textContent = 'จ่ายไฟปกติ';
+    });
+    trIds.forEach(id => {
+      document.getElementById(id+'-led').className = 'led led-on';
+    });
+    mdbIds.forEach(id => {
+      document.getElementById(id+'-led').className = 'led led-on';
+    });
+    // GEN off
+    setGenState(genIds, false);
+    // Stop generator internal simulation
+    if(window.gsControl) window.gsControl('stop');
+    // EMDBs on
+    ['emdb12a1','emdb12a2','emdb12b1','emdb12b2','emdb11a','emdb11b',
+     'emdb13a','emdb14a1','emdb14a2','emdb13b','emdb14b'].forEach(id => {
+      document.getElementById(id+'-led').className = 'led led-on';
+    });
+
+  } else if (m === 'emergency') {
+    document.getElementById('btnEmerg').classList.add('active');
+    document.getElementById('statMode').textContent = 'GENERATOR';
+    document.getElementById('statMode').className = 'stat-val s-orange';
+    document.getElementById('statModeSub').textContent = 'All 7 GENs Running';
+    document.getElementById('alertStrip').classList.add('show');
+
+    // PEA stays connected but GEN takes over emergency loads
+    peaIds.forEach(id => {
+      document.getElementById(id+'-led').className = 'led led-on';
+      document.getElementById(id+'-txt').textContent = 'จ่ายไฟปกติ';
+    });
+    trIds.forEach(id => { document.getElementById(id+'-led').className = 'led led-on'; });
+    mdbIds.forEach(id => { document.getElementById(id+'-led').className = 'led led-on'; });
+
+    // GEN running
+    setGenState(genIds, true);
+    // Start generator internal simulation
+    if(window.gsControl) window.gsControl('start');
+
+    // Show alerts
+    document.getElementById('gen1-alert').style.display = 'inline-flex';
+    document.getElementById('gen5-alert').style.display = 'inline-flex';
+
+  } else if (m === 'fault') {
+    document.getElementById('btnFault').classList.add('active');
+    document.getElementById('statMode').textContent = 'ไฟดับ!';
+    document.getElementById('statMode').className = 'stat-val s-red';
+    document.getElementById('statModeSub').textContent = 'PEA ขัดข้อง — GEN Backup';
+    document.getElementById('alertStrip').classList.add('show');
+    document.getElementById('alertMsg').textContent = '⚡ PEA Power Failure! Emergency Generators activated. Area 12 (91.1%) & Area 13-14 (92.6%) at critical load on single GEN!';
+    document.getElementById('faultFlash').classList.add('show');
+
+    // PEA fault
+    peaIds.forEach(id => {
+      document.getElementById(id).classList.add('pea-fault');
+      document.getElementById(id+'-led').className = 'led led-fault';
+      document.getElementById(id+'-txt').textContent = 'ขัดข้อง! (FAULT)';
+    });
+    // TR off
+    trIds.forEach(id => { document.getElementById(id+'-led').className = 'led led-off'; });
+    mdbIds.forEach(id => { document.getElementById(id+'-led').className = 'led led-off'; });
+
+    // GEN running
+    setGenState(genIds, true);
+    // Start generator internal simulation
+    if(window.gsControl) window.gsControl('start');
+    document.getElementById('gen1-alert').style.display = 'inline-flex';
+    document.getElementById('gen5-alert').style.display = 'inline-flex';
+  }
+
+  startAnimation(m);
+}
+
+function setGenState(ids, running) {
+  const data = {
+    gen1:{pct:43.6,kw:697}, gen2:{pct:47.6,kw:761},
+    gen3:{pct:41.3,kw:495}, gen4:{pct:30.8,kw:370},
+    gen5:{pct:44.5,kw:890}, gen6:{pct:48.1,kw:962},
+    gen7:{pct:39.8,kw:636}
+  };
+  ids.forEach(id => {
+    const d = data[id];
+    const led = document.getElementById(id+'-led');
+    const bar = document.getElementById(id+'-bar');
+    const pct = document.getElementById(id+'-pct');
+    const ltx = document.getElementById(id+'-load-txt');
+    const comp= document.getElementById(id);
+
+    if (!document.getElementById(id+'-alert') || id === 'gen3' || id === 'gen4' || id === 'gen7') {
+      // Hide alert for safe ones
+    } else {
+      // keep existing
+    }
+
+    if (running) {
+      led.className = 'led led-gen';
+      comp.classList.add('running');
+      bar.style.width = d.pct + '%';
+      const c = d.pct >= 80 ? 'var(--red)' : d.pct >= 70 ? 'var(--yellow)' : 'var(--green)';
+      pct.innerHTML = `<span style="color:${c}">${d.pct}%</span>`;
+      ltx.innerHTML = `<span class="spin">⚙</span> ${d.kw} KW`;
+      bar.className = 'load-fill ' + (d.pct>=80?'fill-r':d.pct>=70?'fill-y':'fill-g');
+    } else {
+      led.className = 'led led-off';
+      comp.classList.remove('running');
+      bar.style.width = '0%';
+      pct.innerHTML = `<span style="color:var(--dim)">0%</span>`;
+      ltx.textContent = 'Standby';
+      bar.className = 'load-fill fill-g';
+      // Hide alerts when not running
+      const alertEl = document.getElementById(id+'-alert');
+      if (alertEl) alertEl.style.display = 'none';
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════
+//  DETAIL PANEL
+// ══════════════════════════════════════════════════
+function showDetail(id) {
+  const d = DB[id];
+  if (!d) return;
+  const panel = document.getElementById('detailPanel');
+  const title = document.getElementById('detailTitle');
+  const body  = document.getElementById('detailBody');
+
+  title.textContent = d.name + ' — ' + {tr:'Transformer',mdb:'Main DB',emdb:'Emergency DB',gen:'Generator'}[d.type];
+
+  let html = '';
+  if (d.type === 'tr') {
+    const c = d.pct>=80?'#ff5252':d.pct>=70?'#ffd740':'#00e676';
+    html = `
+      <div class="d-row"><span class="d-key">Area</span><span class="d-val">${d.area === '1314' ? '13-14' : d.area}</span></div>
+      <div class="d-row"><span class="d-key">ความจุ</span><span class="d-val">${d.kva.toLocaleString()} KVA</span></div>
+      <div class="d-row"><span class="d-key">Max Power</span><span class="d-val">${d.kw.toLocaleString()} KW</span></div>
+      <div class="d-row"><span class="d-key">Used (KVA)</span><span class="d-val">${d.usedKva.toLocaleString()} KVA</span></div>
+      <div class="d-row"><span class="d-key">MDB Load</span><span class="d-val">${d.usedKw.toLocaleString()} KW</span></div>
+      <div class="d-row"><span class="d-key">แรงดัน</span><span class="d-val">22kV → 400V/230V</span></div>
+      <div class="d-row" style="border:none"><span class="d-key">%Load</span><span class="d-val" style="color:${c}">${d.pct}%</span></div>
+      <div class="detail-bar"><div class="detail-fill" style="width:${d.pct}%;background:${c}"></div></div>
+    `;
+  } else if (d.type === 'mdb') {
+    html = `
+      <div class="d-row"><span class="d-key">Area</span><span class="d-val">${d.area === '1314' ? '13-14' : d.area}</span></div>
+      <div class="d-row"><span class="d-key">Load</span><span class="d-val">${d.kw.toLocaleString()} KW</span></div>
+      <div class="d-row"><span class="d-key">ประเภท</span><span class="d-val">Main Distribution Board</span></div>
+      <div class="d-row" style="border:none"><span class="d-key">แรงดัน</span><span class="d-val">400V / 3Ph</span></div>
+    `;
+  } else if (d.type === 'emdb') {
+    html = `
+      <div class="d-row"><span class="d-key">Area</span><span class="d-val">${d.area === '1314' ? '13-14' : d.area}</span></div>
+      <div class="d-row"><span class="d-key">Load</span><span class="d-val">${d.kw.toLocaleString()} KW</span></div>
+      <div class="d-row"><span class="d-key">ประเภท</span><span class="d-val">Emergency Distribution Board</span></div>
+      <div class="d-row" style="border:none"><span class="d-key">Power Source</span><span class="d-val">${currentMode==='normal'?'PEA (Normal)':'Generator (Emergency)'}</span></div>
+    `;
+  } else if (d.type === 'gen') {
+    const c = d.pct>=80?'#ff5252':d.pct>=70?'#ffd740':'#00e676';
+    const sp = d.singlePct ? `<div class="d-row"><span class="d-key">Single GEN %</span>
+      <span class="d-val" style="color:${d.singlePct>=80?'#ff5252':'#00e676'}">${d.singlePct}% ${d.singlePct>=80?'⚠️':''}</span></div>` : '';
+    const covers = d.covers.map(x => DB[x]?.name||x).join(', ');
+    html = `
+      <div class="d-row"><span class="d-key">🏭 Brand</span><span class="d-val" style="color:var(--orange)">${d.brand}</span></div>
+      <div class="d-row"><span class="d-key">🔧 Last PM</span><span class="d-val" style="color:var(--yellow)">${d.lastPM}</span></div>
+      <div class="d-row"><span class="d-key">ความจุ</span><span class="d-val">${d.kva.toLocaleString()} KVA</span></div>
+      <div class="d-row"><span class="d-key">Max Power</span><span class="d-val">${d.kw.toLocaleString()} KW</span></div>
+      <div class="d-row"><span class="d-key">Actual Load</span><span class="d-val">${d.actual.toLocaleString()} KW</span></div>
+      <div class="d-row"><span class="d-key">%Gen Load</span><span class="d-val" style="color:${c}">${d.pct}%</span></div>
+      ${sp}
+      <div class="d-row" style="border:none"><span class="d-key">Covers</span><span class="d-val" style="font-size:10px">${covers}</span></div>
+      <div class="detail-bar"><div class="detail-fill" style="width:${d.pct}%;background:${c}"></div></div>
+      <div style="font-size:9px;opacity:.6;margin-top:3px">Type: Diesel Generator / 400V / 3Ph 50Hz</div>
+    `;
+  }
+
+  body.innerHTML = html;
+  panel.classList.add('show');
+}
+function closeDetail() { document.getElementById('detailPanel').classList.remove('show'); }
+
+// ══════════════════════════════════════════════════
+//  CLOCK
+// ══════════════════════════════════════════════════
+function tick() {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const ss = String(now.getSeconds()).padStart(2,'0');
+  const dd = now.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('clock').textContent = `${dd}  ${hh}:${mm}:${ss}`;
+}
+setInterval(tick, 1000);
+tick();
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  startAnimation('normal');
+});
+
+window.addEventListener('scroll', () => {
+  // Canvas redraws on next frame, positions auto-update
+});
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!--  GENERATOR INTERNAL SYSTEM SIMULATION                               -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="genSimSection" style="background:#07101f;border-top:2px solid #1a3050;padding:0 18px 24px;margin-top:4px;">
+
+  <!-- Header -->
+  <div class="gs-header" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0 10px;flex-wrap:wrap;gap:10px;">
+    <div>
+      <div style="font-size:15px;font-weight:700;color:#ddeeff;">⚙️ Generator Internal System Simulation</div>
+      <div class="gs-subtext" style="font-size:10px;color:#445566;margin-top:2px;">Engine → Fuel → Cooling → Lubrication → Exhaust → Alternator → AVR → Controller → Output</div>
+    </div>
+    <div class="gs-controls" style="display:flex;gap:8px;align-items:center;">
+      <div id="gsStatus" style="font-size:11px;padding:4px 12px;border-radius:4px;background:rgba(80,80,80,.15);border:1px solid #333;color:#888;">● STANDBY</div>
+      <button id="gsStart" onclick="gsControl('start')" style="padding:6px 18px;border-radius:5px;border:1.5px solid #00e676;background:transparent;color:#00e676;cursor:pointer;font-size:11px;font-weight:700;">▶ START</button>
+      <button id="gsStop"  onclick="gsControl('stop')"  disabled style="padding:6px 18px;border-radius:5px;border:1.5px solid #333;background:transparent;color:#333;cursor:not-allowed;font-size:11px;font-weight:700;">■ STOP</button>
+    </div>
+  </div>
+
+  <!-- Main layout: canvas + panel -->
+  <div class="gs-grid" style="display:grid;grid-template-columns:1fr 270px;gap:12px;align-items:start;">
+
+    <!-- Canvas diagram -->
+    <div style="background:#060d1f;border:1px solid #1a3050;border-radius:10px;overflow:hidden;position:relative;">
+      <canvas id="gsCanvas" style="display:block;width:100%;height:auto;min-height:200px;"></canvas>
+    </div>
+
+    <!-- Controller Panel -->
+    <div style="background:#060d1f;border:1px solid #1a3050;border-radius:10px;padding:14px;">
+      <div style="font-size:11px;font-weight:700;color:#ff9800;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #1a2a3a;">🖥 Controller — Deep Sea Electronics (DSE)</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+        <div style="background:#0a1525;border:1px solid #1a2a3a;border-radius:6px;padding:8px;text-align:center;">
+          <div style="font-size:8px;color:#445;text-transform:uppercase;letter-spacing:1px;">Voltage</div>
+          <div id="gsV" style="font-size:22px;font-weight:900;color:#40c4ff;font-family:monospace;line-height:1.2;">0</div>
+          <div style="font-size:8px;color:#445;">V (L-N)</div>
+        </div>
+        <div style="background:#0a1525;border:1px solid #1a2a3a;border-radius:6px;padding:8px;text-align:center;">
+          <div style="font-size:8px;color:#445;text-transform:uppercase;letter-spacing:1px;">Frequency</div>
+          <div id="gsHz" style="font-size:22px;font-weight:900;color:#1de9b6;font-family:monospace;line-height:1.2;">0.0</div>
+          <div style="font-size:8px;color:#445;">Hz</div>
+        </div>
+        <div style="background:#0a1525;border:1px solid #1a2a3a;border-radius:6px;padding:8px;text-align:center;">
+          <div style="font-size:8px;color:#445;text-transform:uppercase;letter-spacing:1px;">Current</div>
+          <div id="gsA" style="font-size:22px;font-weight:900;color:#00e676;font-family:monospace;line-height:1.2;">0</div>
+          <div style="font-size:8px;color:#445;">Amp</div>
+        </div>
+        <div style="background:#0a1525;border:1px solid #1a2a3a;border-radius:6px;padding:8px;text-align:center;">
+          <div style="font-size:8px;color:#445;text-transform:uppercase;letter-spacing:1px;">Engine RPM</div>
+          <div id="gsRpm" style="font-size:22px;font-weight:900;color:#ffd740;font-family:monospace;line-height:1.2;">0</div>
+          <div style="font-size:8px;color:#445;">RPM</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+        <div style="background:#0a1525;border:1px solid #1a2a3a;border-radius:6px;padding:7px;text-align:center;">
+          <div style="font-size:8px;color:#445;text-transform:uppercase;">Coolant Temp</div>
+          <div id="gsTemp" style="font-size:17px;font-weight:900;color:#ff9800;font-family:monospace;">30°C</div>
+        </div>
+        <div style="background:#0a1525;border:1px solid #1a2a3a;border-radius:6px;padding:7px;text-align:center;">
+          <div style="font-size:8px;color:#445;text-transform:uppercase;">Oil Pressure</div>
+          <div id="gsOil" style="font-size:17px;font-weight:900;color:#ce93d8;font-family:monospace;">0 PSI</div>
+        </div>
+      </div>
+
+      <!-- Fuel gauge -->
+      <div style="background:#0a1525;border:1px solid #1a2a3a;border-radius:6px;padding:8px;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:4px;">
+          <span style="color:#445;text-transform:uppercase;letter-spacing:1px;">⛽ Fuel Level</span>
+          <span id="gsFuelPct" style="color:#ffd740;font-weight:700;">75%</span>
+        </div>
+        <div style="height:7px;background:#1a2a3a;border-radius:4px;overflow:hidden;">
+          <div id="gsFuelBar" style="height:100%;width:75%;background:linear-gradient(90deg,#e65100,#ff9800);border-radius:4px;transition:width .5s;"></div>
+        </div>
+      </div>
+
+      <!-- System status -->
+      <div style="font-size:8px;text-transform:uppercase;letter-spacing:1px;color:#445;margin-bottom:5px;">System Status</div>
+      <div style="display:flex;flex-direction:column;gap:3px;font-size:10px;">
+        <div style="display:flex;justify-content:space-between;"><span>🔧 Engine</span><span id="stEng" style="color:#445">● OFF</span></div>
+        <div style="display:flex;justify-content:space-between;"><span>⚡ Alternator</span><span id="stAlt" style="color:#445">● OFF</span></div>
+        <div style="display:flex;justify-content:space-between;"><span>💧 Cooling</span><span id="stCool" style="color:#445">● OFF</span></div>
+        <div style="display:flex;justify-content:space-between;"><span>🛢 Lubrication</span><span id="stLub" style="color:#445">● OFF</span></div>
+        <div style="display:flex;justify-content:space-between;"><span>🔌 Circuit Breaker</span><span id="stCB" style="color:#f55">● OPEN</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div style="display:flex;gap:14px;padding:8px 0 0;flex-wrap:wrap;font-size:9px;">
+    <span style="color:#ff9800">⬤ Fuel</span>
+    <span style="color:#40c4ff">⬤ Coolant</span>
+    <span style="color:#999">⬤ Exhaust Gas</span>
+    <span style="color:#c8a060">⬤ Lube Oil</span>
+    <span style="color:#ffd740">⬤ Electrical</span>
+    <span style="color:#e040fb">⬤ Control Signal</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  const C = document.getElementById('gsCanvas');
+  let ctx, W, H;
+  let running = false;
+  let ang = 0;
+  let rpm = 0, tRpm = 0;
+  let volt = 0, hz = 0, amp = 0;
+  let coolT = 30, oilP = 0, fuel = 75;
+  let pts = []; // particles
+  let afId = null;
+
+  function init(){
+    ctx = C.getContext('2d');
+    resize();
+    window.addEventListener('resize', resize);
+    requestAnimationFrame(frame);
+  }
+
+  function resize(){
+    W = C.offsetWidth || 800;
+    H = W < 360 ? 200 : W < 480 ? 240 : W < 600 ? 270 : W < 768 ? 320 : 440;
+    C.width = W; C.height = H;
+    C.style.height = H + 'px';
+  }
+
+  // Layout: scale to canvas width
+  function L(){
+    const s = Math.min(W/1110, 1.0);
+    const ox = (W - 1110*s)/2;
+    return {s, ox,
+      tank:   {x:ox+20*s,  y:105, w:70*s, h:160},
+      pump:   {x:ox+115*s, y:165, w:48*s, h:48},
+      filter: {x:ox+195*s, y:165, w:42*s, h:48},
+      eng:    {x:ox+278*s, y:80,  w:215*s,h:195},
+      alt:    {x:ox+540*s, y:90,  w:165*s,h:165},
+      avr:    {x:ox+740*s, y:130, w:58*s, h:85},
+      ctrl:   {x:ox+828*s, y:90,  w:155*s,h:165},
+      cb:     {x:ox+1010*s,y:158, w:44*s, h:58},
+      out:    {x:ox+1058*s,y:158, w:42*s, h:58},
+      rad:    {x:ox+20*s,  y:310, w:72*s, h:110},
+      sump:   {x:ox+278*s, y:308, w:215*s,h:62},
+      sil:    {x:ox+450*s, y:28,  w:88*s, h:42},
+    };
+  }
+
+  // ── FRAME ──────────────────────────────────────
+  function frame(ts){
+    afId = requestAnimationFrame(frame);
+    if(!ctx) return;
+
+    // Physics
+    if(running){
+      rpm += (tRpm - rpm)*0.018;
+      ang += rpm/1600*0.38;
+      volt = Math.min(230, volt + (230-volt)*0.012);
+      hz   = Math.min(50,  hz  + (50-hz)*0.012);
+      amp  = 145 + 20*Math.sin(ts/2800);
+      coolT= Math.min(82, coolT + 0.04);
+      oilP = Math.min(55, oilP  + 0.7);
+      fuel = Math.max(0,  fuel  - 0.0004);
+    } else {
+      rpm  *= 0.975; ang += rpm/1600*0.38;
+      volt *= 0.985; hz  *= 0.985; amp *= 0.985;
+      coolT= Math.max(30, coolT - 0.08);
+      oilP *= 0.97;
+    }
+
+    updatePanel();
+
+    ctx.fillStyle = '#060d1f';
+    ctx.fillRect(0,0,W,H);
+
+    const l = L();
+    drawPipes(l);
+    drawParticles(l);
+    drawFuelTank(l);
+    drawPump(l);
+    drawFilter(l);
+    drawEngine(l);
+    drawShaft(l);
+    drawAlternator(l);
+    drawAVR(l);
+    drawController(l);
+    drawCB(l);
+    drawOutput(l);
+    drawRadiator(l);
+    drawSump(l);
+    drawExhaust(l);
+
+    if(running && rpm > 80) spawnPts(l);
+  }
+
+  // ── HELPERS ────────────────────────────────────
+  function rr(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+    ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r);
+    ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h);
+    ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r);
+    ctx.quadraticCurveTo(x,y,x+r,y);
+    ctx.closePath();
+  }
+
+  function box(x,y,w,h,bg,stroke,lbl,sub){
+    ctx.save();
+    ctx.shadowBlur=10; ctx.shadowColor=stroke;
+    ctx.fillStyle=bg; rr(x,y,w,h,6); ctx.fill();
+    ctx.strokeStyle=stroke; ctx.lineWidth=1.5; rr(x,y,w,h,6); ctx.stroke();
+    ctx.shadowBlur=0;
+    if(lbl){ctx.font=`bold ${Math.max(8,w*.095)}px Segoe UI`;ctx.fillStyle=stroke;ctx.textAlign='center';ctx.fillText(lbl,x+w/2,y+h-(sub?18:8));}
+    if(sub){ctx.font=`${Math.max(7,w*.08)}px Segoe UI`;ctx.fillStyle='rgba(255,255,255,.45)';ctx.textAlign='center';ctx.fillText(sub,x+w/2,y+h-5);}
+    ctx.restore();
+  }
+
+  // ── COMPONENTS ─────────────────────────────────
+  function drawFuelTank(l){
+    const f=l.tank;
+    box(f.x,f.y,f.w,f.h,'rgba(28,12,0,.95)','#e65100','FUEL','TANK');
+    // fuel fill
+    const fh = (f.h-16)*(fuel/100);
+    ctx.save();
+    const g=ctx.createLinearGradient(0,f.y+f.h-8-fh,0,f.y+f.h-8);
+    g.addColorStop(0,'rgba(255,152,0,.65)'); g.addColorStop(1,'rgba(230,81,0,.9)');
+    ctx.fillStyle=g; rr(f.x+4,f.y+f.h-8-fh,f.w-8,fh,3); ctx.fill();
+    ctx.font='10px monospace'; ctx.fillStyle='#ffd740'; ctx.textAlign='center';
+    ctx.fillText(fuel.toFixed(0)+'%',f.x+f.w/2,f.y+16);
+    ctx.restore();
+  }
+
+  function drawPump(l){
+    const f=l.pump; const cx=f.x+f.w/2, cy=f.y+f.h/2, r=f.w*.38;
+    ctx.save();
+    ctx.shadowBlur=8; ctx.shadowColor='#ff9800';
+    ctx.fillStyle='rgba(28,12,0,.9)'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#e65100'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+    ctx.shadowBlur=0;
+    // gear
+    const ga=running?ang*3.5:0, teeth=6;
+    ctx.beginPath();
+    for(let i=0;i<teeth*2;i++){
+      const a=ga+i*Math.PI/teeth, rr2=i%2===0?r*.55:r*.33;
+      i===0?ctx.moveTo(cx+rr2*Math.cos(a),cy+rr2*Math.sin(a)):ctx.lineTo(cx+rr2*Math.cos(a),cy+rr2*Math.sin(a));
+    }
+    ctx.closePath(); ctx.fillStyle='rgba(255,152,0,.55)'; ctx.fill();
+    ctx.font='8px Segoe UI'; ctx.fillStyle='#e65100'; ctx.textAlign='center';
+    ctx.fillText('PUMP',cx,f.y+f.h+12);
+    ctx.restore();
+  }
+
+  function drawFilter(l){
+    const f=l.filter;
+    box(f.x,f.y,f.w,f.h,'rgba(28,12,0,.9)','#e65100','FILTER','');
+    ctx.font='16px sans-serif'; ctx.fillStyle='#e65100'; ctx.textAlign='center';
+    ctx.fillText('⧖',f.x+f.w/2,f.y+f.h/2+5);
+  }
+
+  function drawEngine(l){
+    const e=l.eng;
+    ctx.save();
+    ctx.shadowBlur=18; ctx.shadowColor='#1de9b6';
+    ctx.fillStyle='rgba(0,18,32,.97)'; rr(e.x,e.y,e.w,e.h,9); ctx.fill();
+    ctx.strokeStyle='#1de9b6'; ctx.lineWidth=2; rr(e.x,e.y,e.w,e.h,9); ctx.stroke();
+    ctx.shadowBlur=0;
+
+    ctx.font='bold 11px Segoe UI'; ctx.fillStyle='#1de9b6'; ctx.textAlign='center';
+    ctx.fillText('DIESEL ENGINE',e.x+e.w/2,e.y+16);
+
+    // crankshaft
+    const ccx=e.x+e.w/2, ccy=e.y+e.h*.82, cr=22;
+    ctx.beginPath(); ctx.arc(ccx,ccy,cr,0,Math.PI*2);
+    ctx.strokeStyle='rgba(29,233,182,.35)'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ccx,ccy);
+    ctx.lineTo(ccx+cr*Math.cos(ang*2),ccy+cr*Math.sin(ang*2));
+    ctx.strokeStyle='#1de9b6'; ctx.lineWidth=2; ctx.stroke();
+
+    // 3 pistons
+    const pw=28, ph=20, nP=3;
+    const sx=e.x+(e.w-nP*(pw+14)+14)/2;
+    const byY=e.y+e.h*.58;
+    for(let i=0;i<nP;i++){
+      const px=sx+i*(pw+14);
+      const off=Math.sin(ang*2+i*2.09)*22;
+      const py=byY-28+off;
+      // cylinder
+      ctx.strokeStyle='rgba(29,233,182,.2)'; ctx.lineWidth=1;
+      ctx.strokeRect(px-2,e.y+30,pw+4,82);
+      // rod
+      ctx.beginPath();
+      ctx.moveTo(px+pw/2,py+ph);
+      ctx.lineTo(ccx+(i-1)*16,ccy);
+      ctx.strokeStyle='rgba(100,200,200,.45)'; ctx.lineWidth=2; ctx.stroke();
+      // piston
+      ctx.fillStyle=running?'rgba(64,196,255,.7)':'rgba(64,196,255,.25)';
+      ctx.fillRect(px,py,pw,ph);
+      ctx.strokeStyle='#40c4ff'; ctx.lineWidth=1; ctx.strokeRect(px,py,pw,ph);
+      // combustion flash
+      if(running && Math.sin(ang*2+i*2.09)>0.88){
+        ctx.beginPath(); ctx.arc(px+pw/2,e.y+36,9,0,Math.PI*2);
+        ctx.fillStyle='rgba(255,200,50,.55)'; ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawShaft(l){
+    const {eng:e,alt:a}=l;
+    const y=e.y+e.h/2;
+    ctx.save();
+    ctx.shadowBlur=running?8:0; ctx.shadowColor='#1de9b6';
+    ctx.strokeStyle=running?'#1de9b6':'#1a3050';
+    ctx.lineWidth=6; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(e.x+e.w,y); ctx.lineTo(a.x,y); ctx.stroke();
+    // shaft marks
+    if(running){
+      const len=a.x-(e.x+e.w);
+      for(let i=0;i<6;i++){
+        const t=((i/6)+ang*.3)%1;
+        const sx=e.x+e.w+t*len;
+        const off=4*Math.cos(ang*4+i);
+        ctx.beginPath(); ctx.moveTo(sx,y-off); ctx.lineTo(sx,y+off);
+        ctx.strokeStyle='rgba(29,233,182,.65)'; ctx.lineWidth=1.5; ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawAlternator(l){
+    const a=l.alt; const cx=a.x+a.w/2, cy=a.y+a.h/2;
+    const OR=Math.min(a.w,a.h)*.41, IR=OR*.53;
+    ctx.save();
+    ctx.shadowBlur=16; ctx.shadowColor='#40c4ff';
+    ctx.fillStyle='rgba(0,15,30,.97)'; rr(a.x,a.y,a.w,a.h,9); ctx.fill();
+    ctx.strokeStyle='#40c4ff'; ctx.lineWidth=2; rr(a.x,a.y,a.w,a.h,9); ctx.stroke();
+    ctx.shadowBlur=0;
+
+    ctx.font='bold 10px Segoe UI'; ctx.fillStyle='#40c4ff'; ctx.textAlign='center';
+    ctx.fillText('ALTERNATOR',cx,a.y+14);
+    ctx.font='8px Segoe UI'; ctx.fillStyle='rgba(64,196,255,.5)';
+    ctx.fillText('Stator / Rotor',cx,a.y+a.h-7);
+
+    // stator winding
+    for(let i=0;i<12;i++){
+      const aa=i*Math.PI/6;
+      ctx.beginPath();
+      ctx.moveTo(cx+OR*.7*Math.cos(aa),cy+OR*.7*Math.sin(aa));
+      ctx.lineTo(cx+OR*Math.cos(aa),cy+OR*Math.sin(aa));
+      ctx.strokeStyle='rgba(64,196,255,.35)'; ctx.lineWidth=3; ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(cx,cy,OR,0,Math.PI*2);
+    ctx.strokeStyle='rgba(64,196,255,.25)'; ctx.lineWidth=7; ctx.stroke();
+
+    // rotor spinning
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(ang*(running?1:.05));
+    for(let i=0;i<4;i++){
+      const pa=i*Math.PI/2, isN=i%2===0;
+      ctx.beginPath();
+      ctx.arc(0,0,IR,pa-.38,pa+.38);
+      ctx.arc(0,0,IR*.28,pa+.38,pa-.38,true);
+      ctx.closePath();
+      ctx.fillStyle=isN?'rgba(255,80,80,.75)':'rgba(80,140,255,.75)'; ctx.fill();
+      ctx.font='bold 9px sans-serif'; ctx.fillStyle='#fff'; ctx.textAlign='center';
+      ctx.fillText(isN?'N':'S',IR*.68*Math.cos(pa),IR*.68*Math.sin(pa)+3);
+    }
+    ctx.beginPath(); ctx.arc(0,0,6,0,Math.PI*2);
+    ctx.fillStyle='#1de9b6'; ctx.fill();
+    ctx.restore(); ctx.restore();
+  }
+
+  function drawAVR(l){
+    const a=l.avr;
+    box(a.x,a.y,a.w,a.h,'rgba(12,0,22,.93)','#ce93d8','AVR','Auto\nVoltage Reg.');
+    if(running){
+      ctx.save();
+      ctx.beginPath();
+      for(let i=0;i<=a.w-12;i++){
+        const xx=a.x+6+i, yy=a.y+a.h/2-8+Math.sin((i/(a.w-12))*5*Math.PI+ang*6)*9;
+        i===0?ctx.moveTo(xx,yy):ctx.lineTo(xx,yy);
+      }
+      ctx.strokeStyle='#ce93d8'; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function drawController(l){
+    const co=l.ctrl;
+    ctx.save();
+    ctx.shadowBlur=12; ctx.shadowColor='#ff9800';
+    ctx.fillStyle='rgba(22,8,0,.97)'; rr(co.x,co.y,co.w,co.h,9); ctx.fill();
+    ctx.strokeStyle='#ff9800'; ctx.lineWidth=2; rr(co.x,co.y,co.w,co.h,9); ctx.stroke();
+    ctx.shadowBlur=0;
+    ctx.font='bold 9px Segoe UI'; ctx.fillStyle='#ff9800'; ctx.textAlign='center';
+    ctx.fillText('DEEP SEA CONTROLLER',co.x+co.w/2,co.y+13);
+
+    // Screen
+    const sx=co.x+8,sy=co.y+20,sw=co.w-16,sh=co.h-50;
+    ctx.fillStyle='#001500'; rr(sx,sy,sw,sh,4); ctx.fill();
+    ctx.strokeStyle='#003000'; ctx.lineWidth=1; rr(sx,sy,sw,sh,4); ctx.stroke();
+
+    ctx.font='bold 10px monospace'; ctx.fillStyle='#00ff44'; ctx.textAlign='left';
+    ctx.fillText(`V  : ${running?volt.toFixed(0).padStart(3,'0'):'000'} V`, sx+5,sy+17);
+    ctx.fillText(`Hz : ${running?hz.toFixed(1):'00.0'} Hz`,sx+5,sy+31);
+    ctx.fillText(`RPM: ${rpm.toFixed(0).padStart(4,'0')}`, sx+5,sy+45);
+    ctx.font='bold 9px monospace';
+    ctx.fillStyle=running?'#00e676':'#666';
+    ctx.fillText(running?'● RUNNING  OK':'● STANDBY', sx+5,sy+60);
+
+    // LEDs
+    const ly=co.y+co.h-18;
+    [{c:running?'#00e676':'#333',l:'RUN'},{c:running&&coolT>75?'#f55':'#333',l:'TEMP'},
+     {c:running?'#ffd740':'#333',l:'OIL'},{c:running?'#40c4ff':'#333',l:'GEN'}]
+    .forEach((d,i)=>{
+      const lx=co.x+10+i*(co.w-20)/4;
+      ctx.beginPath(); ctx.arc(lx+5,ly,4.5,0,Math.PI*2);
+      ctx.fillStyle=d.c; ctx.shadowBlur=d.c!=='#333'?6:0; ctx.shadowColor=d.c; ctx.fill();
+      ctx.shadowBlur=0;
+      ctx.font='7px Segoe UI'; ctx.fillStyle=d.c; ctx.textAlign='center';
+      ctx.fillText(d.l,lx+5,ly+13);
+    });
+    ctx.restore();
+  }
+
+  function drawCB(l){
+    const b=l.cb; const on=running&&volt>200;
+    box(b.x,b.y,b.w,b.h,on?'rgba(0,14,0,.9)':'rgba(14,0,0,.9)',on?'#00e676':'#555','CB',on?'CLOSED':'OPEN');
+  }
+
+  function drawOutput(l){
+    const o=l.out; const on=running&&volt>200;
+    box(o.x,o.y,o.w,o.h,on?'rgba(0,14,4,.9)':'rgba(8,8,14,.9)',on?'#00e676':'#1a3050',on?'400V':'---','3Ph');
+    ctx.font='16px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('⚡',o.x+o.w/2,o.y+o.h/2+2);
+  }
+
+  function drawRadiator(l){
+    const r=l.rad; const cx=r.x+r.w/2, cy=r.y+r.h*.38, fr=r.w*.38;
+    box(r.x,r.y,r.w,r.h,'rgba(0,8,20,.93)','#40c4ff','','');
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(running?ang*2.5:0);
+    for(let i=0;i<6;i++){
+      const ba=i*Math.PI/3;
+      ctx.beginPath();
+      ctx.ellipse(fr*.48*Math.cos(ba),fr*.48*Math.sin(ba),fr*.42,fr*.16,ba,0,Math.PI*2);
+      ctx.fillStyle=running?'rgba(64,196,255,.5)':'rgba(64,196,255,.18)'; ctx.fill();
+      ctx.strokeStyle='#40c4ff'; ctx.lineWidth=1; ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(0,0,5,0,Math.PI*2);
+    ctx.fillStyle='#40c4ff'; ctx.fill();
+    ctx.restore();
+    ctx.font='bold 8px Segoe UI'; ctx.fillStyle='#40c4ff'; ctx.textAlign='center';
+    ctx.fillText('RADIATOR',cx,r.y+r.h-18);
+    ctx.font='7px Segoe UI'; ctx.fillStyle='rgba(64,196,255,.7)';
+    ctx.fillText('Cooling Water Supply',cx,r.y+r.h-7);
+  }
+
+  function drawSump(l){
+    const s=l.sump;
+    // Draw box manually for proper line spacing
+    ctx.save();
+    ctx.shadowBlur=10; ctx.shadowColor='#c8a060';
+    ctx.fillStyle='rgba(18,8,0,.93)'; rr(s.x,s.y,s.w,s.h,6); ctx.fill();
+    ctx.strokeStyle='#c8a060'; ctx.lineWidth=1.5; rr(s.x,s.y,s.w,s.h,6); ctx.stroke();
+    ctx.shadowBlur=0;
+    const cx = s.x+s.w/2;
+    ctx.textAlign='center';
+    ctx.font=`bold ${Math.max(10,s.w*.072)}px Segoe UI`;
+    ctx.fillStyle='#c8a060';
+    ctx.fillText('OIL SUMP (10W-40)', cx, s.y+s.h*0.42);
+    ctx.font=`${Math.max(9,s.w*.058)}px Segoe UI`;
+    ctx.fillStyle='rgba(200,160,96,.6)';
+    ctx.fillText('Cleaning & Filter', cx, s.y+s.h*0.78);
+    ctx.restore();
+  }
+
+  function drawExhaust(l){
+    const {eng:e,sil:s}=l;
+    ctx.save();
+    ctx.strokeStyle=running?'rgba(140,140,140,.7)':'rgba(60,60,60,.4)';
+    ctx.lineWidth=8; ctx.lineCap='round';
+    ctx.beginPath();
+    ctx.moveTo(e.x+e.w*.67,e.y);
+    ctx.lineTo(e.x+e.w*.67,s.y+s.h/2);
+    ctx.lineTo(s.x,s.y+s.h/2);
+    ctx.stroke();
+    box(s.x,s.y,s.w,s.h,'rgba(20,20,20,.93)','#888','SILENCER','');
+    ctx.font='14px sans-serif'; ctx.fillStyle='#888'; ctx.textAlign='center';
+    ctx.fillText('🔇',s.x+s.w/2,s.y+s.h/2+4);
+    if(running){
+      ctx.font='11px sans-serif'; ctx.fillStyle='rgba(150,150,150,.7)';
+      ctx.textAlign='left';
+      ctx.fillText('💨 →',s.x+s.w+4,s.y+s.h/2+4);
+    }
+    ctx.restore();
+  }
+
+  // ── PIPES ──────────────────────────────────────
+  function drawPipes(l){
+    const {tank:ft,pump:fp,filter:ff,eng:e,alt:a,avr:av,ctrl:co,cb:b,out:o,rad:r,sump:sp}=l;
+    const alpha=running?.65:.18;
+    const pipes=[
+      // fuel
+      [{x:ft.x+ft.w,y:ft.y+ft.h*.5},{x:fp.x,y:fp.y+fp.h/2},'#e65100',3],
+      [{x:fp.x+fp.w,y:fp.y+fp.h/2},{x:ff.x,y:ff.y+ff.h/2},'#e65100',3],
+      [{x:ff.x+ff.w,y:ff.y+ff.h/2},{x:e.x,y:e.y+e.h*.28},'#e65100',3],
+      // coolant supply (hot)
+      [{x:e.x,y:e.y+e.h*.78},{x:r.x+r.w,y:r.y+r.h*.28},'#ff5722',2.5],
+      // coolant return (cool)
+      [{x:r.x+r.w,y:r.y+r.h*.72},{x:e.x,y:e.y+e.h*.92},'#40c4ff',2.5],
+      // oil
+      [{x:sp.x+sp.w*.45,y:sp.y},{x:e.x+e.w*.45,y:e.y+e.h},'#c8a060',2],
+      [{x:e.x+e.w*.55,y:e.y+e.h},{x:sp.x+sp.w*.55,y:sp.y},'#c8a060',2],
+      // electrical
+      [{x:a.x+a.w,y:a.y+a.h/2},{x:av.x,y:av.y+av.h/2},'#ffd740',2.5],
+      [{x:av.x+av.w,y:av.y+av.h/2},{x:co.x,y:co.y+co.h*.45},'#ffd740',2.5],
+      [{x:co.x+co.w,y:co.y+co.h*.4},{x:b.x,y:b.y+b.h/2},'#00e676',2.5],
+      [{x:b.x+b.w,y:b.y+b.h/2},{x:o.x,y:o.y+o.h/2},'#00e676',2.5],
+      // control signal
+      [{x:co.x+co.w*.5,y:co.y+co.h},{x:e.x+e.w*.5,y:e.y+e.h},'#e040fb',1.5],
+    ];
+    pipes.forEach(p=>{
+      ctx.save();
+      ctx.strokeStyle=p[2]+Math.round(alpha*255).toString(16).padStart(2,'0');
+      ctx.lineWidth=p[3]; ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(p[0].x,p[0].y); ctx.lineTo(p[1].x,p[1].y);
+      ctx.stroke(); ctx.restore();
+    });
+  }
+
+  // ── PARTICLES ──────────────────────────────────
+  function spawnPts(l){
+    const {tank:ft,pump:fp,filter:ff,eng:e,alt:a,avr:av,ctrl:co,cb:b,out:o,rad:r,sump:sp,sil:s}=l;
+    const paths=[
+      {p:[{x:ft.x+ft.w,y:ft.y+ft.h*.5},{x:fp.x+fp.w/2,y:fp.y+fp.h/2},{x:ff.x+ff.w/2,y:ff.y+ff.h/2},{x:e.x,y:e.y+e.h*.28}],c:'#ff9800',r:3},
+      {p:[{x:e.x,y:e.y+e.h*.78},{x:r.x+r.w,y:r.y+r.h*.28}],c:'#ff5722',r:2.5},
+      {p:[{x:r.x+r.w,y:r.y+r.h*.72},{x:e.x,y:e.y+e.h*.92}],c:'#40c4ff',r:2.5},
+      {p:[{x:sp.x+sp.w*.45,y:sp.y},{x:e.x+e.w*.45,y:e.y+e.h}],c:'#c8a060',r:2},
+      {p:[{x:a.x+a.w,y:a.y+a.h/2},{x:av.x+av.w/2,y:av.y+av.h/2},{x:co.x+co.w/2,y:co.y+co.h*.45},{x:b.x+b.w/2,y:b.y+b.h/2},{x:o.x,y:o.y+o.h/2}],c:'#ffd740',r:3},
+      {p:[{x:e.x+e.w*.67,y:e.y},{x:e.x+e.w*.67,y:s.y+s.h/2},{x:s.x+s.w,y:s.y+s.h/2}],c:'#999',r:3.5},
+    ];
+    if(Math.random()<.35){
+      const pd=paths[Math.floor(Math.random()*paths.length)];
+      pts.push({p:pd.p,c:pd.c,r:pd.r,t:0,spd:.006+Math.random()*.008,a:.85+Math.random()*.15});
+    }
+    if(pts.length>130) pts=pts.slice(-110);
+  }
+
+  function drawParticles(l){
+    pts=pts.filter(pt=>pt.t<=1);
+    pts.forEach(pt=>{
+      pt.t+=pt.spd*(rpm/1500);
+      if(pt.t>1) return;
+      const n=pt.p.length-1, seg=Math.min(Math.floor(pt.t*n),n-1);
+      const lt=pt.t*n-seg, aa=pt.p[seg], bb=pt.p[seg+1]||aa;
+      const px=aa.x+(bb.x-aa.x)*lt, py=aa.y+(bb.y-aa.y)*lt;
+      ctx.save();
+      ctx.globalAlpha=pt.a*(1-pt.t*.4);
+      ctx.beginPath(); ctx.arc(px,py,pt.r,0,Math.PI*2);
+      ctx.fillStyle=pt.c; ctx.shadowBlur=9; ctx.shadowColor=pt.c; ctx.fill();
+      ctx.restore();
+    });
+  }
+
+  // ── PANEL UPDATE ───────────────────────────────
+  function updatePanel(){
+    const on=running||rpm>10;
+    document.getElementById('gsV').textContent=on?volt.toFixed(0):'0';
+    document.getElementById('gsHz').textContent=on?hz.toFixed(1):'0.0';
+    document.getElementById('gsA').textContent=on&&volt>200?amp.toFixed(0):'0';
+    document.getElementById('gsRpm').textContent=rpm.toFixed(0);
+    document.getElementById('gsTemp').textContent=coolT.toFixed(0)+'°C';
+    document.getElementById('gsOil').textContent=oilP.toFixed(0)+' PSI';
+    const fp=fuel.toFixed(0);
+    document.getElementById('gsFuelPct').textContent=fp+'%';
+    document.getElementById('gsFuelBar').style.width=fp+'%';
+
+    const led=(v,on)=>`<span style="color:${on?'#00e676':'#445566'}">● ${on?'ON':'OFF'}</span>`;
+    document.getElementById('stEng').innerHTML=led('',on&&rpm>60);
+    document.getElementById('stAlt').innerHTML=led('',on&&rpm>700);
+    document.getElementById('stCool').innerHTML=led('',on);
+    document.getElementById('stLub').innerHTML=led('',on&&oilP>5);
+    document.getElementById('stCB').innerHTML=`<span style="color:${volt>200?'#00e676':'#f55'}">● ${volt>200?'CLOSED':'OPEN'}</span>`;
+
+    const st=document.getElementById('gsStatus');
+    if(running){st.style.cssText='font-size:11px;padding:4px 12px;border-radius:4px;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:#00e676';st.textContent='● RUNNING';}
+    else if(rpm>50){st.style.cssText='font-size:11px;padding:4px 12px;border-radius:4px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);color:#ffd740';st.textContent='◐ STOPPING';}
+    else{st.style.cssText='font-size:11px;padding:4px 12px;border-radius:4px;background:rgba(80,80,80,.15);border:1px solid #333;color:#888';st.textContent='● STANDBY';}
+  }
+
+  window.gsControl=function(a){
+    if(a==='start'){
+      running=true; tRpm=1500;
+      document.getElementById('gsStart').disabled=true;
+      document.getElementById('gsStop').disabled=false;
+      document.getElementById('gsStop').style.cssText='padding:6px 18px;border-radius:5px;border:1.5px solid #ff5252;background:transparent;color:#ff5252;cursor:pointer;font-size:11px;font-weight:700;';
+    } else {
+      running=false; tRpm=0;
+      document.getElementById('gsStart').disabled=false;
+      document.getElementById('gsStop').disabled=true;
+      document.getElementById('gsStop').style.cssText='padding:6px 18px;border-radius:5px;border:1.5px solid #333;background:transparent;color:#333;cursor:not-allowed;font-size:11px;font-weight:700;';
+    }
+  };
+
+  if(document.readyState==='loading') window.addEventListener('load',init); else init();
+})();
+</script>
+
+</body>
+</html>

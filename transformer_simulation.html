@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Transformer System Simulator — 22kV</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#07071a;color:#e0e0e0;font-family:'Segoe UI',sans-serif}
+header{background:linear-gradient(135deg,#0d0d2a,#1a1a3a);padding:10px 18px;border-bottom:2px solid #ff6600;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+header h1{font-size:1.05rem;color:#ff8800}
+header .sub{font-size:.72rem;color:#aaa}
+.legrow{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.leg{display:flex;align-items:center;gap:4px;font-size:10px}
+.led{width:10px;height:10px;border-radius:50%}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px;max-width:1500px;margin:0 auto}
+.panel{background:#0d0d1f;border:1px solid #2a2a4a;border-radius:8px;overflow:hidden}
+.ptitle{background:linear-gradient(90deg,#111130,#1a1a40);padding:6px 12px;font-size:.8rem;font-weight:700;color:#ffd700;border-bottom:1px solid #333}
+.panel svg{width:100%;height:auto;display:block}
+.sbar{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;padding:5px 8px;background:#09091a;border-top:1px solid #1a1a3a}
+.st{padding:3px 9px;border-radius:3px;font-size:11px;font-weight:500}
+.sl{background:#0a2a0a;color:#00ff88;border:1px solid #00aa44}
+.sd{background:#2a0a0a;color:#ff6666;border:1px solid #aa2222}
+.st2{background:#2a2000;color:#ffd700;border:1px solid #aa8800}
+.sg{background:#0a1f0a;color:#88ff88;border:1px solid #44aa44}
+.stg{background:#081808;color:#44ff88;border:1px solid #229944}
+.ibar{text-align:center;font-size:10px;color:#555;padding:3px;background:#07071a}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>&#x26A1; TRANSFORMER SYSTEM SIMULATOR &#x2014; 22kV Distribution</h1>
+    <div class="sub">8 Transformers &middot; 4 MDB Pairs &middot; 7 Generators &middot; TIE GDB between GEN pairs (except MDB14)</div>
+  </div>
+  <div class="legrow">
+    <div class="leg"><div class="led" style="background:#ff6600"></div>22kV Bus</div>
+    <div class="leg"><div class="led" style="background:#00aaff"></div>Transformer</div>
+    <div class="leg"><div class="led" style="background:#00ff88"></div>Energized</div>
+    <div class="leg"><div class="led" style="background:#ffd700"></div>MDB TIE</div>
+    <div class="leg"><div class="led" style="background:#44ff88"></div>GEN / TIE GDB</div>
+    <div class="leg"><div class="led" style="background:#ff4444"></div>Open/Dead</div>
+  </div>
+</header>
+<div class="grid" id="G"></div>
+
+<script>
+// ── Configuration ──
+var CFG = [
+  {id:'m11', title:'สาย 11 — MDB11A / MDB11B', tiegen:true,
+   trA:{id:'TR1',kva:1500,kw:1200}, trB:{id:'TR2',kva:1500,kw:1200},
+   mdbA:'MDB11A', mdbB:'MDB11B',
+   emdbA:['EMDB11A'], emdbB:['EMDB11B'],
+   genA:{id:'GEN3',kva:1500,kw:1200}, genB:{id:'GEN4',kva:1500,kw:1200}},
+  {id:'m12', title:'สาย 12 — MDB12A / MDB12B', tiegen:true,
+   trA:{id:'TR7',kva:2000,kw:1600}, trB:{id:'TR8',kva:2000,kw:1600},
+   mdbA:'MDB12A', mdbB:'MDB12B',
+   emdbA:['EMDB12A1','EMDB12A2'], emdbB:['EMDB12B1','EMDB12B2'],
+   genA:{id:'GEN1',kva:2000,kw:1600}, genB:{id:'GEN2',kva:2000,kw:1600}},
+  {id:'m13', title:'สาย 13 — MDB13A / MDB13B', tiegen:true,
+   trA:{id:'TR3',kva:1500,kw:1200}, trB:{id:'TR4',kva:1500,kw:1200},
+   mdbA:'MDB13A', mdbB:'MDB13B',
+   emdbA:['EMDB13A','EMDB13A2'], emdbB:['EMDB13B','EMDB13B2'],
+   genA:{id:'GEN5',kva:2500,kw:2000}, genB:{id:'GEN6',kva:2500,kw:2000}},
+  {id:'m14', title:'สาย 14 — MDB14A / MDB14B', tiegen:false,
+   trA:{id:'TR5',kva:2000,kw:1600}, trB:{id:'TR6',kva:2000,kw:1600},
+   mdbA:'MDB14A', mdbB:'MDB14B',
+   emdbA:['EMDB14A1','EMDB14A2'], emdbB:['EMDB14B'],
+   genA:{id:'GEN5+6',kva:2500,kw:2000}, genB:{id:'GEN7',kva:2000,kw:1600}}
+];
+
+var ST = {};
+CFG.forEach(function(c){
+  ST[c.id] = {hvA:true,hvB:true,acbA:true,acbB:true,tie:false,genA:false,genB:false,tieGen:false};
+});
+
+// ── Energized logic ──
+function genEnA(id){ return ST[id].genA || (ST[id].tieGen && ST[id].genB); }
+function genEnB(id){ return ST[id].genB || (ST[id].tieGen && ST[id].genA); }
+function ntA(id){ return (ST[id].acbA && ST[id].hvA) || genEnA(id); }
+function ntB(id){ return (ST[id].acbB && ST[id].hvB) || genEnB(id); }
+function enA(id){ return ntA(id) || (ST[id].tie && ntB(id)); }
+function enB(id){ return ntB(id) || (ST[id].tie && ntA(id)); }
+
+function tdir(id){
+  if(!ST[id].tie) return null;
+  var a=ntA(id), b=ntB(id);
+  if(a&&!b) return 'A to B'; if(b&&!a) return 'B to A';
+  if(a&&b) return 'Parallel'; return null;
+}
+function tgenDir(id){
+  if(!ST[id].tieGen) return null;
+  var a=ST[id].genA, b=ST[id].genB;
+  if(a&&!b) return 'A to B'; if(b&&!a) return 'B to A';
+  if(a&&b) return 'Parallel'; return null;
+}
+
+// ── Toggle functions ──
+function toggleACB(id,side){ ST[id]['acb'+side]=!ST[id]['acb'+side]; renderAll(); }
+function toggleTIE(id){ ST[id].tie=!ST[id].tie; renderAll(); }
+function toggleHV(id,side){ ST[id]['hv'+side]=!ST[id]['hv'+side]; renderAll(); }
+function toggleGen(id,side){ ST[id]['gen'+side]=!ST[id]['gen'+side]; renderAll(); }
+function toggleTieGen(id){ ST[id].tieGen=!ST[id].tieGen; renderAll(); }
+
+// ── SVG Helpers ──
+function wline(x1,y1,x2,y2,live,col,sw){
+  var c=live?(col||'#00ff88'):'#252535';
+  return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width="'+(sw||2.5)+'"/>';
+}
+function dot(cx,cy,live,col){
+  return '<circle cx="'+cx+'" cy="'+cy+'" r="5" fill="'+(live?(col||'#00ff88'):'#252535')+'"/>';
+}
+function flowDots(pathD,live,uid,col,dur){
+  if(!live) return '';
+  col=col||'#00ff88'; dur=dur||'1.5';
+  var out='', offs=[0,0.34,0.67];
+  for(var i=0;i<3;i++){
+    var b=(offs[i]*parseFloat(dur)).toFixed(2)+'s';
+    out+='<path id="fp'+uid+i+'" d="'+pathD+'" fill="none" stroke="none"/>';
+    out+='<circle r="4" fill="'+col+'" opacity="0.9"><animateMotion dur="'+dur+'s" repeatCount="indefinite" begin="'+b+'"><mpath xlink:href="#fp'+uid+i+'"/></animateMotion></circle>';
+  }
+  return out;
+}
+function trSymbol(cx,y0,live){
+  var c=live?'#00aaff':'#404060';
+  var o='';
+  o+='<circle cx="'+cx+'" cy="'+(y0+18)+'" r="14" fill="none" stroke="'+c+'" stroke-width="2.5"/>';
+  o+='<circle cx="'+cx+'" cy="'+(y0+36)+'" r="14" fill="none" stroke="'+c+'" stroke-width="2.5"/>';
+  o+='<line x1="'+cx+'" y1="'+y0+'" x2="'+cx+'" y2="'+(y0+4)+'" stroke="'+c+'" stroke-width="2.5"/>';
+  o+='<line x1="'+cx+'" y1="'+(y0+50)+'" x2="'+cx+'" y2="'+(y0+56)+'" stroke="'+c+'" stroke-width="2.5"/>';
+  return o;
+}
+function emdbBox(cx,cy,labels,live){
+  var h=20+labels.length*15;
+  var bc=live?'#2255cc':'#333', fc=live?'#0a1525':'#0d0d0d';
+  var o='<rect x="'+(cx-54)+'" y="'+(cy-h/2+4)+'" width="108" height="'+h+'" rx="4" fill="'+fc+'" stroke="'+bc+'" stroke-width="'+(live?1.5:1)+'"/>';
+  o+='<text x="'+cx+'" y="'+(cy-h/2+18)+'" fill="'+(live?'#5577ff':'#444')+'" font-size="9" text-anchor="middle" font-weight="bold">EMDB</text>';
+  for(var i=0;i<labels.length;i++){
+    o+='<text x="'+cx+'" y="'+(cy-h/2+30+i*15)+'" fill="'+(live?'#7799ff':'#555')+'" font-size="10" text-anchor="middle">'+labels[i]+'</text>';
+  }
+  return o;
+}
+function genBox(cx,cy,gen,run,fn){
+  var bc=run?'#44cc44':'#335533', fc=run?'#091509':'#080f08', tc=run?'#88ff88':'#557755', sc=run?'#00ff44':'#ff6644';
+  var o='<g onclick="'+fn+'" style="cursor:pointer">';
+  o+='<rect x="'+(cx-54)+'" y="'+(cy-28)+'" width="108" height="56" rx="5" fill="'+fc+'" stroke="'+bc+'" stroke-width="'+(run?2:1.5)+'"/>';
+  o+='<text x="'+cx+'" y="'+(cy-11)+'" fill="'+tc+'" font-size="9" text-anchor="middle">&#x2699; '+gen.id+'</text>';
+  o+='<text x="'+cx+'" y="'+(cy+2)+'" fill="'+tc+'" font-size="9" text-anchor="middle">'+gen.kva+' KVA / '+gen.kw+' KW</text>';
+  o+='<text x="'+cx+'" y="'+(cy+15)+'" fill="'+sc+'" font-size="10" text-anchor="middle" font-weight="bold">'+(run?'&#x25B6; RUNNING':'&#x25A0; STANDBY')+'</text>';
+  o+='</g>';
+  return o;
+}
+function hvBadge(cx,cy,live,fn){
+  var c=live?'#ff6600':'#666', bg=live?'#1f0e00':'#111';
+  var o='<g onclick="'+fn+'" style="cursor:pointer">';
+  o+='<rect x="'+(cx-26)+'" y="'+(cy-16)+'" width="52" height="32" rx="4" fill="'+bg+'" stroke="'+c+'" stroke-width="2"/>';
+  o+='<text x="'+cx+'" y="'+(cy-2)+'" fill="'+c+'" font-size="9" text-anchor="middle" font-weight="bold">22 kV</text>';
+  o+='<text x="'+cx+'" y="'+(cy+11)+'" fill="'+(live?'#ff9944':'#666')+'" font-size="9" text-anchor="middle">'+(live?'ON':'TRIP')+'</text>';
+  o+='</g>';
+  return o;
+}
+function acbSym(cx,cy,closed,fn,lbl){
+  var co=closed?'#00ff44':'#ff4444', bg=closed?'#082008':'#200808';
+  var o='<g onclick="'+fn+'" style="cursor:pointer">';
+  o+='<rect x="'+(cx-24)+'" y="'+(cy-24)+'" width="48" height="48" rx="6" fill="'+bg+'" stroke="'+co+'" stroke-width="2.5"/>';
+  if(closed){
+    o+='<line x1="'+(cx-13)+'" y1="'+cy+'" x2="'+(cx+13)+'" y2="'+cy+'" stroke="'+co+'" stroke-width="4.5"/>';
+  } else {
+    o+='<line x1="'+(cx-10)+'" y1="'+(cy-10)+'" x2="'+(cx+10)+'" y2="'+(cy+10)+'" stroke="'+co+'" stroke-width="3.5"/>';
+    o+='<line x1="'+(cx+10)+'" y1="'+(cy-10)+'" x2="'+(cx-10)+'" y2="'+(cy+10)+'" stroke="'+co+'" stroke-width="3.5"/>';
+  }
+  o+='<text x="'+cx+'" y="'+(cy-29)+'" fill="'+co+'" font-size="9" text-anchor="middle" font-weight="bold">'+lbl+'</text>';
+  o+='</g>';
+  return o;
+}
+function tieSym(cx,cy,closed,fn,lbl){
+  var co=closed?'#ffd700':'#cc5500', bg=closed?'#1e1600':'#120a00';
+  var o='<g onclick="'+fn+'" style="cursor:pointer">';
+  o+='<rect x="'+(cx-24)+'" y="'+(cy-24)+'" width="48" height="48" rx="6" fill="'+bg+'" stroke="'+co+'" stroke-width="2.5"/>';
+  if(closed){
+    o+='<line x1="'+(cx-13)+'" y1="'+cy+'" x2="'+(cx+13)+'" y2="'+cy+'" stroke="'+co+'" stroke-width="4.5"/>';
+  } else {
+    o+='<line x1="'+(cx-10)+'" y1="'+(cy-10)+'" x2="'+(cx+10)+'" y2="'+(cy+10)+'" stroke="'+co+'" stroke-width="3.5"/>';
+    o+='<line x1="'+(cx+10)+'" y1="'+(cy-10)+'" x2="'+(cx-10)+'" y2="'+(cy+10)+'" stroke="'+co+'" stroke-width="3.5"/>';
+  }
+  o+='<text x="'+cx+'" y="'+(cy-29)+'" fill="'+co+'" font-size="9" text-anchor="middle" font-weight="bold">'+(lbl||'TIE ACB')+'</text>';
+  o+='</g>';
+  return o;
+}
+// TIE GDB symbol (green theme, smaller)
+function tieGdbSym(cx,cy,closed,fn){
+  var co=closed?'#44ff88':'#226633', bg=closed?'#061306':'#040c04';
+  var o='<g onclick="'+fn+'" style="cursor:pointer">';
+  o+='<rect x="'+(cx-24)+'" y="'+(cy-20)+'" width="48" height="40" rx="5" fill="'+bg+'" stroke="'+co+'" stroke-width="2"/>';
+  if(closed){
+    o+='<line x1="'+(cx-11)+'" y1="'+cy+'" x2="'+(cx+11)+'" y2="'+cy+'" stroke="'+co+'" stroke-width="4"/>';
+  } else {
+    o+='<line x1="'+(cx-9)+'" y1="'+(cy-9)+'" x2="'+(cx+9)+'" y2="'+(cy+9)+'" stroke="'+co+'" stroke-width="3"/>';
+    o+='<line x1="'+(cx+9)+'" y1="'+(cy-9)+'" x2="'+(cx-9)+'" y2="'+(cy+9)+'" stroke="'+co+'" stroke-width="3"/>';
+  }
+  o+='<text x="'+cx+'" y="'+(cy-24)+'" fill="'+co+'" font-size="8" text-anchor="middle" font-weight="bold">TIE GDB</text>';
+  o+='</g>';
+  return o;
+}
+
+// ── Main SVG Renderer ──
+function rSVG(cfg){
+  var s=ST[cfg.id], id=cfg.id;
+  // Pre-compute event handlers (no nested template literals)
+  var onACBA = "toggleACB('"+id+"','A')";
+  var onACBB = "toggleACB('"+id+"','B')";
+  var onTIE  = "toggleTIE('"+id+"')";
+  var onHVA  = "toggleHV('"+id+"','A')";
+  var onHVB  = "toggleHV('"+id+"','B')";
+  var onGenA = "toggleGen('"+id+"','A')";
+  var onGenB = "toggleGen('"+id+"','B')";
+  var onTG   = "toggleTieGen('"+id+"')";
+
+  // Layout
+  var W=440, H=565;
+  var AX=110, BX=330, MX=220;
+  var busY=65, trY0=85, trY1=141;
+  var mTop=160, mH=175, mBot=335;
+  var acbCY=206, bY2=268;
+  var tL=170, tR=270;
+  var emdbY=378, genY=460;
+  var genBusY=510; // TIE GDB bus Y
+
+  // States
+  var hvA=s.hvA, hvB=s.hvB;
+  var eA_=enA(id), eB_=enB(id);
+  var td_=tdir(id), tgd=tgenDir(id);
+  var tAB=s.tie&&(td_==='A to B'||td_==='Parallel');
+  var tBA=s.tie&&(td_==='B to A'||td_==='Parallel');
+  var tgAB=s.tieGen&&(tgd==='A to B'||tgd==='Parallel');
+  var tgBA=s.tieGen&&(tgd==='B to A'||tgd==='Parallel');
+  var geA=genEnA(id), geB=genEnB(id);
+
+  var eAh=20+cfg.emdbA.length*15, eBh=20+cfg.emdbB.length*15;
+  var eAb=emdbY+eAh/2+6, eBb=emdbY+eBh/2+6;
+
+  var o='';
+  o+='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">';
+  o+='<rect width="'+W+'" height="'+H+'" fill="#09091e"/>';
+
+  // ── 22kV Bus ──
+  o+=wline(20,busY,W-20,busY,(hvA||hvB),'#ff6600',5);
+  o+='<text x="'+MX+'" y="'+(busY-9)+'" fill="#ff8800" font-size="10" text-anchor="middle" font-weight="bold">&#x2501;&#x2501; 22 kV INCOMING BUS &#x2501;&#x2501;</text>';
+  o+=hvBadge(AX,38,hvA,onHVA);
+  o+=hvBadge(BX,38,hvB,onHVB);
+
+  // Bus → TR
+  o+=wline(AX,busY,AX,trY0,hvA,'#ff7700');
+  o+=wline(BX,busY,BX,trY0,hvB,'#ff7700');
+
+  // Transformers
+  o+=trSymbol(AX,trY0,hvA);
+  o+=trSymbol(BX,trY0,hvB);
+  o+='<text x="'+AX+'" y="'+(trY0+62)+'" fill="'+(hvA?'#00bbff':'#556')+'" font-size="10" text-anchor="middle" font-weight="bold">'+cfg.trA.id+'</text>';
+  o+='<text x="'+AX+'" y="'+(trY0+73)+'" fill="'+(hvA?'#5599ff':'#445')+'" font-size="9" text-anchor="middle">'+cfg.trA.kva+' KVA</text>';
+  o+='<text x="'+BX+'" y="'+(trY0+62)+'" fill="'+(hvB?'#00bbff':'#556')+'" font-size="10" text-anchor="middle" font-weight="bold">'+cfg.trB.id+'</text>';
+  o+='<text x="'+BX+'" y="'+(trY0+73)+'" fill="'+(hvB?'#5599ff':'#445')+'" font-size="9" text-anchor="middle">'+cfg.trB.kva+' KVA</text>';
+
+  // TR → MDB top
+  o+=wline(AX,trY1,AX,mTop,hvA,'#00aaff');
+  o+=wline(BX,trY1,BX,mTop,hvB,'#00aaff');
+
+  // ── MDB-A box ──
+  var bcA=eA_?'#4444cc':'#333', fcA=eA_?'#111128':'#0e0e18';
+  o+='<rect x="'+(AX-60)+'" y="'+mTop+'" width="120" height="'+mH+'" rx="7" fill="'+fcA+'" stroke="'+bcA+'" stroke-width="'+(eA_?2:1.5)+'"/>';
+  o+=dot(AX,mTop,hvA,'#00aaff');
+  o+=wline(AX,mTop,AX,acbCY-24,hvA,'#00aaff');
+  o+=acbSym(AX,acbCY,s.acbA,onACBA,'ACB-A');
+  o+=wline(AX,acbCY+24,AX,bY2,s.acbA&&hvA);
+  o+='<line x1="'+(AX-60)+'" y1="'+bY2+'" x2="'+(AX+60)+'" y2="'+bY2+'" stroke="'+(eA_?'#ffd700':'#2a2a20')+'" stroke-width="'+(eA_?4.5:2)+'"/>';
+  o+=wline(AX,bY2,AX,mBot,eA_);
+  o+=dot(AX,mBot,eA_);
+  o+='<text x="'+AX+'" y="'+(mTop+mH-30)+'" fill="'+(eA_?'#aaaaff':'#557')+'" font-size="13" text-anchor="middle" font-weight="bold">'+cfg.mdbA+'</text>';
+  o+='<text x="'+AX+'" y="'+(mTop+mH-14)+'" fill="'+(eA_?'#00ff88':'#666')+'" font-size="10" text-anchor="middle">'+(eA_?'&#x25CF; ENERGIZED':'&#x25CB; DE-ENERGIZED')+'</text>';
+
+  // ── MDB-B box ──
+  var bcB=eB_?'#4444cc':'#333', fcB=eB_?'#111128':'#0e0e18';
+  o+='<rect x="'+(BX-60)+'" y="'+mTop+'" width="120" height="'+mH+'" rx="7" fill="'+fcB+'" stroke="'+bcB+'" stroke-width="'+(eB_?2:1.5)+'"/>';
+  o+=dot(BX,mTop,hvB,'#00aaff');
+  o+=wline(BX,mTop,BX,acbCY-24,hvB,'#00aaff');
+  o+=acbSym(BX,acbCY,s.acbB,onACBB,'ACB-B');
+  o+=wline(BX,acbCY+24,BX,bY2,s.acbB&&hvB);
+  o+='<line x1="'+(BX-60)+'" y1="'+bY2+'" x2="'+(BX+60)+'" y2="'+bY2+'" stroke="'+(eB_?'#ffd700':'#2a2a20')+'" stroke-width="'+(eB_?4.5:2)+'"/>';
+  o+=wline(BX,bY2,BX,mBot,eB_);
+  o+=dot(BX,mBot,eB_);
+  o+='<text x="'+BX+'" y="'+(mTop+mH-30)+'" fill="'+(eB_?'#aaaaff':'#557')+'" font-size="13" text-anchor="middle" font-weight="bold">'+cfg.mdbB+'</text>';
+  o+='<text x="'+BX+'" y="'+(mTop+mH-14)+'" fill="'+(eB_?'#00ff88':'#666')+'" font-size="10" text-anchor="middle">'+(eB_?'&#x25CF; ENERGIZED':'&#x25CB; DE-ENERGIZED')+'</text>';
+
+  // ── TIE ACB (MDB level) ──
+  var twC=(s.tie&&(tAB||tBA))?'#ffd700':'#2a2a20';
+  o+=wline(tL,bY2,MX-25,bY2,s.tie,twC,4);
+  o+=wline(MX+25,bY2,tR,bY2,s.tie,twC,4);
+  o+=tieSym(MX,bY2,s.tie,onTIE,'TIE ACB');
+  if(td_) o+='<text x="'+MX+'" y="'+(bY2+44)+'" fill="#ffd700" font-size="11" text-anchor="middle" font-weight="bold">'+td_+'</text>';
+
+  // ── MDB → EMDB ──
+  o+=wline(AX,mBot,AX,emdbY-eAh/2+4,eA_);
+  o+=wline(BX,mBot,BX,emdbY-eBh/2+4,eB_);
+  o+=emdbBox(AX,emdbY,cfg.emdbA,eA_);
+  o+=emdbBox(BX,emdbY,cfg.emdbB,eB_);
+
+  // ── EMDB → GEN ──
+  o+=wline(AX,eAb,AX,genY-28,eA_);
+  o+=wline(BX,eBb,BX,genY-28,eB_);
+
+  // ── GEN boxes ──
+  o+=genBox(AX,genY,cfg.genA,s.genA,onGenA);
+  o+=genBox(BX,genY,cfg.genB,s.genB,onGenB);
+
+  // ── TIE GDB (GEN level) — only for panels with tiegen ──
+  if(cfg.tiegen){
+    var tgWC=(s.tieGen&&(tgAB||tgBA))?'#44ff88':'#1a3a1a';
+    var tgSW=s.tieGen?3.5:2;
+    // Short wires from GEN bottom down to genBusY
+    o+=wline(AX,genY+28,AX,genBusY,s.genA,'#44ff88',2.5);
+    o+=wline(BX,genY+28,BX,genBusY,s.genB,'#44ff88',2.5);
+    // Horizontal bus lines left and right of TIE GDB
+    o+='<line x1="'+AX+'" y1="'+genBusY+'" x2="'+(MX-25)+'" y2="'+genBusY+'" stroke="'+tgWC+'" stroke-width="'+tgSW+'"/>';
+    o+='<line x1="'+(MX+25)+'" y1="'+genBusY+'" x2="'+BX+'" y2="'+genBusY+'" stroke="'+tgWC+'" stroke-width="'+tgSW+'"/>';
+    // Junction dots
+    o+=dot(AX,genBusY,s.genA,'#44ff88');
+    o+=dot(BX,genBusY,s.genB,'#44ff88');
+    // TIE GDB symbol
+    o+=tieGdbSym(MX,genBusY,s.tieGen,onTG);
+    if(tgd) o+='<text x="'+MX+'" y="'+(genBusY+38)+'" fill="#44ff88" font-size="10" text-anchor="middle" font-weight="bold">'+tgd+'</text>';
+  }
+
+  // ── GEN reverse feed indicator (when running, dots go UP to EMDB) ──
+  if(s.genA) o+=flowDots('M'+AX+' '+(genY-28)+' L'+AX+' '+eAb,true,'gA'+id,'#44ff44','2.0');
+  if(s.genB) o+=flowDots('M'+BX+' '+(genY-28)+' L'+BX+' '+eBb,true,'gB'+id,'#44ff44','2.0');
+
+  // ── TIE GDB flow dots ──
+  if(cfg.tiegen){
+    o+=flowDots('M'+AX+' '+genBusY+' L'+MX+' '+genBusY,tgAB,'tgL'+id,'#44ff88','1.0');
+    o+=flowDots('M'+MX+' '+genBusY+' L'+BX+' '+genBusY,tgAB,'tgR'+id,'#44ff88','1.0');
+    o+=flowDots('M'+BX+' '+genBusY+' L'+MX+' '+genBusY,tgBA,'tgRL'+id,'#44ff88','1.0');
+    o+=flowDots('M'+MX+' '+genBusY+' L'+AX+' '+genBusY,tgBA,'tgLL'+id,'#44ff88','1.0');
+    // TIE GDB feed going UP (when TIE GDB feeds opposite side)
+    if(tgAB) o+=flowDots('M'+BX+' '+genBusY+' L'+BX+' '+(genY-28),true,'tgUp'+id,'#44ff88','2.0');
+    if(tgBA) o+=flowDots('M'+AX+' '+genBusY+' L'+AX+' '+(genY-28),true,'tgUpA'+id,'#44ff88','2.0');
+  }
+
+  // ── Main flow dots (HV/TR/MDB) ──
+  o+=flowDots('M'+AX+' '+busY+' L'+AX+' '+trY0,hvA,'h1A'+id,'#ff7700','1.2');
+  o+=flowDots('M'+BX+' '+busY+' L'+BX+' '+trY0,hvB,'h1B'+id,'#ff7700','1.2');
+  o+=flowDots('M'+AX+' '+trY1+' L'+AX+' '+acbCY,hvA,'h2A'+id,'#00aaff','1.5');
+  o+=flowDots('M'+BX+' '+trY1+' L'+BX+' '+acbCY,hvB,'h2B'+id,'#00aaff','1.5');
+  o+=flowDots('M'+AX+' '+acbCY+' L'+AX+' '+bY2,s.acbA&&hvA,'h3A'+id,'#00ff88','1.5');
+  o+=flowDots('M'+BX+' '+acbCY+' L'+BX+' '+bY2,s.acbB&&hvB,'h3B'+id,'#00ff88','1.5');
+  o+=flowDots('M'+tL+' '+bY2+' L'+tR+' '+bY2,tAB,'tAB'+id,'#ffd700','1.0');
+  o+=flowDots('M'+tR+' '+bY2+' L'+tL+' '+bY2,tBA,'tBA'+id,'#ffd700','1.0');
+  o+=flowDots('M'+AX+' '+bY2+' L'+AX+' '+mBot,eA_,'h4A'+id,'#00ff88','1.5');
+  o+=flowDots('M'+BX+' '+bY2+' L'+BX+' '+mBot,eB_,'h4B'+id,'#00ff88','1.5');
+  o+=flowDots('M'+AX+' '+mBot+' L'+AX+' '+emdbY,eA_,'h5A'+id,'#00ff88','1.5');
+  o+=flowDots('M'+BX+' '+mBot+' L'+BX+' '+emdbY,eB_,'h5B'+id,'#00ff88','1.5');
+
+  o+='</svg>';
+  return o;
+}
+
+// ── Render All ──
+function renderAll(){
+  var html='';
+  for(var i=0;i<CFG.length;i++){
+    var cfg=CFG[i], s=ST[cfg.id], id=cfg.id;
+    var eA_=enA(id), eB_=enB(id), td_=tdir(id), tgd=tgenDir(id);
+    html+='<div class="panel">';
+    html+='<div class="ptitle">&#x26A1; '+cfg.title+(cfg.tiegen?' &nbsp;<span style="font-size:.7rem;color:#44ff88;font-weight:normal">&#x2666; TIE GDB</span>':'')+'</div>';
+    html+=rSVG(cfg);
+    html+='<div class="sbar">';
+    html+='<span class="st '+(eA_?'sl':'sd')+'">'+cfg.mdbA+': '+(eA_?'&#x2705; LIVE':'&#x274C; DEAD')+'</span>';
+    html+='<span class="st '+(eB_?'sl':'sd')+'">'+cfg.mdbB+': '+(eB_?'&#x2705; LIVE':'&#x274C; DEAD')+'</span>';
+    if(s.tie) html+='<span class="st st2">TIE MDB: '+(td_||'No Src')+'</span>';
+    if(cfg.tiegen && s.tieGen) html+='<span class="st stg">TIE GDB: '+(tgd||'No Src')+'</span>';
+    if(s.genA) html+='<span class="st sg">'+cfg.genA.id+': &#x25B6;</span>';
+    if(s.genB) html+='<span class="st sg">'+cfg.genB.id+': &#x25B6;</span>';
+    html+='</div>';
+    html+='<div class="ibar">[22kV]=Trip HV &nbsp;|&nbsp; [ACB-A/B]=Breaker &nbsp;|&nbsp; [TIE ACB]=MDB TIE'+(cfg.tiegen?' &nbsp;|&nbsp; [TIE GDB]=GEN TIE':'')+' &nbsp;|&nbsp; [GEN]=Start/Stop</div>';
+    html+='</div>';
+  }
+  document.getElementById('G').innerHTML=html;
+}
+
+try{ renderAll(); }
+catch(e){ document.getElementById('G').innerHTML='<div style="color:#ff6666;padding:20px">Error: '+e.message+'</div>'; }
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     OIL-IMMERSED TRANSFORMER — PHYSICS ANIMATION SECTION
+═══════════════════════════════════════════════════════════ -->
+<div id="trSection" style="background:#07071a;padding:8px 10px 14px;border-top:3px solid #ffd700;margin-top:4px;">
+  <div style="max-width:1500px;margin:0 auto;">
+
+    <!-- ── Title bar ── -->
+    <div style="background:linear-gradient(90deg,#0d0d22,#1a1a40,#0d0d22);border:1px solid #3a3a6a;border-radius:8px 8px 0 0;padding:5px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+      <span style="color:#ffd700;font-weight:bold;font-size:0.92rem;">&#x26A1; Oil-Immersed Power Transformer &mdash; การทำงานภายในและการระบายความร้อน</span>
+      <span style="color:#667;font-size:0.75rem;">1,500 kVA &bull; 22kV/400V &bull; ONAN &bull; Naphthenic Oil</span>
+    </div>
+
+    <!-- ── Live status bar (HTML — all text here) ── -->
+    <div style="background:#060616;border:1px solid #222244;border-bottom:none;padding:5px 12px;display:flex;flex-wrap:wrap;gap:4px 18px;font-family:'Courier New',monospace;font-size:0.8rem;align-items:center;">
+      <span style="color:#888;">Temp:</span>     <span id="trT"   style="color:#44ff88;min-width:58px;display:inline-block;font-weight:bold;">--</span>
+      <span style="color:#888;">Load:</span>     <span id="trL"   style="color:#ffd700;min-width:48px;display:inline-block;font-weight:bold;">--</span>
+      <span style="color:#888;">V&#x2081;:</span>      <span id="trV1"  style="color:#ff9944;min-width:62px;display:inline-block;font-weight:bold;">--</span>
+      <span style="color:#888;">V&#x2082;:</span>      <span id="trV2"  style="color:#ff7722;min-width:52px;display:inline-block;font-weight:bold;">--</span>
+      <span style="color:#888;">I&#x2081;:</span>      <span id="trI1"  style="color:#cc88ff;min-width:52px;display:inline-block;font-weight:bold;">--</span>
+      <span style="color:#888;">I&#x2082;:</span>      <span id="trI2"  style="color:#dd66ff;min-width:58px;display:inline-block;font-weight:bold;">--</span>
+      <span style="color:#888;">P.F.:</span>     <span id="trPF"  style="color:#88ffcc;min-width:44px;display:inline-block;font-weight:bold;">--</span>
+      <span style="color:#888;">Eff:</span>      <span id="trEff" style="color:#ffcc44;min-width:48px;display:inline-block;font-weight:bold;">--</span>
+      <span style="color:#888;">&#x3A6;:</span>       <span id="trFl"  style="color:#88aaff;min-width:58px;display:inline-block;font-weight:bold;">--</span>
+      <span style="color:#888;">Hz:</span>       <span id="trHz"  style="color:#aaaaff;min-width:44px;display:inline-block;font-weight:bold;">--</span>
+    </div>
+
+    <!-- ── Main area: canvas + side panel ── -->
+    <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;">
+
+      <!-- ── Canvas + HTML label overlay ── -->
+      <div style="flex:1;min-width:580px;position:relative;line-height:0;">
+        <canvas id="trCvs" style="width:100%;height:auto;display:block;border:1px solid #2a2a4a;border-radius:0 0 8px 8px;border-top:none;"></canvas>
+
+        <!-- ────────────────────────────────────────────────
+             HTML LABEL OVERLAY  (pointer-events:none)
+             All % values are relative to the canvas display size
+        ──────────────────────────────────────────────────── -->
+        <!-- ══════════════════════════════════════════════════════
+             HTML LABEL OVERLAY — positions calibrated to canvas pixels
+             Canvas: W=960px  H=580px
+             Tank: x=180 y=118 w=540 h=345  cx=450  cy=290
+             Core: CR_TYY=176  CR_LEGY=198  CR_BYY=385
+             Fins: L-center x=170  R-center x=730  y_mid=308
+             Bushings: HV tops y=60  LV tops y=76
+             Conservator: cx=625 cy=83 cw=100
+             MDB box: x=762 y=225 w=85 h=130
+             Sine waves: y=481  left x=8 w=165  right x=740 w=165
+        ═══════════════════════════════════════════════════════ -->
+        <div style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;font-family:'Segoe UI',Arial,sans-serif;font-size:clamp(9px,1vw,12px);">
+
+          <!-- ①  22kV pole labels  (x=75, y≈104–116 → L=7.8% T=17.9–20%) -->
+          <div style="position:absolute;left:7%;top:16.5%;text-align:center;line-height:1.4;">
+            <div style="color:#ff9922;font-weight:bold;text-shadow:0 0 8px #ff6600,0 1px 3px #000;">22 kV</div>
+            <div style="color:#ffbb66;font-size:0.85em;text-shadow:0 1px 3px #000;">PEA Grid</div>
+          </div>
+
+          <!-- ②  HV Bushings  (label center x=368, y=108 → L=38.3% T=18.6%) -->
+          <div style="position:absolute;left:29.5%;top:17%;transform:translateX(-50%);color:#5588ff;font-weight:bold;white-space:nowrap;text-shadow:0 0 6px #2244cc,0 1px 3px #000;">HV Bushings</div>
+
+          <!-- ③  LV Bushings  (label x=518, y=108 → L=53.9% T=18.6%) -->
+          <div style="position:absolute;left:64.3%;top:9%;transform:translateX(-50%);color:#ff7733;font-weight:bold;white-space:nowrap;text-shadow:0 0 6px #cc3300,0 1px 3px #000;">LV Bushings</div>
+
+          <!-- ④  Conservator Tank  (label center x=675, y=78 → L=70.3% T=13.4%) -->
+          <div style="position:absolute;left:47%;top:10%;transform:translateX(-50%);color:#7799bb;white-space:nowrap;text-shadow:0 1px 3px #000;">Conservator Tank</div>
+
+          <!-- ⑤  Buchholz relay  (x=657, y=126 → L=68.4% T=21.7%) -->
+          <div style="position:absolute;left:44%;top:19%;transform:translateX(-50%);color:#5577aa;font-size:0.9em;text-shadow:0 1px 2px #000;">Buchholz</div>
+
+          <!-- ⑥  Left fins  (center x=170, y_mid=308 → L=17.7% T=53.1%) -->
+          <div style="position:absolute;left:17%;top:50%;transform:translate(-50%,-50%);color:#5577aa;font-size:0.9em;line-height:1.4;text-align:center;text-shadow:0 1px 2px #000;">ครีบ<br>ระบาย</div>
+
+          <!-- ⑦  Right fins  (center x=730, y_mid=308 → L=76% T=53.1%) -->
+          <div style="position:absolute;left:76%;top:50%;transform:translate(-50%,-50%);color:#5577aa;font-size:0.9em;line-height:1.4;text-align:center;text-shadow:0 1px 2px #000;">Cooling<br>Fins</div>
+
+          <!-- ⑧  Si-Steel Core  (center x=450, y=171 → L=46.9% T=29.5%) -->
+          <div style="position:absolute;left:47%;top:27%;transform:translateX(-50%);color:#9aabcc;white-space:nowrap;text-shadow:0 1px 3px #000;">Si-Steel Lamination Core</div>
+
+          <!-- ⑨  Iron Core arrow  (x=668, y=187 → L=69.6% T=32.2%) -->
+          <div style="position:absolute;left:47%;top:38%;transform:translateX(-50%);color:#9ab0cc;font-size:0.9em;text-shadow:0 1px 2px #000;">&#x2193; Iron Core (Window)</div>
+
+          <!-- ⑩  Primary Winding  (center x=450, y=192 → L=46.9% T=33.1%) -->
+          <div style="position:absolute;left:29.5%;top:72%;transform:translate(-50%,-50%);color:#5588ff;font-weight:bold;white-space:nowrap;text-shadow:0 0 6px #2244aa,0 1px 2px #000;">Primary Winding (HV) &mdash; 22,000 V</div>
+
+          <!-- ⑪  Secondary Winding  (center x=450, y=383 → L=46.9% T=66%) -->
+          <div style="position:absolute;left:62%;top:72%;transform:translate(-50%,-50%);color:#ff7733;font-weight:bold;white-space:nowrap;text-shadow:0 0 6px #aa2200,0 1px 2px #000;">Secondary Winding (LV) &mdash; 400 V</div>
+
+          <!-- ⑫  Hot oil rises  (x=410, y=136 → L=42.7% T=23.4%) -->
+          <div style="position:absolute;left:47%;top:43%;transform:translateX(-50%);color:#4488aa;font-size:0.88em;white-space:nowrap;text-shadow:0 1px 2px #000;">&#x2191; Hot oil rises near core</div>
+
+          <!-- ⑬  Cool oil sinks  (x=184, y=455 → L=19.2% T=78.4%) -->
+          <div style="position:absolute;left:19%;top:77.5%;color:#335577;font-size:0.88em;white-space:nowrap;text-shadow:0 1px 2px #000;">&#x2193; Cool oil sinks at walls</div>
+
+          <!-- ⑭  Magnetic Flux live  (center x=450, y=423 → L=46.9% T=72.9%) -->
+          <div id="trFluxLbl" style="position:absolute;left:47%;top:57%;transform:translateX(-50%);color:#88ccff;font-weight:bold;white-space:nowrap;font-family:'Courier New',monospace;text-shadow:0 0 8px #4488ff,0 1px 3px #000;">Magnetic Flux &#x3A6; = &#x2014; Wb</div>
+
+          <!-- ⑮  MDB box labels  (box x=762 y=225 w=85 h=130 → center x=804.5 y=290 → L=83.8% T=50%) -->
+          <div style="position:absolute;left:83.8%;top:50%;transform:translate(-50%,-50%);text-align:center;line-height:1.65;">
+            <div style="color:#aaaaff;font-weight:bold;text-shadow:0 0 8px #5555ff,0 1px 2px #000;">MDB</div>
+            <div style="color:#00ff88;font-size:0.88em;text-shadow:0 1px 2px #000;">400 V</div>
+            <div style="color:#00dd77;font-size:0.88em;text-shadow:0 1px 2px #000;">50 Hz</div>
+            <div style="color:#ffdd88;font-size:0.85em;text-shadow:0 1px 2px #000;">3-Phase</div>
+          </div>
+
+          <!-- ⑯  N-ratio + formula  (center x=470, y=507–521 → L=49% T=87.4–89.8%) -->
+          <div style="position:absolute;left:49%;top:86.5%;transform:translateX(-50%);text-align:center;line-height:1.6;">
+            <div style="color:#ffd700;font-weight:bold;white-space:nowrap;text-shadow:0 1px 2px #000;">N&#x2081;:N&#x2082; = 55:1</div>
+            <div style="color:#8899bb;font-size:0.88em;white-space:nowrap;text-shadow:0 1px 2px #000;">V&#x2082; = V&#x2081; &times; (N&#x2082;/N&#x2081;) = 22,000 &divide; 55 = 400 V</div>
+          </div>
+
+          <!-- ⑰  Left sine labels  (sine at x=8 y=481 w=165 → label y=493 T=85%) -->
+          <div style="position:absolute;left:1%;top:84.5%;color:#4488ff;font-size:0.88em;white-space:nowrap;text-shadow:0 1px 2px #000;">22kV Primary V</div>
+          <div style="position:absolute;left:14.5%;top:84.5%;color:#3366cc;font-size:0.82em;opacity:0.8;">50 Hz</div>
+
+          <!-- ⑱  Right sine labels  (sine at x=740 y=481 w=165 → label y=493 T=85%) -->
+          <div style="position:absolute;left:77%;top:84.5%;color:#ff7733;font-size:0.88em;white-space:nowrap;text-shadow:0 1px 2px #000;">0.4kV Secondary V</div>
+          <div style="position:absolute;left:90.5%;top:84.5%;color:#cc5511;font-size:0.82em;opacity:0.8;">50 Hz</div>
+
+        </div>
+      </div><!-- end canvas wrapper -->
+
+      <!-- ── Side info panel ── -->
+      <div style="width:190px;flex-shrink:0;display:flex;flex-direction:column;gap:7px;font-size:11px;padding-top:1px;">
+
+        <div style="background:#0d1a0d;border:1px solid #33aa44;border-radius:6px;padding:9px;">
+          <div style="color:#44ff88;font-weight:bold;margin-bottom:5px;">&#x1F6E1; ฉนวน (Insulation)</div>
+          <div style="color:#88cc99;line-height:1.5;">น้ำมันมีความต้านทานไฟฟ้าสูง ป้องกันการ Arcing ระหว่างขดลวดและตัวถัง</div>
+        </div>
+
+        <div style="background:#160f00;border:1px solid #bb7700;border-radius:6px;padding:9px;">
+          <div style="color:#ffcc44;font-weight:bold;margin-bottom:5px;">&#x1F525; ระบายความร้อน (Cooling)</div>
+          <div style="color:#ccaa66;line-height:1.5;">น้ำมันพาความร้อนจากขดลวด/แกนเหล็กไปยังครีบระบาย ป้องกัน Overheat</div>
+        </div>
+
+        <div style="background:#0e000e;border:1px solid #9922aa;border-radius:6px;padding:9px;">
+          <div style="color:#cc88ff;font-weight:bold;margin-bottom:5px;">&#x26A1; ดับ Arc (Arc Quench)</div>
+          <div style="color:#aa77cc;line-height:1.5;">หากเกิด Arcing ภายใน น้ำมันดับประกายไฟและดูดซับพลังงาน</div>
+        </div>
+
+        <div style="background:#09091e;border:1px solid #3a4466;border-radius:6px;padding:9px;">
+          <div style="color:#99aadd;font-weight:bold;margin-bottom:6px;">&#x1F4CB; Nameplate</div>
+          <table style="color:#7788bb;line-height:1.7;width:100%;font-family:'Courier New',monospace;font-size:10px;">
+            <tr><td style="color:#aab;">kVA</td><td style="color:#ddeeff;">1,500</td></tr>
+            <tr><td style="color:#aab;">HV</td><td style="color:#ff9944;">22,000 V</td></tr>
+            <tr><td style="color:#aab;">LV</td><td style="color:#ff7722;">400 V</td></tr>
+            <tr><td style="color:#aab;">HV I</td><td style="color:#cc88ff;">39.4 A</td></tr>
+            <tr><td style="color:#aab;">LV I</td><td style="color:#dd66ff;">2,165 A</td></tr>
+            <tr><td style="color:#aab;">Ratio</td><td style="color:#ffd700;">55 : 1</td></tr>
+            <tr><td style="color:#aab;">Freq</td><td style="color:#aaaaff;">50 Hz</td></tr>
+            <tr><td style="color:#aab;">Cool</td><td style="color:#44ffcc;">ONAN</td></tr>
+            <tr><td style="color:#aab;">Oil</td><td style="color:#cc9944;">Naphthenic</td></tr>
+            <tr><td style="color:#aab;">Temp</td><td style="color:#ff8844;">+55 K rise</td></tr>
+          </table>
+        </div>
+
+        <div style="background:#060f06;border:1px solid #1a441a;border-radius:6px;padding:9px;">
+          <div style="color:#44ff88;font-weight:bold;margin-bottom:6px;">&#x1F4F6; Live Readings</div>
+          <div id="trLiveData" style="color:#55dd88;line-height:1.85;font-size:10px;font-family:'Courier New',monospace;"></div>
+        </div>
+
+      </div><!-- end side panel -->
+    </div><!-- end main area -->
+  </div><!-- end max-width wrapper -->
+</div><!-- end trSection -->
+
+<script>
+(function(){
+  var C = document.getElementById('trCvs');
+  if(!C) return;
+  var ctx = C.getContext('2d');
+  var W = 960, H = 580;
+  C.width = W; C.height = H;
+
+  var t = 0;
+
+  // ── Tank geometry (y=118 gives space for 58px-tall HV Bushings above) ──
+  var TK = {x:180, y:118, w:540, h:345};
+  TK.cx = TK.x + TK.w/2;
+  TK.cy = TK.y + TK.h/2;
+
+  // ── Core geometry — rectangular frame (Step-Down Transformer style) ──
+  var CR_CT = 54;                        // core thickness (px)
+  var CR_OX1=256, CR_OX2=644;            // outer left/right X of core
+  var CR_OY1=163, CR_OY2=415;            // outer top/bottom Y of core
+  var WIN_X1=CR_OX1+CR_CT;              // window left  = 310
+  var WIN_X2=CR_OX2-CR_CT;              // window right = 590
+  var WIN_Y1=CR_OY1+CR_CT;              // window top   = 217
+  var WIN_Y2=CR_OY2-CR_CT;              // window bot   = 361
+  var LLX1=CR_OX1, LLX2=WIN_X1;        // left  leg x1=256, x2=310
+  var RLX1=WIN_X2, RLX2=CR_OX2;        // right leg x1=590, x2=644
+  var LLCX=(LLX1+LLX2)/2;              // left  leg center X = 283
+  var RLCX=(RLX1+RLX2)/2;              // right leg center X = 617
+  // Coil winding areas on the legs (between yokes, with small margin)
+  var COIL_Y1=WIN_Y1+8;                 // = 225
+  var COIL_Y2=WIN_Y2-8;                 // = 353
+  var N1=9, N2=5;                        // HV turns, LV turns
+  var HV_EXT=CR_OX1-48;                 // HV coil extends left to X = 208
+  var LV_EXT=CR_OX2+48;                 // LV coil extends right to X = 692
+  // LV coil vertical range (centered, scaled by turns ratio)
+  var LV_H=(COIL_Y2-COIL_Y1)*(N2/N1);  // ~71 px
+  var LV_Y1=TK.cy-LV_H/2;              // centered on tank
+  var LV_Y2=TK.cy+LV_H/2;
+
+  // ── Fin geometry ──
+  var FN = 9, FH = 26, FW = 15, FG = 10;
+  var FY0 = TK.y+28;
+
+  // ── Oil particles ──
+  var OIL_N=40, oilPts=[];
+  for(var i=0;i<OIL_N;i++){
+    oilPts.push({
+      x: TK.x+22+Math.random()*(TK.w-44),
+      y: TK.y+25+Math.random()*(TK.h-50),
+      vx:0, vy:0
+    });
+  }
+
+  function updateOil(){
+    for(var i=0;i<oilPts.length;i++){
+      var p=oilPts[i];
+      // Hot near either leg (primary heats more), cool in window center
+      var hot = (p.x>LLX1-12&&p.x<LLX2+12)||(p.x>RLX1-12&&p.x<RLX2+12);
+      if(hot){ p.vy -= 0.13; if(p.vy<-3) p.vy=-3; }
+      else   { p.vy += 0.09; if(p.vy>3)  p.vy=3; }
+      // Redirect at top/bottom toward window center
+      if(p.y < TK.y+70)       p.vx += (p.x<TK.cx) ? 0.10 : -0.10;
+      if(p.y > TK.y+TK.h-70) p.vx += (p.x<TK.cx) ? 0.10 : -0.10;
+      p.vx *= 0.91; p.vy *= 0.93;
+      p.x += p.vx; p.y += p.vy;
+      if(p.x<TK.x+15){p.x=TK.x+15;p.vx= Math.abs(p.vx);}
+      if(p.x>TK.x+TK.w-15){p.x=TK.x+TK.w-15;p.vx=-Math.abs(p.vx);}
+      if(p.y<TK.y+15){p.y=TK.y+15;p.vy= Math.abs(p.vy);}
+      if(p.y>TK.y+TK.h-15){p.y=TK.y+TK.h-15;p.vy=-Math.abs(p.vy);}
+    }
+  }
+
+  function rr(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+    ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r);
+    ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h);
+    ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r);
+    ctx.quadraticCurveTo(x,y,x+r,y);
+    ctx.closePath();
+  }
+
+  function drawFins(mag){
+    for(var i=0;i<FN;i++){
+      var fy = FY0+i*(FH+FG);
+      var ha = 0.10+0.14*mag;
+      // Left
+      ctx.fillStyle='#162235'; ctx.strokeStyle='#2255aa'; ctx.lineWidth=1;
+      ctx.fillRect(TK.x-FW-2,fy,FW,FH); ctx.strokeRect(TK.x-FW-2,fy,FW,FH);
+      ctx.fillStyle='rgba(255,110,20,'+ha+')'; ctx.fillRect(TK.x-FW-2,fy,FW,FH);
+      // Right
+      ctx.fillStyle='#162235'; ctx.strokeStyle='#2255aa';
+      ctx.fillRect(TK.x+TK.w+2,fy,FW,FH); ctx.strokeRect(TK.x+TK.w+2,fy,FW,FH);
+      ctx.fillStyle='rgba(255,110,20,'+ha+')'; ctx.fillRect(TK.x+TK.w+2,fy,FW,FH);
+    }
+  }
+
+  function drawTank(){
+    ctx.shadowColor='rgba(60,80,200,0.3)'; ctx.shadowBlur=18;
+    ctx.fillStyle='#0d0d22'; rr(TK.x,TK.y,TK.w,TK.h,8); ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.strokeStyle='#2a4477'; ctx.lineWidth=2.5; rr(TK.x,TK.y,TK.w,TK.h,8); ctx.stroke();
+    // Oil fill (amber)
+    var og=ctx.createLinearGradient(TK.cx-120,TK.y,TK.cx+120,TK.y+TK.h);
+    og.addColorStop(0,'rgba(140,80,12,0.18)');
+    og.addColorStop(0.5,'rgba(190,120,22,0.28)');
+    og.addColorStop(1,'rgba(130,70,10,0.18)');
+    ctx.fillStyle=og; rr(TK.x+2,TK.y+2,TK.w-4,TK.h-4,6); ctx.fill();
+  }
+
+  function drawHeat(mag){
+    var r=ctx.createRadialGradient(TK.cx,TK.cy,15,TK.cx,TK.cy,130);
+    r.addColorStop(0,'rgba(255,170,0,'+(0.04+0.20*mag)+')');
+    r.addColorStop(0.5,'rgba(255,60,0,'+(0.01+0.08*mag)+')');
+    r.addColorStop(1,'rgba(200,0,0,0)');
+    ctx.fillStyle=r; rr(TK.x+2,TK.y+2,TK.w-4,TK.h-4,6); ctx.fill();
+  }
+
+  function drawOilParticles(){
+    for(var i=0;i<oilPts.length;i++){
+      var p=oilPts[i];
+      var hot=(p.x>LLX1-12&&p.x<LLX2+12)||(p.x>RLX1-12&&p.x<RLX2+12);
+      var tmp=hot?0.85:0.25;
+      ctx.beginPath(); ctx.arc(p.x,p.y,2+tmp*2,0,Math.PI*2);
+      ctx.fillStyle='hsla('+(hot?38:28)+',75%,58%,'+(0.45+tmp*0.4)+')';
+      ctx.fill();
+    }
+  }
+
+  // ── Rectangular frame core (Primary on left leg, Secondary on right leg) ──
+  function drawCore(mag){
+    function cBlock(x,y,w,h){
+      // Teal/green like reference image
+      var g=ctx.createLinearGradient(x,y,x+w,y);
+      g.addColorStop(0,'#2a5040'); g.addColorStop(0.5,'#3d7a62'); g.addColorStop(1,'#2a5040');
+      ctx.fillStyle=g; ctx.fillRect(x,y,w,h);
+      // Lamination lines (horizontal, characteristic of Si-steel)
+      ctx.strokeStyle='rgba(40,80,60,0.5)'; ctx.lineWidth=0.8;
+      for(var i=3;i<h;i+=5){ ctx.beginPath();ctx.moveTo(x,y+i);ctx.lineTo(x+w,y+i);ctx.stroke(); }
+      // Flux magnetic glow (teal)
+      ctx.fillStyle='rgba(60,200,130,'+(0.05+0.28*mag)+')'; ctx.fillRect(x,y,w,h);
+      ctx.strokeStyle='rgba(50,160,100,0.9)'; ctx.lineWidth=2; ctx.strokeRect(x,y,w,h);
+    }
+    // 3D depth illusion — right face
+    ctx.fillStyle='rgba(20,50,35,0.8)';
+    ctx.fillRect(CR_OX2, CR_OY1+6, 8, CR_OY2-CR_OY1-6);
+    // Top yoke (full width)
+    cBlock(CR_OX1, CR_OY1, CR_OX2-CR_OX1, CR_CT);
+    // Bottom yoke (full width)
+    cBlock(CR_OX1, CR_OY2-CR_CT, CR_OX2-CR_OX1, CR_CT);
+    // Left leg (between yokes)
+    cBlock(LLX1, CR_OY1+CR_CT, CR_CT, CR_OY2-CR_OY1-2*CR_CT);
+    // Right leg (between yokes)
+    cBlock(RLX1, CR_OY1+CR_CT, CR_CT, CR_OY2-CR_OY1-2*CR_CT);
+    // Window fill (darker to show opening)
+    ctx.fillStyle='rgba(5,10,18,0.55)';
+    ctx.fillRect(WIN_X1, WIN_Y1, WIN_X2-WIN_X1, WIN_Y2-WIN_Y1);
+  }
+
+  // ── Magnetic flux arrows — travel around the rectangular core loop ──
+  function drawFlux(st,mag){
+    if(mag<0.04) return;
+    var dir=st>0?1:-1, fp=((t*1.6)%(Math.PI*2))/(Math.PI*2);
+    var legTopY=CR_OY1+CR_CT, legBotY=CR_OY2-CR_CT;
+    for(var j=0;j<4;j++){
+      var frac=dir>0?(fp+j/4)%1:(1-fp+j/4)%1;
+      var fx,fy,fa;
+      // up left leg → right top yoke → down right leg → left bottom yoke
+      if(frac<0.25){
+        fx=LLCX; fy=legBotY-(frac/0.25)*(legBotY-legTopY); fa=dir>0?'up':'down';
+      } else if(frac<0.5){
+        fx=LLCX+(frac-0.25)/0.25*(RLCX-LLCX); fy=CR_OY1+CR_CT/2; fa=dir>0?'right':'left';
+      } else if(frac<0.75){
+        fx=RLCX; fy=legTopY+(frac-0.5)/0.25*(legBotY-legTopY); fa=dir>0?'down':'up';
+      } else {
+        fx=RLCX-(frac-0.75)/0.25*(RLCX-LLCX); fy=CR_OY2-CR_CT/2; fa=dir>0?'left':'right';
+      }
+      var as=7;
+      ctx.fillStyle='rgba(100,230,160,'+(0.55+0.40*mag)+')';
+      ctx.beginPath();
+      if(fa==='up')   {ctx.moveTo(fx,fy-as);ctx.lineTo(fx-as/2,fy+as/2);ctx.lineTo(fx+as/2,fy+as/2);}
+      else if(fa==='down'){ctx.moveTo(fx,fy+as);ctx.lineTo(fx-as/2,fy-as/2);ctx.lineTo(fx+as/2,fy-as/2);}
+      else if(fa==='right'){ctx.moveTo(fx+as,fy);ctx.lineTo(fx-as/2,fy-as/2);ctx.lineTo(fx-as/2,fy+as/2);}
+      else            {ctx.moveTo(fx-as,fy);ctx.lineTo(fx+as/2,fy-as/2);ctx.lineTo(fx+as/2,fy+as/2);}
+      ctx.closePath(); ctx.fill();
+    }
+  }
+
+  // ── Helical solenoid coil around a vertical leg (like reference image) ──
+  function drawSolenoidCoil(lEdge,y1,y2,extX,col,bright,nTurns,mag,phase){
+    var isLeft=(extX<lEdge);
+    var turnH=(y2-y1)/nTurns;
+    for(var i=0;i<nTurns;i++){
+      var yt=y1+i*turnH+1, yb=yt+turnH-2, ym=(yt+yb)*0.5;
+      ctx.strokeStyle=(i%2===0)?bright:col;
+      ctx.lineWidth=3.8; ctx.globalAlpha=0.80+0.20*mag;
+      ctx.beginPath();
+      ctx.moveTo(lEdge,yt);
+      if(isLeft){
+        ctx.bezierCurveTo(lEdge-10,yt+turnH*0.10, extX,yt+turnH*0.20, extX,ym);
+        ctx.bezierCurveTo(extX,yb-turnH*0.20, lEdge-10,yb-turnH*0.10, lEdge,yb);
+      } else {
+        ctx.bezierCurveTo(lEdge+10,yt+turnH*0.10, extX,yt+turnH*0.20, extX,ym);
+        ctx.bezierCurveTo(extX,yb-turnH*0.20, lEdge+10,yb-turnH*0.10, lEdge,yb);
+      }
+      ctx.stroke(); ctx.globalAlpha=1;
+    }
+    // Current flow dots on outer curve
+    if(mag>0.06){
+      var nd=2+Math.floor(mag*3);
+      for(var d=0;d<nd;d++){
+        var fr=((phase*1.5+d/nd)%1);
+        var ti=Math.floor(fr*nTurns), tf=(fr*nTurns)-ti;
+        var yt2=y1+ti*turnH+1, yb2=yt2+turnH-2, ym2=(yt2+yb2)*0.5;
+        var dotX,dotY;
+        if(tf<0.5){
+          var f2=tf*2;
+          dotX=isLeft? lEdge-(lEdge-extX)*f2 : lEdge+(extX-lEdge)*f2;
+          dotY=yt2+(ym2-yt2)*f2*1.4;
+        } else {
+          var f2=(tf-0.5)*2;
+          dotX=isLeft? extX+(lEdge-extX)*f2 : extX-(extX-lEdge)*f2;
+          dotY=ym2+(yb2-ym2)*f2*1.4;
+        }
+        ctx.beginPath(); ctx.arc(dotX,dotY,3.5,0,Math.PI*2);
+        ctx.fillStyle=bright; ctx.globalAlpha=0.88; ctx.fill(); ctx.globalAlpha=1;
+      }
+    }
+  }
+
+  function drawWindings(st,mag){
+    // ── Primary coil (HV) on LEFT leg — extends left ──
+    drawSolenoidCoil(LLX1, COIL_Y1, COIL_Y2, HV_EXT, '#1144cc','#4488ff', N1, mag, t);
+    // Lead wires out of primary coil to tank left wall
+    ctx.strokeStyle='#3355bb'; ctx.lineWidth=2.5; ctx.globalAlpha=0.60;
+    ctx.beginPath(); ctx.moveTo(HV_EXT, COIL_Y1+3); ctx.lineTo(TK.x, COIL_Y1+3); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(HV_EXT, COIL_Y2-3); ctx.lineTo(TK.x, COIL_Y2-3); ctx.stroke();
+    ctx.globalAlpha=1;
+
+    // ── Secondary coil (LV) on RIGHT leg — extends right ──
+    drawSolenoidCoil(RLX2, LV_Y1, LV_Y2, LV_EXT, '#cc4400','#ff7733', N2, mag, t+Math.PI);
+    // Lead wires from secondary coil to tank right wall
+    ctx.strokeStyle='#bb5522'; ctx.lineWidth=2.5; ctx.globalAlpha=0.60;
+    ctx.beginPath(); ctx.moveTo(LV_EXT, LV_Y1+3); ctx.lineTo(TK.x+TK.w, LV_Y1+3); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(LV_EXT, TK.cy);   ctx.lineTo(TK.x+TK.w, TK.cy);   ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(LV_EXT, LV_Y2-3); ctx.lineTo(TK.x+TK.w, LV_Y2-3); ctx.stroke();
+    ctx.globalAlpha=1;
+  }
+
+  function drawBush(x,y,w,h,col,nr){
+    ctx.fillStyle='#181830'; ctx.strokeStyle=col; ctx.lineWidth=1.5;
+    ctx.fillRect(x-w/2,y-h,w,h); ctx.strokeRect(x-w/2,y-h,w,h);
+    for(var i=0;i<nr;i++){
+      var ry=y-h*(0.2+i*0.18);
+      ctx.beginPath(); ctx.ellipse(x,ry,w*1.6,3.5,0,0,Math.PI*2);
+      ctx.fillStyle='#252545'; ctx.fill();
+      ctx.strokeStyle=col; ctx.lineWidth=1; ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(x,y-h,w/2+1,Math.PI,0);
+    ctx.fillStyle=col; ctx.fill();
+  }
+
+  function drawBushings(){
+    // HV bushings — above LEFT leg (primary coil) — 3-phase: R, S, T
+    drawBush(LLCX-20, TK.y, 10, 58, '#3366ff', 5);
+    drawBush(LLCX,    TK.y, 10, 58, '#3366ff', 5);
+    drawBush(LLCX+20, TK.y, 10, 58, '#3366ff', 5);
+    // LV bushings — above RIGHT leg (secondary coil)
+    drawBush(RLCX-20, TK.y, 8, 42, '#ff6622', 3);
+    drawBush(RLCX,    TK.y, 8, 42, '#ff6622', 3);
+    drawBush(RLCX+20, TK.y, 8, 42, '#ff6622', 3);
+  }
+
+  function drawConservator(){
+    // Centered above tank window — away from both bushing groups
+    var cx=TK.cx-50, cy=TK.y-55, cw=100, ch=26;
+    var px=cx+cw/2-18;
+    // Pipe + Buchholz relay
+    ctx.strokeStyle='#224455'; ctx.lineWidth=5;
+    ctx.beginPath(); ctx.moveTo(px,TK.y); ctx.lineTo(px,cy+ch); ctx.stroke();
+    ctx.fillStyle='#1a2a3a'; ctx.strokeStyle='#446688'; ctx.lineWidth=1.5;
+    ctx.fillRect(px-8,TK.y-18,16,18); ctx.strokeRect(px-8,TK.y-18,16,18);
+    // Conservator cylinder
+    rr(cx,cy,cw,ch,12); ctx.fillStyle='#1a2844'; ctx.fill();
+    ctx.strokeStyle='#3366aa'; ctx.lineWidth=2; rr(cx,cy,cw,ch,12); ctx.stroke();
+    // Oil level (animated)
+    var lvl=0.62+0.06*Math.sin(t*0.25);
+    ctx.save(); ctx.beginPath(); rr(cx+2,cy+2,cw-4,ch-4,10); ctx.clip();
+    ctx.fillStyle='rgba(180,120,25,0.55)';
+    ctx.fillRect(cx+2,cy+ch*(1-lvl),cw-4,ch*lvl);
+    ctx.restore();
+  }
+
+  function draw22kV(mag){
+    var px=75;
+    // Pole
+    ctx.strokeStyle='#664422'; ctx.lineWidth=6;
+    ctx.beginPath(); ctx.moveTo(px,TK.y-10); ctx.lineTo(px,TK.y+TK.h+20); ctx.stroke();
+    // Cross arm (wider for 3 phases)
+    ctx.strokeStyle='#7a5533'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(px-42,TK.y+18); ctx.lineTo(px+42,TK.y+18); ctx.stroke();
+    // 3 sets of disc insulators (R, S, T)
+    var ixArr=[px-30, px, px+30];
+    var bxArr=[LLCX-20, LLCX, LLCX+20];
+    var phCol=['rgba(255,80,80,0.85)','rgba(240,240,60,0.85)','rgba(80,160,255,0.85)'];
+    for(var p=0;p<3;p++){
+      for(var i=0;i<4;i++){
+        ctx.beginPath(); ctx.ellipse(ixArr[p],TK.y+18-i*9,7,3.5,0,0,Math.PI*2);
+        ctx.fillStyle='#ccdde8'; ctx.fill();
+        ctx.strokeStyle='#aabbcc'; ctx.lineWidth=0.8; ctx.stroke();
+      }
+    }
+    // 3-phase wires to HV bushings
+    ctx.strokeStyle='#888855'; ctx.lineWidth=1.5;
+    for(var p=0;p<3;p++){
+      ctx.beginPath();
+      ctx.moveTo(ixArr[p], TK.y+18-27);
+      ctx.lineTo(bxArr[p], TK.y-58);
+      ctx.stroke();
+    }
+    // Animated dots — 3 phases with 120° offset, phase colours R/S/T
+    for(var p=0;p<3;p++){
+      for(var d=0;d<4;d++){
+        var f=((t*1.1 + p/3 + d/4)%1);
+        var ax=ixArr[p]+f*(bxArr[p]-ixArr[p]);
+        var ay=(TK.y+18-27)+f*(TK.y-58-(TK.y+18-27));
+        ctx.beginPath(); ctx.arc(ax,ay,4.5,0,Math.PI*2);
+        ctx.fillStyle=phCol[p]; ctx.fill();
+      }
+    }
+    drawSineWave(8,TK.y+TK.h+18,165,52,'#3388ff',t,1.0);
+  }
+
+  function draw04kV(){
+    var mx=TK.x+TK.w+42, my=TK.cy-65, mw=85, mh=130;
+    ctx.fillStyle='#111128'; ctx.strokeStyle='#4444aa'; ctx.lineWidth=2;
+    ctx.fillRect(mx,my,mw,mh); ctx.strokeRect(mx,my,mw,mh);
+    // Lines from LV bushings (above right leg — RLCX±20) to MDB
+    ctx.strokeStyle='#ff8844'; ctx.lineWidth=1.5;
+    var bx1=RLCX-20, bx2=RLCX+20, by1=TK.y-42, by2=my+mh/2;
+    ctx.beginPath(); ctx.moveTo(bx1,by1); ctx.lineTo(mx,by2-15); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo((bx1+bx2)/2,by1); ctx.lineTo(mx,by2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(bx2,by1); ctx.lineTo(mx,by2+15); ctx.stroke();
+    // Animated LV dots (more, faster = more current, lower voltage)
+    for(var d=0;d<9;d++){
+      var f=((t*2.2+d/9)%1);
+      var ax=(bx1+bx2)/2+f*(mx-(bx1+bx2)/2), ay=by1+f*(by2-by1);
+      ctx.beginPath(); ctx.arc(ax,ay,3.5,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,140,40,0.9)'; ctx.fill();
+    }
+    drawSineWave(TK.x+TK.w+20,TK.y+TK.h+18,165,52,'#ff7733',t,0.9);
+  }
+
+  function drawSineWave(x,y,w,h,col,time,amp){
+    ctx.fillStyle='rgba(8,8,25,0.8)'; ctx.fillRect(x,y,w,h);
+    ctx.strokeStyle='rgba(50,50,90,0.6)'; ctx.lineWidth=1; ctx.strokeRect(x,y,w,h);
+    ctx.strokeStyle='rgba(70,70,100,0.4)'; ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.moveTo(x,y+h/2); ctx.lineTo(x+w,y+h/2); ctx.stroke();
+    ctx.beginPath(); ctx.strokeStyle=col; ctx.lineWidth=2;
+    for(var i=0;i<=w;i++){
+      var a=(i/w)*Math.PI*4+time*2.5;
+      var yp=y+h/2-(h/2-4)*Math.sin(a)*amp;
+      if(i===0) ctx.moveTo(x+i,yp); else ctx.lineTo(x+i,yp);
+    }
+    ctx.stroke();
+  }
+
+  // ── Realistic random-walk readings ──
+  var RNG = { load:0.72, temp:62.0, v1:22000, pf:0.88, freq:50.00 };
+  var rTick = 0;
+
+  function rwalk(v, d, lo, hi){ v+=(Math.random()-0.5)*d; return Math.max(lo,Math.min(hi,v)); }
+
+  function updateReadings(){
+    rTick++;
+    if(rTick%4!==0) return;  // ~15 fps update
+    RNG.load = rwalk(RNG.load, 0.012, 0.42, 0.98);
+    RNG.temp += ((38+RNG.load*52)-RNG.temp)*0.003 + (Math.random()-0.5)*0.09;
+    RNG.temp  = Math.max(35, Math.min(95, RNG.temp));
+    RNG.v1    = rwalk(RNG.v1,  20,  20900, 23100);
+    RNG.pf    = rwalk(RNG.pf,  0.005, 0.82, 0.95);
+    RNG.freq  = rwalk(RNG.freq,0.02,  49.82, 50.18);
+
+    // Derived physics
+    var reg  = 1 - RNG.load*0.028;            // voltage regulation
+    var v2   = (RNG.v1/55.0) * reg;           // secondary V
+    var i1   = RNG.load*1500000/(RNG.v1*1.7321*RNG.pf);
+    var i2   = RNG.load*1500000/(v2*1.7321*RNG.pf);
+    var eff  = Math.max(0.966, Math.min(0.995, 0.975 + RNG.pf*0.014 - RNG.load*0.004));
+    var flux = RNG.v1/(4.44*RNG.freq*1000);   // Φ = V/(4.44·f·N), N=1000 scaling
+
+    function $s(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
+    $s('trT',   RNG.temp.toFixed(1)+' \xB0C');
+    $s('trL',   (RNG.load*100).toFixed(1)+' %');
+    $s('trV1',  Math.round(RNG.v1)+' V');
+    $s('trV2',  v2.toFixed(1)+' V');
+    $s('trI1',  i1.toFixed(2)+' A');
+    $s('trI2',  Math.round(i2)+' A');
+    $s('trPF',  RNG.pf.toFixed(3));
+    $s('trEff', (eff*100).toFixed(2)+' %');
+    $s('trFl',  flux.toFixed(3)+' Wb');
+    $s('trHz',  RNG.freq.toFixed(2)+' Hz');
+
+    var fl=document.getElementById('trFluxLbl');
+    if(fl) fl.textContent='Magnetic Flux Φ = '+flux.toFixed(3)+' Wb';
+
+    var ld=document.getElementById('trLiveData');
+    if(ld) ld.innerHTML=
+      'Temp  : '+RNG.temp.toFixed(1)+' \xB0C<br>'+
+      'Load  : '+(RNG.load*100).toFixed(1)+' %<br>'+
+      'V₁    : '+Math.round(RNG.v1)+' V<br>'+
+      'V₂    : '+v2.toFixed(1)+' V<br>'+
+      'I₁    : '+i1.toFixed(2)+' A<br>'+
+      'I₂    : '+Math.round(i2)+' A<br>'+
+      'P.F.  : '+RNG.pf.toFixed(3)+'<br>'+
+      'Eff   : '+(eff*100).toFixed(2)+' %<br>'+
+      'Φ     : '+flux.toFixed(3)+' Wb<br>'+
+      'Hz    : '+RNG.freq.toFixed(2);
+  }
+
+  // ── Main animation loop ──
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#09091e'; ctx.fillRect(0,0,W,H);
+    t += 0.022;
+    var st=Math.sin(t), mag=Math.abs(st);
+
+    updateOil();
+    drawFins(mag);
+    drawTank();
+    drawHeat(mag);
+    drawOilParticles();
+    drawCore(mag);
+    drawFlux(st,mag);
+    drawWindings(st,mag);
+    drawBushings();
+    drawConservator();
+    draw22kV(mag);
+    draw04kV();
+    updateReadings();
+
+    requestAnimationFrame(frame);
+  }
+
+  frame();
+})();
+</script>
+</body>
+</html>
