@@ -29,6 +29,13 @@ header .sub{font-size:.72rem;color:#aaa}
 .sg{background:#0a1f0a;color:#88ff88;border:1px solid #44aa44}
 .stg{background:#081808;color:#44ff88;border:1px solid #229944}
 .ibar{text-align:center;font-size:10px;color:#555;padding:3px;background:#07071a}
+.modebar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 18px;background:#08081c;border-bottom:1px solid #1a1a3a}
+.modebar span{font-size:11px;color:#888;}
+.mbtn{padding:5px 16px;border-radius:20px;font-size:12px;font-weight:700;border:2px solid;cursor:pointer;font-family:'Noto Sans Thai','Segoe UI',sans-serif;transition:all .2s}
+.mbtn-normal{background:#0a2a0a;color:#00ff88;border-color:#00aa44;}
+.mbtn-normal.active{background:#00aa44;color:#fff;box-shadow:0 0 10px #00ff8888}
+.mbtn-outage{background:#2a0808;color:#ff6666;border-color:#aa2222;}
+.mbtn-outage.active{background:#cc2222;color:#fff;box-shadow:0 0 10px #ff444488}
 </style>
 </head>
 <body>
@@ -46,6 +53,11 @@ header .sub{font-size:.72rem;color:#aaa}
     <div class="leg"><div class="led" style="background:#ff4444"></div>Open/Dead</div>
   </div>
 </header>
+<div class="modebar">
+  <span>โหมดระบบ :</span>
+  <button class="mbtn mbtn-normal active" id="btnNormal" onclick="setMode('normal')">&#x1F7E2; ไฟปกติ (PEA)</button>
+  <button class="mbtn mbtn-outage" id="btnOutage" onclick="setMode('outage')">&#x1F534; ไฟดับ</button>
+</div>
 <div class="grid" id="G"></div>
 
 <script>
@@ -97,6 +109,23 @@ function tgenDir(id){
   var a=ST[id].genA, b=ST[id].genB;
   if(a&&!b) return 'A to B'; if(b&&!a) return 'B to A';
   if(a&&b) return 'Parallel'; return null;
+}
+
+// ── Global mode ──
+function setMode(mode){
+  CFG.forEach(function(c){
+    var id=c.id;
+    if(mode==='normal'){
+      ST[id].hvA=true; ST[id].hvB=true;
+      ST[id].genA=false; ST[id].genB=false;
+    } else {
+      ST[id].hvA=false; ST[id].hvB=false;
+      ST[id].genA=true; ST[id].genB=true;
+    }
+  });
+  document.getElementById('btnNormal').classList.toggle('active', mode==='normal');
+  document.getElementById('btnOutage').classList.toggle('active', mode==='outage');
+  renderAll();
 }
 
 // ── Toggle functions ──
