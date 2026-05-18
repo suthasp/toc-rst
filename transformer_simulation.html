@@ -98,7 +98,15 @@ function tgenDir(id){
 // ── Toggle functions ──
 function toggleACB(id,side){ ST[id]['acb'+side]=!ST[id]['acb'+side]; renderAll(); }
 function toggleTIE(id){ ST[id].tie=!ST[id].tie; renderAll(); }
-function toggleHV(id,side){ ST[id]['hv'+side]=!ST[id]['hv'+side]; renderAll(); }
+function toggleHV(id,side){
+  ST[id]['hv'+side]=!ST[id]['hv'+side];
+  if(!ST[id]['hv'+side]){
+    ST[id]['gen'+side]=true;   // HV trip → auto-start generator
+  } else {
+    ST[id]['gen'+side]=false;  // HV restored → auto-stop generator
+  }
+  renderAll();
+}
 function toggleGen(id,side){ ST[id]['gen'+side]=!ST[id]['gen'+side]; renderAll(); }
 function toggleTieGen(id){ ST[id].tieGen=!ST[id].tieGen; renderAll(); }
 
