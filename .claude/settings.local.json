@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(cd \"c:\\\\Users\\\\suthas\\\\OneDrive\\\\Documents\\\\GitHub\\\\PM Plan\"; git add . 2>&1 | Select-Object -Last 5; Write-Host \"Exit: $LASTEXITCODE\")"
+    ]
+  }
+}
