@@ -1,0 +1,446 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Fire Safety Management System — TOC Data Center</title>
+<link rel="icon" href="assets/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e14;--bg2:#111827;--bg3:#1a2332;--brd:#2d3748;--grn:#00d26a;--amb:#f59e0b;--red:#ef4444;--blu:#38bdf8;--pur:#a78bfa;--txt:#e2e8f0;--mut:#94a3b8;--mono:'JetBrains Mono',monospace;--thai:'Noto Sans Thai',sans-serif}
+body{background:var(--bg);color:var(--txt);font-family:var(--thai);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{background:linear-gradient(135deg,#060910,#0c1520);border-bottom:2px solid #1a2840;padding:5px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0}
+.htitle{font-size:.98rem;font-weight:700;color:#ef4444;letter-spacing:.04em}
+.hsub{font-size:.68rem;color:#3a5a78;margin-top:1px}
+.hdiv{width:1px;height:22px;background:#2d3748}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:4px;font-size:.65rem;font-family:var(--mono);font-weight:700;letter-spacing:.04em}
+.bg{background:rgba(0,210,106,.12);color:#00d26a;border:1px solid rgba(0,210,106,.35)}
+.br{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.45);animation:flash .5s step-end infinite}
+.bap{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.4);animation:ptxt 1s ease-in-out infinite}
+.bb{background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.3)}
+.ba{background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+#clk{font-family:var(--mono);font-size:.7rem;color:#3a5a78;margin-left:auto}
+.main{display:grid;grid-template-columns:295px 1fr 290px;gap:6px;padding:6px;flex:1;overflow:hidden;min-height:0}
+.panel{background:var(--bg2);border:1px solid var(--brd);border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
+.phdr{background:#0c1520;padding:5px 11px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.phdr h2{font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#3a5a78}
+.pbody{flex:1;overflow-y:auto;padding:7px}
+.pbody::-webkit-scrollbar{width:3px}.pbody::-webkit-scrollbar-track{background:#07090e}.pbody::-webkit-scrollbar-thumb{background:#1e2d3d;border-radius:2px}
+.zgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.zc{border:2px solid var(--brd);border-radius:5px;padding:7px 8px;cursor:pointer;transition:all .2s;background:var(--bg3);display:flex;flex-direction:column;gap:3px;min-height:80px;position:relative}
+.zc:hover{filter:brightness(1.1)}
+.zc.sel{outline:2px solid #38bdf8;outline-offset:2px}
+.zc.zn{border-color:rgba(0,210,106,.35);background:rgba(0,210,106,.05)}
+.zc.zp{border-color:#f59e0b;background:rgba(245,158,11,.1);animation:pcard 1.2s ease-in-out infinite}
+.zc.za{border-color:#ef4444;background:rgba(239,68,68,.14);animation:fcard .5s step-end infinite}
+.zc.zf{border-color:#a78bfa;background:rgba(167,139,250,.08)}
+.zc.zi{border-color:#374151;background:rgba(55,65,81,.07);opacity:.6}
+.zid{font-family:var(--mono);font-size:.58rem;color:var(--mut)}
+.znm{font-size:.72rem;font-weight:700}
+.zdots{display:flex;gap:3px;flex-wrap:wrap;margin-top:2px}
+.dd{width:7px;height:7px;border-radius:50%;background:#1a2a3a}
+.dd.da{background:#ef4444;box-shadow:0 0 4px #ef4444}.dd.dp{background:#f59e0b}
+.zst{font-family:var(--mono);font-size:.6rem;font-weight:700;margin-top:auto}
+.zn .zst{color:#00d26a}.zp .zst{color:#f59e0b}.za .zst{color:#ef4444}.zf .zst{color:#a78bfa}.zi .zst{color:#6b7280}
+.zcd{position:absolute;top:4px;right:5px;font-family:var(--mono);font-size:.68rem;font-weight:700;color:#f59e0b}
+.legend{display:flex;flex-wrap:wrap;gap:5px;font-size:.57rem;font-family:var(--mono);margin-top:7px;padding-top:7px;border-top:1px solid var(--brd)}
+.sctrls{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px}
+.cb{font-size:.62rem;font-family:var(--mono);padding:4px 10px;border-radius:3px;border:none;cursor:pointer;font-weight:600;transition:all .15s}
+.cbr{background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.3)}.cbr:hover{background:rgba(56,189,248,.22)}
+.cbs{background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}.cbs:hover{background:rgba(245,158,11,.22)}
+.cbx{background:rgba(239,68,68,.08);color:#ef4444;border:1px solid rgba(239,68,68,.3)}.cbx:hover{background:rgba(239,68,68,.2)}
+.cbg{background:rgba(75,85,99,.1);color:#9ca3af;border:1px solid #374151}.cbg:hover{background:rgba(75,85,99,.22)}
+.di{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:4px;margin-bottom:4px;background:var(--bg3);border:1px solid var(--brd)}
+.dico{font-size:.95rem;width:18px;text-align:center}
+.dinf{flex:1}
+.dlb{font-size:.72rem;font-weight:600}
+.dtp{font-size:.58rem;color:var(--mut);font-family:var(--mono)}
+.dbg{font-family:var(--mono);font-size:.58rem;font-weight:700;padding:2px 6px;border-radius:3px;white-space:nowrap}
+.dbn{background:rgba(0,210,106,.1);color:#00d26a;border:1px solid rgba(0,210,106,.3)}
+.dba{background:rgba(239,68,68,.16);color:#ef4444;border:1px solid #ef4444;animation:flash .5s step-end infinite}
+.dbi{background:rgba(75,85,99,.1);color:#9ca3af;border:1px solid #374151}
+.tbt{font-size:.57rem;font-family:var(--mono);padding:2px 6px;border-radius:3px;border:1px solid #ef4444;background:rgba(239,68,68,.07);color:#ef4444;cursor:pointer;white-space:nowrap}
+.tbt:hover{background:rgba(239,68,68,.2)}.tbt:disabled{opacity:.22;cursor:not-allowed}
+.ibt{font-size:.57rem;font-family:var(--mono);padding:2px 6px;border-radius:3px;border:1px solid #374151;background:rgba(75,85,99,.08);color:#9ca3af;cursor:pointer}
+.ibt:hover{background:rgba(75,85,99,.2)}
+.zctrls{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:7px}
+.szc{background:var(--bg3);border:2px solid var(--brd);border-radius:5px;padding:9px;margin-bottom:7px}
+.szc.ss{border-color:rgba(56,189,248,.3)}
+.szc.sp{border-color:#f59e0b;animation:pcard 1.2s ease-in-out infinite}
+.szc.sd{border-color:#ef4444;background:rgba(239,68,68,.06);animation:fcard .5s step-end infinite}
+.szc.sa{border-color:rgba(0,210,106,.4)}
+.szc.sh{border-color:rgba(167,139,250,.45);background:rgba(167,139,250,.06)}
+.szhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.sznm{font-size:.74rem;font-weight:700}
+.szag{font-size:.57rem;font-family:var(--mono);color:#38bdf8;background:rgba(56,189,248,.08);padding:2px 6px;border-radius:3px;border:1px solid rgba(56,189,248,.25)}
+.szst{font-family:var(--mono);font-size:.63rem;font-weight:700;margin-bottom:6px}
+.cylrow{display:flex;gap:4px;margin-bottom:6px;align-items:flex-end}
+.cyl{width:28px;height:50px;border-radius:5px 5px 3px 3px;border:2px solid;position:relative;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px}
+.cfill{position:absolute;bottom:0;left:0;right:0}
+.cyl.ok{border-color:#00d26a}.cyl.ok .cfill{background:linear-gradient(to top,rgba(0,210,106,.55),rgba(0,210,106,.12))}
+.cyl.lo{border-color:#f59e0b}.cyl.lo .cfill{background:linear-gradient(to top,rgba(245,158,11,.55),rgba(245,158,11,.12))}
+.cyl.mt{border-color:#ef4444}.cyl.mt .cfill{background:rgba(239,68,68,.18)}
+.clbl{position:relative;z-index:1;font-family:var(--mono);font-size:.5rem;font-weight:700;color:#e2e8f0}
+.prow{display:flex;align-items:center;gap:5px;font-size:.63rem;flex:1}
+.pval{font-family:var(--mono);font-weight:700;font-size:.8rem}
+.pvok{color:#00d26a}.pvlo{color:#f59e0b}.pvmt{color:#ef4444}
+.pbar{height:5px;background:#0c1520;border-radius:3px;border:1px solid #1e2d3d;overflow:hidden;flex:1}
+.pbf{height:100%;border-radius:3px;transition:width .4s}
+.cdwrap{background:#07101a;border-radius:4px;padding:6px 9px;margin-bottom:6px;border:1px solid var(--brd);text-align:center}
+.cdtit{font-size:.58rem;color:#2a4a6a;font-family:var(--mono);margin-bottom:2px}
+.cdnum{font-family:var(--mono);font-size:1.4rem;font-weight:700}
+.cdn-p{color:#f59e0b;animation:ptxt 1s ease-in-out infinite}
+.cdn-d{color:#ef4444;animation:flash .35s step-end infinite}
+.cdn-h{color:#a78bfa}.cdn-a{color:#00d26a}
+.rdiag{position:relative;height:54px;border-radius:4px;background:#0b1622;border:1px solid #1a2a3a;overflow:hidden;margin-bottom:5px}
+.rsrv{position:absolute;background:#132030;border:1px solid #1e3040;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:.48rem;color:#1e4060}
+.gfill{position:absolute;inset:0;background:linear-gradient(to top,rgba(125,211,252,.62),rgba(99,179,237,.18));border-radius:4px;opacity:0;pointer-events:none}
+.rlbl{position:absolute;bottom:2px;right:4px;font-size:.5rem;font-family:var(--mono);color:#1e4060}
+.dmprow{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px}
+.dmp{display:flex;align-items:center;gap:3px;font-size:.58rem;font-family:var(--mono);padding:2px 6px;border-radius:3px;border:1px solid}
+.dop{border-color:rgba(0,210,106,.3);color:#00d26a;background:rgba(0,210,106,.06)}
+.dcl{border-color:rgba(239,68,68,.3);color:#ef4444;background:rgba(239,68,68,.06)}
+.ddot{width:6px;height:6px;border-radius:50%}
+.dop .ddot{background:#00d26a}.dcl .ddot{background:#ef4444}
+.szctrl{display:flex;gap:4px;flex-wrap:wrap}
+.szb{font-size:.58rem;font-family:var(--mono);padding:3px 9px;border-radius:3px;border:none;cursor:pointer;font-weight:600;transition:all .15s}
+.sba{background:rgba(0,210,106,.1);color:#00d26a;border:1px solid rgba(0,210,106,.3)}.sba:hover{background:rgba(0,210,106,.22)}
+.sbm{background:rgba(239,68,68,.08);color:#ef4444;border:1px solid rgba(239,68,68,.28)}.sbm:hover{background:rgba(239,68,68,.2)}
+.sbr{background:rgba(56,189,248,.08);color:#38bdf8;border:1px solid rgba(56,189,248,.28)}.sbr:hover{background:rgba(56,189,248,.2)}
+.sb-off{opacity:.25;pointer-events:none}
+.logpanel{background:var(--bg2);border-top:1px solid var(--brd);height:120px;display:flex;flex-direction:column;flex-shrink:0}
+.loghdr{padding:4px 11px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:7px;flex-shrink:0}
+.loghdr h2{font-size:.65rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#2a4a6a}
+.logbody{flex:1;overflow-y:auto}
+.logbody::-webkit-scrollbar{width:3px}.logbody::-webkit-scrollbar-track{background:#07090e}.logbody::-webkit-scrollbar-thumb{background:#1a2a3a;border-radius:2px}
+.li{display:grid;grid-template-columns:80px 50px 70px 1fr 46px;gap:4px;padding:2px 11px;font-size:.6rem;font-family:var(--mono);border-bottom:1px solid rgba(20,32,48,.7)}
+.li:nth-child(even){background:rgba(15,25,38,.4)}
+.lt{color:#1e3a56}.lz{color:#4a8abf;font-weight:700}.ld{color:#2a4a6a}
+.lmn{color:#00d26a}.lmw{color:#f59e0b}.lmc{color:#ef4444;font-weight:700}.lms{color:#a78bfa}.lmb{color:#38bdf8}
+.ls{text-align:right}.si{color:#4a8abf}.sw{color:#f59e0b}.sc{color:#ef4444;font-weight:700}
+@keyframes flash{0%,100%{opacity:1}50%{opacity:.1}}
+@keyframes fcard{0%,100%{background:rgba(239,68,68,.14)}50%{background:rgba(239,68,68,.03)}}
+@keyframes pcard{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.25)}50%{box-shadow:0 0 0 4px rgba(245,158,11,.1)}}
+@keyframes ptxt{0%,100%{opacity:1}50%{opacity:.35}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="htitle">🔥 FIRE SAFETY MANAGEMENT SYSTEM</div>
+    <div class="hsub">TOC Data Center — Building DC-01 &nbsp;|&nbsp; FACP Model: EST3 &nbsp;|&nbsp; NFPA 72 / TIS 1586</div>
+  </div>
+  <div class="hdiv"></div>
+  <span id="bSys" class="badge bg">● SYSTEM NORMAL</span>
+  <span id="bAlarm" class="badge bb">⚑ 0 ALARMS</span>
+  <span id="bZone" class="badge bb">ZONES 6/6 ONLINE</span>
+  <span id="bSup" class="badge bb">FM-200 READY</span>
+  <span id="bSnd" class="badge bb">🔇 SOUNDER OFF</span>
+  <span id="clk"></span>
+</header>
+
+<div class="main">
+  <!-- ZONE MAP -->
+  <div class="panel">
+    <div class="phdr">
+      <h2>⬡ Floor Plan — Zone Map</h2>
+      <button class="cb cbx" style="font-size:.57rem;padding:2px 7px" onclick="resetAll()">↺ RESET ALL</button>
+    </div>
+    <div class="pbody">
+      <div class="zgrid" id="zoneGrid"></div>
+      <div class="legend">
+        <span style="color:#00d26a">■ NORMAL</span>
+        <span style="color:#f59e0b">■ PRE-ALARM</span>
+        <span style="color:#ef4444">■ ALARM</span>
+        <span style="color:#a78bfa">■ FAULT</span>
+        <span style="color:#6b7280">■ ISOLATED</span>
+      </div>
+      <div class="sctrls">
+        <button class="cb cbs" onclick="silenceAll()">🔇 Silence</button>
+        <button class="cb cbr" onclick="resetAll()">↺ Reset All</button>
+        <button class="cb cbg" onclick="testSounder()">🔊 Test</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEVICE PANEL -->
+  <div class="panel">
+    <div class="phdr">
+      <h2 id="devTitle">📡 Select a Zone</h2>
+      <div id="devBadge"></div>
+    </div>
+    <div class="pbody" id="devPanel">
+      <div style="color:#1e3a56;font-size:.85rem;padding:30px;text-align:center">กรุณาเลือก Zone จากแผนผังด้านซ้าย</div>
+    </div>
+  </div>
+
+  <!-- SUPPRESSION PANEL -->
+  <div class="panel">
+    <div class="phdr">
+      <h2>⚗ Fire Suppression — FM-200</h2>
+      <span class="badge bb" style="font-size:.57rem">NFPA 2001</span>
+    </div>
+    <div class="pbody" id="suppPanel"></div>
+  </div>
+</div>
+
+<!-- EVENT LOG -->
+<div class="logpanel">
+  <div class="loghdr">
+    <h2>📋 Event Log</h2>
+    <span id="logCnt" style="font-family:var(--mono);font-size:.6rem;color:#1e3a56">0 events</span>
+    <button class="cb cbg" style="margin-left:auto;font-size:.57rem;padding:2px 7px" onclick="clearLog()">✕ Clear</button>
+  </div>
+  <div class="logbody" id="logBody"></div>
+</div>
+
+<script>
+const ZONES={
+  Z1:{id:'Z1',name:'Server Room A',status:'NORMAL',countdown:0,tmr:null,suppZone:'SZ1',devices:['SD-01','SD-02','VESDA-01']},
+  Z2:{id:'Z2',name:'Server Room B',status:'NORMAL',countdown:0,tmr:null,suppZone:'SZ2',devices:['SD-03','SD-04','VESDA-02']},
+  Z3:{id:'Z3',name:'UPS Room',     status:'NORMAL',countdown:0,tmr:null,suppZone:null, devices:['SD-05','HD-01']},
+  Z4:{id:'Z4',name:'Generator Room',status:'NORMAL',countdown:0,tmr:null,suppZone:null,devices:['HD-02','FD-01']},
+  Z5:{id:'Z5',name:'Battery Room', status:'NORMAL',countdown:0,tmr:null,suppZone:null, devices:['HD-03','GD-01']},
+  Z6:{id:'Z6',name:'Corridor',     status:'NORMAL',countdown:0,tmr:null,suppZone:null, devices:['SD-06','MCP-01']},
+};
+const DEVS={
+  'SD-01':   {zone:'Z1',type:'Optical Smoke',    label:'SD-01',   status:'NORMAL',icon:'💨'},
+  'SD-02':   {zone:'Z1',type:'Optical Smoke',    label:'SD-02',   status:'NORMAL',icon:'💨'},
+  'VESDA-01':{zone:'Z1',type:'VESDA / ASD',      label:'VESDA-01',status:'NORMAL',icon:'🔬'},
+  'SD-03':   {zone:'Z2',type:'Optical Smoke',    label:'SD-03',   status:'NORMAL',icon:'💨'},
+  'SD-04':   {zone:'Z2',type:'Optical Smoke',    label:'SD-04',   status:'NORMAL',icon:'💨'},
+  'VESDA-02':{zone:'Z2',type:'VESDA / ASD',      label:'VESDA-02',status:'NORMAL',icon:'🔬'},
+  'SD-05':   {zone:'Z3',type:'Ionization Smoke', label:'SD-05',   status:'NORMAL',icon:'⚡'},
+  'HD-01':   {zone:'Z3',type:'Fixed Temp Heat',  label:'HD-01',   status:'NORMAL',icon:'🌡'},
+  'HD-02':   {zone:'Z4',type:'Rate-of-Rise Heat',label:'HD-02',   status:'NORMAL',icon:'🌡'},
+  'FD-01':   {zone:'Z4',type:'UV/IR Flame',      label:'FD-01',   status:'NORMAL',icon:'🔥'},
+  'HD-03':   {zone:'Z5',type:'Fixed Temp Heat',  label:'HD-03',   status:'NORMAL',icon:'🌡'},
+  'GD-01':   {zone:'Z5',type:'Gas Detector',     label:'GD-01',   status:'NORMAL',icon:'⚗'},
+  'SD-06':   {zone:'Z6',type:'Optical Smoke',    label:'SD-06',   status:'NORMAL',icon:'💨'},
+  'MCP-01':  {zone:'Z6',type:'Manual Call Point','label':'MCP-01',status:'NORMAL',icon:'🆘'},
+};
+const SUPP={
+  SZ1:{id:'SZ1',name:'Server Room A',cylCount:2,pressure:42.0,agentKg:68,designConc:7.9,status:'STANDBY',countdown:0,tmr:null,dumpFrac:0,damperClosed:false,doorHeld:true},
+  SZ2:{id:'SZ2',name:'Server Room B',cylCount:2,pressure:41.5,agentKg:68,designConc:7.9,status:'STANDBY',countdown:0,tmr:null,dumpFrac:0,damperClosed:false,doorHeld:true},
+};
+let selZone=null,sounderOn=false;
+const EVENTS=[];
+
+function triggerDevice(devId){
+  const dev=DEVS[devId];
+  if(!dev||dev.status==='ALARM')return;
+  if(dev.status==='ISOLATED'){logEv(dev.zone,devId,'Device isolated — trigger ignored','i');return;}
+  dev.status='ALARM';
+  const z=ZONES[dev.zone];
+  if(z.status==='ISOLATED'){logEv(dev.zone,devId,'Zone isolated — no action','i');return;}
+  const alarmed=z.devices.filter(d=>DEVS[d].status==='ALARM').length;
+  if(dev.type==='Manual Call Point'){confirmAlarm(dev.zone,devId);}
+  else if(alarmed===1&&z.status==='NORMAL'){
+    z.status='PRE_ALARM';z.countdown=30;
+    logEv(dev.zone,devId,'PRE-ALARM: '+dev.type+' '+devId+' activated — 30s countdown','w');
+    if(z.tmr)clearInterval(z.tmr);
+    z.tmr=setInterval(()=>tickZone(dev.zone),1000);
+    sounderOn=true;
+  }else if(alarmed>=2){confirmAlarm(dev.zone,devId);}
+  renderAll();
+}
+
+function tickZone(zid){
+  const z=ZONES[zid];
+  if(z.status!=='PRE_ALARM'){clearInterval(z.tmr);return;}
+  z.countdown--;
+  if(z.countdown<=0)confirmAlarm(zid,'TIMEOUT');
+  else{renderZoneCards();updateHeader();}
+}
+
+function confirmAlarm(zid,src){
+  const z=ZONES[zid];
+  clearInterval(z.tmr);
+  z.status='ALARM';z.countdown=0;
+  logEv(zid,src||'CONFIRM','FIRE CONFIRMED — '+z.name+' | Outputs activated','c');
+  sounderOn=true;
+  if(z.suppZone)startPreDischarge(z.suppZone);
+  renderAll();
+}
+
+function isolateZone(zid){
+  const z=ZONES[zid];
+  if(z.status==='ISOLATED'){z.status='NORMAL';logEv(zid,'SYS','Zone '+zid+' de-isolated','i');}
+  else{z.status='ISOLATED';clearInterval(z.tmr);logEv(zid,'SYS','Zone '+zid+' manually isolated','w');}
+  renderAll();
+}
+
+function isolateDev(devId){
+  const d=DEVS[devId];
+  d.status=d.status==='ISOLATED'?'NORMAL':'ISOLATED';
+  logEv(d.zone,devId,devId+' '+(d.status==='ISOLATED'?'isolated':'de-isolated'),'i');
+  renderAll();
+}
+
+function resetZone(zid){
+  const z=ZONES[zid];
+  clearInterval(z.tmr);
+  z.status='NORMAL';z.countdown=0;
+  z.devices.forEach(d=>{if(DEVS[d].status!=='ISOLATED')DEVS[d].status='NORMAL';});
+  logEv(zid,'SYS','Zone '+zid+' reset to NORMAL','i');
+  if(!Object.values(ZONES).some(z=>z.status==='ALARM'||z.status==='PRE_ALARM'))sounderOn=false;
+  renderAll();
+}
+
+function resetAll(){Object.keys(ZONES).forEach(zid=>resetZone(zid));sounderOn=false;renderAll();}
+function silenceAll(){sounderOn=false;logEv('SYS','OPR','Sounder silenced by operator','w');renderAll();}
+function testSounder(){sounderOn=!sounderOn;logEv('SYS','TEST','Sounder test '+(sounderOn?'ON':'OFF'),'i');renderAll();}
+
+function startPreDischarge(szId){
+  const sz=SUPP[szId];
+  if(sz.status!=='STANDBY')return;
+  sz.status='PRE_DISCHARGE';sz.countdown=30;sz.damperClosed=true;sz.doorHeld=false;
+  logEv(szId,'FSS','PRE-DISCHARGE: '+sz.name+' — Dampers CLOSED | Door holders RELEASED | ABORT within 30s!','c');
+  if(sz.tmr)clearInterval(sz.tmr);
+  sz.tmr=setInterval(()=>tickSupp(szId),1000);
+  renderSupp();
+}
+
+function tickSupp(szId){
+  const sz=SUPP[szId];
+  if(sz.status!=='PRE_DISCHARGE'){clearInterval(sz.tmr);return;}
+  sz.countdown--;
+  if(sz.countdown<=0)doDischarge(szId);
+  else renderSupp();
+}
+
+function doDischarge(szId){
+  const sz=SUPP[szId];
+  clearInterval(sz.tmr);
+  sz.status='DISCHARGING';sz.countdown=0;sz.dumpFrac=0;
+  logEv(szId,'FSS','FM-200 DISCHARGE — '+sz.name+' | Solenoid OPEN | Agent releasing (~10s)','c');
+  let t=0;
+  sz.tmr=setInterval(()=>{
+    t++;sz.dumpFrac=t/10;
+    if(t>=10){
+      clearInterval(sz.tmr);
+      sz.status='HOLD';sz.pressure=Math.max(4,sz.pressure-37);sz.agentKg=Math.ceil(sz.agentKg*.06);sz.dumpFrac=1;
+      logEv(szId,'FSS','DISCHARGE COMPLETE — '+sz.name+' | HOLD phase | Do NOT ventilate for 10 min','c');
+    }
+    renderSupp();
+  },1000);
+}
+
+function abortDischarge(szId){
+  const sz=SUPP[szId];
+  if(sz.status!=='PRE_DISCHARGE')return;
+  clearInterval(sz.tmr);
+  sz.status='ABORT';sz.countdown=0;sz.damperClosed=false;sz.doorHeld=true;
+  logEv(szId,'OPR','ABORT activated — '+sz.name+' suppression cancelled by operator','w');
+  renderSupp();
+}
+
+function manualDischarge(szId){
+  if(!confirm('ยืนยันการปล่อย FM-200 ที่ '+SUPP[szId].name+' ?'))return;
+  const sz=SUPP[szId];
+  if(sz.status==='PRE_DISCHARGE')clearInterval(sz.tmr);
+  sz.status='STANDBY';doDischarge(szId);
+}
+
+function resetSupp(szId){
+  const sz=SUPP[szId];
+  clearInterval(sz.tmr);
+  sz.status='STANDBY';sz.countdown=0;sz.dumpFrac=0;sz.damperClosed=false;sz.doorHeld=true;
+  logEv(szId,'SYS','Suppression zone '+szId+' reset to STANDBY','i');
+  renderSupp();
+}
+
+function renderAll(){renderZoneCards();renderDevPanel();renderSupp();updateHeader();}
+const ZCL={NORMAL:'zn',PRE_ALARM:'zp',ALARM:'za',FAULT:'zf',ISOLATED:'zi'};
+function zstLbl(z){return z.status==='PRE_ALARM'?'⚠ PRE-ALARM '+z.countdown+'s':z.status==='ALARM'?'FIRE ALARM — CONFIRMED':z.status==='FAULT'?'FAULT':z.status==='ISOLATED'?'ISOLATED':'● NORMAL';}
+
+function renderZoneCards(){
+  document.getElementById('zoneGrid').innerHTML=Object.values(ZONES).map(z=>`
+    <div class="zc ${ZCL[z.status]||'zn'}${selZone===z.id?' sel':''}" onclick="selectZone('${z.id}')">
+      <div class="zid">${z.id}${z.suppZone?' | FM-200':''}</div>
+      <div class="znm">${z.name}</div>
+      <div class="zdots">${z.devices.map(d=>`<div class="dd${DEVS[d].status==='ALARM'?' da':DEVS[d].status==='ISOLATED'?' dp':''}"></div>`).join('')}</div>
+      <div class="zst">${zstLbl(z)}</div>
+      ${z.status==='PRE_ALARM'?`<div class="zcd">⏱${z.countdown}s</div>`:''}
+    </div>`).join('');
+}
+
+function selectZone(zid){selZone=zid;renderZoneCards();renderDevPanel();}
+
+function renderDevPanel(){
+  if(!selZone){return;}
+  const z=ZONES[selZone];
+  document.getElementById('devTitle').textContent='📡 '+z.name+' ('+z.id+')';
+  const sc=z.status;
+  const bc=sc==='NORMAL'?'bg':sc==='PRE_ALARM'?'bap':sc==='ALARM'?'br':sc==='ISOLATED'?'bb':'bb';
+  document.getElementById('devBadge').innerHTML='<span class="badge '+bc+'">'+zstLbl(z)+'</span>';
+  const items=z.devices.map(devId=>{
+    const d=DEVS[devId];
+    const dc=d.status==='ALARM'?'dba':d.status==='ISOLATED'?'dbi':'dbn';
+    const dl=d.status==='ALARM'?'ALARM':d.status==='ISOLATED'?'ISOLATED':'● NORMAL';
+    return '<div class="di"><div class="dico">'+d.icon+'</div><div class="dinf"><div class="dlb">'+d.label+'</div><div class="dtp">'+d.type+'</div></div><span class="dbg '+dc+'">'+dl+'</span><button class="tbt" onclick="triggerDevice(\''+devId+'\')" '+(d.status==='ALARM'||d.status==='ISOLATED'?'disabled':'')+'>TRIGGER</button><button class="ibt" onclick="isolateDev(\''+devId+'\')">'+( d.status==='ISOLATED'?'DE-ISO':'ISOLATE')+'</button></div>';
+  }).join('');
+  document.getElementById('devPanel').innerHTML='<div class="zctrls"><button class="cb cbr" onclick="resetZone(\''+z.id+'\')">↺ Reset Zone</button><button class="cb cbs" onclick="silenceAll()">🔇 Silence</button><button class="cb cbg" onclick="isolateZone(\''+z.id+'\')">'+(z.status==='ISOLATED'?'🔓 De-Isolate':'🔒 Isolate')+'</button></div><div style="font-size:.6rem;color:#1e3a56;font-family:var(--mono);margin-bottom:5px">DETECTION DEVICES ('+z.devices.length+')</div>'+items;
+}
+
+function renderSupp(){
+  document.getElementById('suppPanel').innerHTML=Object.values(SUPP).map(sz=>{
+    const p=sz.pressure,pPct=Math.min(100,(p/42)*100);
+    const pCl=p>=34?'pvok':p>=20?'pvlo':'pvmt';
+    const pBg=p>=34?'#00d26a':p>=20?'#f59e0b':'#ef4444';
+    const cH=Math.min(88,(p/42)*88);
+    const cCl=p>=34?'ok':p>=20?'lo':'mt';
+    const stMap={STANDBY:'ss',PRE_DISCHARGE:'sp',DISCHARGING:'sd',ABORT:'sa',HOLD:'sh'};
+    const stClr={STANDBY:'#38bdf8',PRE_DISCHARGE:'#f59e0b',DISCHARGING:'#ef4444',ABORT:'#00d26a',HOLD:'#a78bfa'};
+    const stLbl=sz.status==='STANDBY'?'● STANDBY':sz.status==='PRE_DISCHARGE'?'⚠ PRE-DISCHARGE — ABORT within '+sz.countdown+'s':sz.status==='DISCHARGING'?'DISCHARGING — Agent Releasing':sz.status==='ABORT'?'✔ ABORT — Discharge Cancelled':sz.status==='HOLD'?'HOLD — Do NOT Ventilate':'FAULT';
+    const gasOp=sz.status==='DISCHARGING'?sz.dumpFrac*.62:sz.status==='HOLD'?.68:0;
+    const ab=sz.status==='PRE_DISCHARGE';
+    const mn=sz.status==='STANDBY'||sz.status==='PRE_DISCHARGE';
+    const rs=sz.status==='ABORT'||sz.status==='HOLD';
+    const cylsHtml=Array(sz.cylCount).fill(0).map((_,i)=>'<div class="cyl '+cCl+'"><div class="cfill" style="height:'+cH+'%"></div><div class="clbl">C'+(i+1)+'</div></div>').join('');
+    const cdHtml=sz.status!=='STANDBY'?'<div class="cdwrap"><div class="cdtit">DISCHARGE STATUS</div><div class="cdnum '+(sz.status==='PRE_DISCHARGE'?'cdn-p':sz.status==='DISCHARGING'?'cdn-d':sz.status==='HOLD'?'cdn-h':'cdn-a')+'">'+(sz.status==='PRE_DISCHARGE'?sz.countdown+'s':sz.status==='DISCHARGING'?'RELEASING':'HOLD / ABORT')+'</div></div>':'';
+    const srvs=[0,1,2].map(i=>'<div class="rsrv" style="left:'+(7+i*30)+'%;top:12%;width:24%;height:76%">R'+(i+1)+'</div>').join('');
+    return '<div class="szc '+(stMap[sz.status]||'ss')+'"><div class="szhdr"><div class="sznm">'+sz.name+'</div><span class="szag">FM-200 / HFC-227ea</span></div><div class="szst" style="color:'+(stClr[sz.status]||'#38bdf8')+'">'+stLbl+'</div><div style="display:flex;align-items:flex-end;gap:7px;margin-bottom:6px"><div class="cylrow">'+cylsHtml+'</div><div style="flex:1"><div class="prow"><span style="color:var(--mut);font-size:.6rem">PRESSURE</span><span class="pval '+pCl+'">'+p.toFixed(1)+' bar</span></div><div class="pbar"><div class="pbf" style="width:'+pPct+'%;background:'+pBg+'"></div></div><div style="font-size:.57rem;color:#1e3a56;font-family:var(--mono);margin-top:2px">Agent: '+sz.agentKg+' kg | Conc: '+sz.designConc+'% vol</div></div></div>'+cdHtml+'<div class="rdiag">'+srvs+'<div class="gfill" style="opacity:'+gasOp+'"></div><div class="rlbl">GAS: '+(sz.status==='HOLD'?100:sz.status==='DISCHARGING'?Math.round(sz.dumpFrac*100):0)+'%</div></div><div class="dmprow"><div class="dmp '+(sz.damperClosed?'dcl':'dop')+'"><div class="ddot"></div>HVAC: '+(sz.damperClosed?'CLOSED':'OPEN')+'</div><div class="dmp '+(sz.doorHeld?'dop':'dcl')+'"><div class="ddot"></div>DOOR: '+(sz.doorHeld?'HELD OPEN':'RELEASED')+'</div></div><div class="szctrl"><button class="szb sba'+(ab?'':' sb-off')+'" onclick="abortDischarge(\''+sz.id+'\')">✋ ABORT</button><button class="szb sbm'+(mn?'':' sb-off')+'" onclick="manualDischarge(\''+sz.id+'\')">⚡ Manual</button><button class="szb sbr'+(rs?'':' sb-off')+'" onclick="resetSupp(\''+sz.id+'\')">↺ Reset</button></div></div>';
+  }).join('');
+}
+
+function updateHeader(){
+  const az=Object.values(ZONES).filter(z=>z.status==='ALARM');
+  const pz=Object.values(ZONES).filter(z=>z.status==='PRE_ALARM');
+  const iz=Object.values(ZONES).filter(z=>z.status==='ISOLATED');
+  const tot=az.length+pz.length;
+  const bs=document.getElementById('bSys');
+  if(az.length){bs.className='badge br';bs.textContent='FIRE ALARM ACTIVE';}
+  else if(pz.length){bs.className='badge bap';bs.textContent='⚠ PRE-ALARM';}
+  else{bs.className='badge bg';bs.textContent='● SYSTEM NORMAL';}
+  const ba=document.getElementById('bAlarm');
+  ba.className='badge '+(tot?'br':'bb');ba.textContent='⚑ '+tot+' ALARM'+(tot!==1?'S':'');
+  document.getElementById('bZone').textContent='ZONES '+(6-iz.length)+'/6 ONLINE';
+  const sa=Object.values(SUPP).some(s=>s.status!=='STANDBY');
+  const bsu=document.getElementById('bSup');
+  bsu.className='badge '+(sa?'br':'bb');bsu.textContent=sa?'⚗ SUPPRESSION ACTIVE':'FM-200 READY';
+  const bsn=document.getElementById('bSnd');
+  bsn.className='badge '+(sounderOn?'br':'bb');bsn.textContent=sounderOn?'🔊 SOUNDER ACTIVE':'🔇 SOUNDER OFF';
+}
+
+function logEv(zid,devId,msg,sev){
+  const t=new Date().toLocaleTimeString('th-TH',{hour12:false});
+  EVENTS.unshift({t,zid,devId,msg,sev});
+  if(EVENTS.length>60)EVENTS.pop();
+  const mc=sev==='c'?'lmc':sev==='w'?'lmw':sev==='b'?'lmb':sev==='s'?'lms':'lmn';
+  const sc2=sev==='c'?'sc':sev==='w'?'sw':'si';
+  const sl=sev==='c'?'CRIT':sev==='w'?'WARN':'INFO';
+  document.getElementById('logBody').insertAdjacentHTML('afterbegin','<div class="li"><span class="lt">'+t+'</span><span class="lz">'+zid+'</span><span class="ld">'+devId+'</span><span class="'+mc+'">'+msg+'</span><span class="ls '+sc2+'">'+sl+'</span></div>');
+  document.getElementById('logCnt').textContent=EVENTS.length+' events';
+}
+
+function clearLog(){EVENTS.length=0;document.getElementById('logBody').innerHTML='';document.getElementById('logCnt').textContent='0 events';}
+
+const TM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function clk(){const d=new Date();document.getElementById('clk').textContent=d.toLocaleTimeString('th-TH',{hour12:false})+' '+d.getDate()+' '+TM[d.getMonth()]+' '+(d.getFullYear()+543);}
+setInterval(clk,1000);clk();
+renderAll();
+logEv('SYS','FACP','Fire Safety Management System ONLINE — All 6 zones NORMAL | FM-200 SZ1 SZ2 STANDBY','i');
+</script>
+</body>
+</html>
