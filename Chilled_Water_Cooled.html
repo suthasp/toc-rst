@@ -190,8 +190,8 @@ function drawTower(){
     ctx.strokeStyle=run?'#00bfff':'#2a4455'; ctx.lineWidth=rs(1.5); ctx.stroke();
     if(run){ for(let b=0;b<4;b++){ const a=T*5+b*Math.PI/2; ctx.save(); ctx.translate(fc.x,fc.y); ctx.rotate(a); ctx.beginPath(); ctx.ellipse(fr*.38,0,fr*.3,fr*.1,0,0,Math.PI*2); ctx.fillStyle='rgba(0,150,200,.32)'; ctx.fill(); ctx.restore(); } }
     ctx.beginPath(); ctx.arc(fc.x,fc.y,fr*.18,0,Math.PI*2); ctx.fillStyle=run?'#00bfff':'#2a4455'; ctx.fill();
-    ctx.fillStyle='#4a7a9a'; ctx.font=`bold ${rs(9)}px JetBrains Mono,monospace`; ctx.textAlign='center';
-    ctx.fillText(cell.id,fc.x,fc.y+fr+rs(11));
+    ctx.fillStyle='#4a7a9a'; ctx.font=`bold ${rs(12)}px JetBrains Mono,monospace`; ctx.textAlign='center';
+    ctx.fillText(cell.id,fc.x,fc.y+fr+rs(14));
   });
   // Water droplets
   for(let d=0;d<10;d++){
@@ -202,11 +202,11 @@ function drawTower(){
   // Basin
   ctx.fillStyle='rgba(15,70,130,.4)'; ctx.fillRect(x+rs(4),y+h*.78,w-rs(8),h*.18);
   // Label
-  ctx.fillStyle='#3a7a9a'; ctx.font=`bold ${rs(11)}px Noto Sans Thai,sans-serif`; ctx.textAlign='center';
-  ctx.fillText('Cooling Tower',x+w/2,y+h+rs(14));
-  ctx.font=`${rs(9.5)}px JetBrains Mono,monospace`;
-  ctx.fillStyle='#ff9800'; ctx.fillText('EWT: '+EQ.tower.ewt.toFixed(1)+'°C',x+w/2,y+h+rs(26));
-  ctx.fillStyle='#40c4ff'; ctx.fillText('LWT: '+EQ.tower.lwt.toFixed(1)+'°C',x+w/2,y+h+rs(38));
+  ctx.fillStyle='#3a7a9a'; ctx.font=`bold ${rs(14)}px Noto Sans Thai,sans-serif`; ctx.textAlign='center';
+  ctx.fillText('Cooling Tower',x+w/2,y+h+rs(16));
+  ctx.font=`${rs(12)}px JetBrains Mono,monospace`;
+  ctx.fillStyle='#ff9800'; ctx.fillText('EWT: '+EQ.tower.ewt.toFixed(1)+'°C',x+w/2,y+h+rs(30));
+  ctx.fillStyle='#40c4ff'; ctx.fillText('LWT: '+EQ.tower.lwt.toFixed(1)+'°C',x+w/2,y+h+rs(44));
 }
 
 function drawChiller(i){
@@ -225,19 +225,19 @@ function drawChiller(i){
   ctx.beginPath(); ctx.arc(cx,cy,cr*.22,0,Math.PI*2); ctx.fillStyle=bc; ctx.fill();
   // Labels
   ctx.textAlign='center';
-  ctx.fillStyle=run?'#40c4ff':'#334455'; ctx.font=`bold ${rs(9)}px JetBrains Mono,monospace`;
+  ctx.fillStyle=run?'#40c4ff':'#334455'; ctx.font=`bold ${rs(12)}px JetBrains Mono,monospace`;
   ctx.fillText(eq.id,cx,y+h*.91);
   if(run){
-    ctx.fillStyle='#00e676'; ctx.font=`${rs(8)}px JetBrains Mono,monospace`;
+    ctx.fillStyle='#00e676'; ctx.font=`${rs(10.5)}px JetBrains Mono,monospace`;
     ctx.fillText(eq.load+'% · '+eq.kw+'kW',cx,y+h*.99);
-    const fs=rs(7.5);
+    const fs=rs(10);
     ctx.font=`${fs}px JetBrains Mono,monospace`; ctx.textAlign='left';
-    ctx.fillStyle='#40c4ff'; ctx.fillText('S:'+eq.chws.toFixed(1)+'°',x+rs(3),y+rs(12));
-    ctx.fillStyle='#ff9800'; ctx.fillText('R:'+eq.chwr.toFixed(1)+'°',x+rs(3),y+rs(22));
-    ctx.fillStyle='#ff7755'; ctx.fillText('CWS:'+eq.cws.toFixed(1)+'°',x+rs(3),y+h*.7);
-    ctx.fillStyle='#ff4422'; ctx.fillText('CWR:'+eq.cwr.toFixed(1)+'°',x+rs(3),y+h*.8);
+    ctx.fillStyle='#40c4ff'; ctx.fillText('S:'+eq.chws.toFixed(1)+'°',x+rs(4),y+rs(15));
+    ctx.fillStyle='#ff9800'; ctx.fillText('R:'+eq.chwr.toFixed(1)+'°',x+rs(4),y+rs(27));
+    ctx.fillStyle='#ff7755'; ctx.fillText('CWS:'+eq.cws.toFixed(1)+'°',x+rs(4),y+h*.7);
+    ctx.fillStyle='#ff4422'; ctx.fillText('CWR:'+eq.cwr.toFixed(1)+'°',x+rs(4),y+h*.82);
   } else {
-    ctx.fillStyle='#2a4050'; ctx.font=`${rs(8.5)}px Noto Sans Thai,sans-serif`;
+    ctx.fillStyle='#2a4050'; ctx.font=`${rs(11)}px Noto Sans Thai,sans-serif`;
     ctx.textAlign='center'; ctx.fillText('STANDBY',cx,y+h*.99);
   }
 }
@@ -249,9 +249,9 @@ function drawPump(cx,cy,r,run,fault,lbl,kw){
   ctx.strokeStyle=col; ctx.lineWidth=rs(2); ctx.stroke();
   if(run){ for(let b=0;b<4;b++){ const a=T*4+b*Math.PI/2; ctx.save(); ctx.translate(cx,cy); ctx.rotate(a); ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,r*.62,-.2,.6); ctx.closePath(); ctx.fillStyle='rgba(0,180,80,.22)'; ctx.fill(); ctx.restore(); } }
   ctx.beginPath(); ctx.arc(cx,cy,r*.22,0,Math.PI*2); ctx.fillStyle=col; ctx.fill();
-  ctx.fillStyle=col; ctx.font=`bold ${r*.5}px JetBrains Mono,monospace`; ctx.textAlign='center';
-  ctx.fillText(lbl,cx,cy+r+r*.7);
-  if(run&&kw>0){ ctx.fillStyle='#334455'; ctx.font=`${r*.42}px JetBrains Mono,monospace`; ctx.fillText(kw.toFixed(1)+'kW',cx,cy+r+r*1.3); }
+  ctx.fillStyle=col; ctx.font=`bold ${r*.65}px JetBrains Mono,monospace`; ctx.textAlign='center';
+  ctx.fillText(lbl,cx,cy+r+r*.8);
+  if(run&&kw>0){ ctx.fillStyle='#556677'; ctx.font=`${r*.55}px JetBrains Mono,monospace`; ctx.fillText(kw.toFixed(1)+'kW',cx,cy+r+r*1.45); }
 }
 
 function drawAHU(){
@@ -264,9 +264,9 @@ function drawAHU(){
   for(let b=0;b<3;b++){ const a=T*3+b*Math.PI*2/3; ctx.save(); ctx.translate(fcx,fcy); ctx.rotate(a); ctx.beginPath(); ctx.ellipse(fr*.42,0,fr*.35,fr*.12,.3,0,Math.PI*2); ctx.fillStyle='rgba(0,110,190,.3)'; ctx.fill(); ctx.restore(); }
   ctx.beginPath(); ctx.arc(fcx,fcy,fr*.15,0,Math.PI*2); ctx.fillStyle='#1a5a8a'; ctx.fill();
   // CRAH label
-  ctx.fillStyle='#1a7aaa'; ctx.font=`bold ${rs(11)}px Noto Sans Thai,sans-serif`; ctx.textAlign='center';
+  ctx.fillStyle='#1a7aaa'; ctx.font=`bold ${rs(14)}px Noto Sans Thai,sans-serif`; ctx.textAlign='center';
   ctx.fillText('CRAH',x+w/2,y+h*.7);
-  ctx.fillStyle='#2a6a8a'; ctx.font=`${rs(9)}px JetBrains Mono,monospace`;
+  ctx.fillStyle='#2a6a8a'; ctx.font=`${rs(12)}px JetBrains Mono,monospace`;
   ctx.fillText('DC Room',x+w/2,y+h*.82);
   ctx.fillText('Supply',x+w/2,y+h*.91);
   ctx.fillText(EQ.ch.filter(c=>c.run).length>0?EQ.ch.filter(c=>c.run).reduce((a,c)=>a+c.chws,0)/EQ.ch.filter(c=>c.run).length|0+'°C':'--',x+w/2,y+h*.99);
@@ -385,7 +385,7 @@ function drawPipes(){
 //  PIPE LABELS
 // ════════════════════════════════════════════
 function drawLabels(){
-  const fs=rs(9);
+  const fs=rs(12);
   ctx.font=`bold ${fs}px JetBrains Mono,monospace`;
   ctx.textAlign='left';
   ctx.fillStyle='#aa4422'; ctx.fillText('CDR — Condenser Return (Hot '+EQ.tower.ewt.toFixed(1)+'°C)',rx(270),ry(PY.cdwRet-5));
@@ -397,13 +397,13 @@ function drawLabels(){
   ctx.fillStyle='#2244aa'; ctx.fillText('CHWR '+rchwr.toFixed(1)+'°C',rx(880),ry(PY.chwRet-5));
 
   // Section titles
-  ctx.fillStyle='#2a5a7a'; ctx.font=`bold ${rs(10)}px Noto Sans Thai,sans-serif`; ctx.textAlign='center';
+  ctx.fillStyle='#2a5a7a'; ctx.font=`bold ${rs(13)}px Noto Sans Thai,sans-serif`; ctx.textAlign='center';
   const cdpMx=rx((CDPx[0]+CDPx[3])/2);
-  ctx.fillText('Condenser Water Pump',cdpMx,ry(560));
-  ctx.fillText('CDP-01 ~ CDP-04',cdpMx,ry(572));
+  ctx.fillText('Condenser Water Pump',cdpMx,ry(562));
+  ctx.fillText('CDP-01 ~ CDP-04',cdpMx,ry(576));
   const chpMx=rx((CHPx[0]+CHPx[3])/2);
-  ctx.fillText('Chilled Water Pump',chpMx,ry(560));
-  ctx.fillText('CHP-01 ~ CHP-04',chpMx,ry(572));
+  ctx.fillText('Chilled Water Pump',chpMx,ry(562));
+  ctx.fillText('CHP-01 ~ CHP-04',chpMx,ry(576));
 
   // Legend
   const items=[
@@ -416,8 +416,8 @@ function drawLabels(){
   items.forEach((it,i)=>{
     ctx.strokeStyle=it.c; ctx.lineWidth=rs(3);
     ctx.beginPath(); ctx.moveTo(lx+i*rs(210),ly); ctx.lineTo(lx+i*rs(210)+rs(20),ly); ctx.stroke();
-    ctx.fillStyle='#445566'; ctx.font=`${rs(8.5)}px Noto Sans Thai,sans-serif`; ctx.textAlign='left';
-    ctx.fillText(it.l,lx+i*rs(210)+rs(23),ly+rs(3));
+    ctx.fillStyle='#445566'; ctx.font=`${rs(11)}px Noto Sans Thai,sans-serif`; ctx.textAlign='left';
+    ctx.fillText(it.l,lx+i*rs(210)+rs(23),ly+rs(4));
   });
 }
 
@@ -445,8 +445,8 @@ function draw(){
   rr(rx(30),ry(265),rs(145),rs(28),rs(5));
   ctx.fillStyle='rgba(10,30,60,.8)'; ctx.fill();
   ctx.strokeStyle='#1a4a7a'; ctx.lineWidth=rs(1.5); ctx.stroke();
-  ctx.fillStyle='#2266aa'; ctx.font=`bold ${rs(9.5)}px Noto Sans Thai,sans-serif`; ctx.textAlign='center';
-  ctx.fillText('Condenser Water Loop',rx(103),ry(282));
+  ctx.fillStyle='#2266aa'; ctx.font=`bold ${rs(12)}px Noto Sans Thai,sans-serif`; ctx.textAlign='center';
+  ctx.fillText('Condenser Water Loop',rx(103),ry(283));
   ctx.restore();
 
   // CHW loop label box
@@ -455,8 +455,8 @@ function draw(){
   rr(bx,ry(268),rs(120),rs(25),rs(5));
   ctx.fillStyle='rgba(0,10,30,.8)'; ctx.fill();
   ctx.strokeStyle='#1a5a8a'; ctx.lineWidth=rs(1.5); ctx.stroke();
-  ctx.fillStyle='#0088cc'; ctx.font=`bold ${rs(9.5)}px Noto Sans Thai,sans-serif`; ctx.textAlign='center';
-  ctx.fillText('Chilled Water Loop',bx+rs(60),ry(284));
+  ctx.fillStyle='#0088cc'; ctx.font=`bold ${rs(12)}px Noto Sans Thai,sans-serif`; ctx.textAlign='center';
+  ctx.fillText('Chilled Water Loop',bx+rs(60),ry(285));
   ctx.restore();
 }
 
