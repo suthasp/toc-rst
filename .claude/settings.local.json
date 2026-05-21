@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(cd \"c:\\\\Users\\\\suthas\\\\OneDrive\\\\Documents\\\\GitHub\\\\PM Plan\"; git add . 2>&1 | Select-Object -Last 5; Write-Host \"Exit: $LASTEXITCODE\")"
+      "PowerShell(cd \"c:\\\\Users\\\\suthas\\\\OneDrive\\\\Documents\\\\GitHub\\\\PM Plan\"; git add . 2>&1 | Select-Object -Last 5; Write-Host \"Exit: $LASTEXITCODE\")",
+      "PowerShell([System.IO.File]::ReadAllText\\(\"c:\\\\Users\\\\suthas\\\\OneDrive\\\\Documents\\\\GitHub\\\\toc-rst\\\\firealarm.html\"\\).Length)"
     ]
   }
 }
