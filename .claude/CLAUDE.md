@@ -24,6 +24,8 @@ This workspace is for building **interactive web simulations** of Data Center Fa
 ### Safety & Protection Systems
 - **Grounding System** — Ground resistance, bonding paths, fault current flow
 - **Lightning Protection System (LPS)** — Air terminals, down conductors, surge arrestors
+- **Fire Alarm System (FAS/FACP)** — Multi-zone detection (smoke/heat/flame/VESDA/MCP), pre-alarm & confirmed alarm escalation, alarm panel
+- **Fire Suppression System (FSS)** — FM-200 / Novec 1230 / CO₂ / Inert gas, pre-discharge countdown, abort, discharge animation, HVAC damper interlock
 
 ---
 
@@ -122,6 +124,37 @@ Utility (Grid)
 - PID-like cooling output adjustment
 - Raise alarm if temp > 27°C; critical alarm > 35°C
 
+### Fire Alarm System (FAS) — Zone State Machine
+
+```text
+NORMAL
+  └─▶ PRE_ALARM    (1st detector triggered → 30s investigate countdown)
+        └─▶ ALARM  (2nd detector OR MCP OR timeout → confirmed fire)
+              └─▶  → notify suppression, activate sounders/strobes
+Any state → FAULT   (detector offline / loop fault)
+Any state → ISOLATED (manual operator isolation)
+```
+
+- Zone grid: color per status — green (NORMAL), amber (PRE_ALARM), red (ALARM), gray (ISOLATED)
+- Event log: timestamp | zone | device | event
+- Controls: trigger detector, silence, reset, isolate zone, test devices
+
+### Fire Suppression System (FSS) — FM-200 Discharge Sequence
+
+```text
+STANDBY
+  └─▶ PRE-DISCHARGE  (FACP fire signal → close HVAC dampers, release door holders, start 30s abort window)
+        ├─▶ ABORT     (operator presses abort within 30s)
+        └─▶ DISCHARGE (solenoid opens → agent fills room ~10s animation)
+              └─▶ HOLD (maintain concentration ~10 min, do NOT ventilate)
+                    └─▶ RELEASED / VENTED (all-clear confirmed)
+Any state → FAULT (cylinder pressure < 34 bar, solenoid fault, damper fault)
+```
+
+- Display: cylinder pressure (bar), agent weight (kg), design concentration (% vol), abort countdown
+- Interlock: on PRE-DISCHARGE → `hvac.closeDamper(zone)`, `accessControl.releaseDoorHolders(zone)`
+- SVG room diagram: animate gas fill overlay opacity 0 → 0.4 during DISCHARGE state
+
 ---
 
 ## Alarm System
@@ -159,10 +192,11 @@ For each simulation request, deliver:
 |------|---------|--------------|
 | หม้อแปลงไฟฟ้า | Transformer | TX |
 | เครื่องกำเนิดไฟฟ้า | Generator | GEN |
+| ระบบแจ้งเหตุและเตือนภัย/ระบบระงับอัคคีภัย |Fire Alarm/Fire Suppression | FA/FS |  
 | สวิตช์สับเปลี่ยนอัตโนมัติ | Automatic Transfer Switch | ATS |
 | ตู้จ่ายไฟหลัก | Main Distribution Board | MDB |
 | เซอร์กิตเบรกเกอร์อากาศ | Air Circuit Breaker | ACB |
-| ระบบปรับอากาศ | HVAC / Precision Cooling | CRAC/CRAH |
+| ระบบปรับอากาศ | HVAC / Precision Cooling | CRAC/CRAH/Chlled Air Cooled/Chilled Water Cooled |
 | เครื่องสำรองไฟ | Uninterruptible Power Supply | UPS |
 | เครื่องเรียงกระแส | Rectifier | RECT |
 | ระบบกราวด์ | Grounding System | GND |
