@@ -365,40 +365,152 @@ function drawPump3D(cx,cy,p,isCHP){
 }
 
 // ══════════════════════════════════════
-//  DRAW COOLING TOWER CELL (3D)
+//  DRAW COOLING TOWER 3D (Full Structure)
 // ══════════════════════════════════════
-function drawCT3D(i){
-  const eq=EQ.ct[i];
-  const x=rx(CT_CX[i]-CT_RW/2),y=ry(CT_CY[i]),w=rs(CT_RW),h=rs(CT_RH),d=rs(9);
-  const run=eq.run,flt=eq.fault;
-  const fc=flt?'#1a0404':run?'#050e18':'#070d14';
-  const tc=flt?'#260606':run?'#081626':'#0a1018';
-  const sc=flt?'#110303':run?'#030c14':'#060a10';
-  box3D(x,y,w,h,d,fc,tc,sc);
-  // Fan assembly
-  const fcx=x+w/2,fcy=y+h*.38,fr=rs(30);
-  const fg=ctx.createRadialGradient(fcx,fcy,fr*.1,fcx,fcy,fr);
-  fg.addColorStop(0,run?'#092030':'#060c12');fg.addColorStop(1,run?'#030c18':'#050910');
-  ctx.beginPath();ctx.arc(fcx,fcy,fr,0,Math.PI*2);ctx.fillStyle=fg;ctx.fill();
-  ctx.strokeStyle=run?'#0077aa':flt?'#660000':'#1a2a35';ctx.lineWidth=rs(1.5);ctx.stroke();
-  if(run){
-    for(let b=0;b<5;b++){const a=T*5.5+b*Math.PI*2/5;ctx.save();ctx.translate(fcx,fcy);ctx.rotate(a);ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,fr*.78,-.22,.32);ctx.closePath();ctx.fillStyle='rgba(0,130,200,.38)';ctx.fill();ctx.restore();}
-    // Outer glow
-    ctx.beginPath();ctx.arc(fcx,fcy,fr+rs(1.5),0,Math.PI*2);
-    ctx.strokeStyle='rgba(0,170,220,.35)';ctx.lineWidth=rs(2);ctx.stroke();
-    ctx.beginPath();ctx.arc(fcx,fcy,fr*.13,0,Math.PI*2);ctx.fillStyle='#00bbdd';ctx.fill();
+function drawCoolingTower3D(){
+  const tx=rx(762),ty=ry(18),tw=rs(602),th=rs(470),d3=rs(14);
+
+  // ── Tower shell (3D box) ──
+  const fc='#06101c',tc='#091828',sc2='#040d16';
+  box3D(tx,ty,tw,th,d3,fc,tc,sc2);
+
+  // ── Fan Deck header bar ──
+  rrPath(tx+rs(3),ty+rs(3),tw-rs(6),rs(26),rs(4));
+  ctx.fillStyle='rgba(8,28,48,.9)';ctx.fill();
+  ctx.strokeStyle='#1a4a6a';ctx.lineWidth=rs(1);ctx.stroke();
+  ctx.textAlign='center';ctx.fillStyle='#2a7aaa';ctx.font=`bold ${rs(11)}px Noto Sans Thai,sans-serif`;
+  ctx.fillText('⚙ COOLING TOWER PLANT — Fan Deck  (8 Cells)',tx+tw/2,ty+rs(18));
+
+  // ── 8 Fan Cells (4 cols × 2 rows) ──
+  const cols=4,rows=2;
+  const cellW=tw/cols, cellH=rs(185);
+  for(let i=0;i<8;i++){
+    const col=i%cols, row=Math.floor(i/cols);
+    const fcx=tx+col*cellW+cellW/2;
+    const fcy=ty+rs(32)+row*rs(100)+rs(45);
+    const fr=rs(36);
+    const eq=EQ.ct[i];
+    const run=eq.run,flt=eq.fault;
+    const bc=flt?'#992200':run?'#0a5a7a':'#1a3040';
+
+    // Cell divider
+    if(col>0){ctx.beginPath();ctx.moveTo(tx+col*cellW,ty+rs(30));ctx.lineTo(tx+col*cellW,ty+rs(30)+cellH);ctx.strokeStyle='rgba(20,60,90,.5)';ctx.lineWidth=rs(1);ctx.stroke();}
+
+    // Fan housing
+    ctx.beginPath();ctx.arc(fcx,fcy,fr+rs(5),0,Math.PI*2);
+    ctx.fillStyle=flt?'#1c0505':run?'#04121e':'#060e16';ctx.fill();
+    ctx.strokeStyle=bc;ctx.lineWidth=rs(2);ctx.stroke();
+
+    // Fan ring
+    ctx.beginPath();ctx.arc(fcx,fcy,fr,0,Math.PI*2);
+    ctx.strokeStyle=run?'#0077aa':'#1a3040';ctx.lineWidth=rs(1.5);ctx.stroke();
+
+    // Blades
+    if(run){
+      for(let b=0;b<5;b++){
+        const a=T*5.5+b*Math.PI*2/5;
+        ctx.save();ctx.translate(fcx,fcy);ctx.rotate(a);
+        ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,fr*.78,-.22,.32);ctx.closePath();
+        ctx.fillStyle='rgba(0,140,210,.42)';ctx.fill();ctx.restore();
+      }
+      ctx.beginPath();ctx.arc(fcx,fcy,fr+rs(2),0,Math.PI*2);
+      ctx.strokeStyle='rgba(0,190,230,.3)';ctx.lineWidth=rs(2.5);ctx.stroke();
+      ctx.beginPath();ctx.arc(fcx,fcy,fr*.12,0,Math.PI*2);ctx.fillStyle='#00ccee';ctx.fill();
+    } else if(flt){
+      ctx.beginPath();ctx.arc(fcx,fcy,fr*.5,0,Math.PI*2);ctx.strokeStyle='rgba(255,50,50,.3)';ctx.lineWidth=rs(2);ctx.stroke();
+    }
+
+    // Label
+    const lc=flt?'#ff5252':run?'#40c4ff':'#2a4466';
+    ctx.textAlign='center';
+    ctx.fillStyle=lc;ctx.font=`bold ${rs(10)}px JetBrains Mono,monospace`;
+    ctx.fillText(eq.id,fcx,fcy+fr+rs(14));
+    ctx.fillStyle=run?'#00e676':'#223a4a';ctx.font=`${rs(9)}px JetBrains Mono,monospace`;
+    ctx.fillText(run?eq.kw.toFixed(0)+'W':'STBY',fcx,fcy+fr+rs(25));
+    // Auto tag
+    rrPath(fcx-rs(14),fcy+fr+rs(28),rs(28),rs(11),rs(3));
+    ctx.fillStyle=run?'#072a12':'#0e1a22';ctx.fill();
+    ctx.fillStyle=run?'#00cc55':'#2a4050';ctx.font=`bold ${rs(8)}px JetBrains Mono,monospace`;
+    ctx.fillText('Auto',fcx,fcy+fr+rs(37));
   }
-  const lc=flt?'#ff5252':run?'#40c4ff':'#2a4050';
-  ctx.textAlign='center';
-  ctx.fillStyle=lc;ctx.font=`bold ${rs(10)}px JetBrains Mono,monospace`;
-  ctx.fillText(eq.id,fcx,y+h*.88);
-  ctx.fillStyle=run?'#00e676':'#223344';ctx.font=`${rs(9)}px JetBrains Mono,monospace`;
-  ctx.fillText(run?eq.kw.toFixed(0)+'W':'STANDBY',fcx,y+h*.97);
-  // Auto badge
-  ctx.fillStyle=run?'#006633':'#1a3040';
-  rrPath(fcx-rs(18),y+h+rs(2),rs(36),rs(13),rs(3));ctx.fill();
-  ctx.fillStyle=run?'#00ee77':'#334455';ctx.font=`bold ${rs(8.5)}px JetBrains Mono,monospace`;
-  ctx.textAlign='center';ctx.fillText('Auto',fcx,y+h+rs(12));
+
+  // ── Hot water inlet spray (top of fill) ──
+  const sprayY=ty+rs(215);
+  for(let n=0;n<8;n++){
+    const nx=tx+(n+.5)*tw/8;
+    for(let sp=0;sp<3;sp++){
+      const f=((T*1.0*60+sp*20+n*7)%40)/40;
+      const sy=sprayY+f*rs(28);
+      const sr=rs(1.8-f*1.6);
+      if(sr>0){ctx.beginPath();ctx.arc(nx+(Math.random()-.5)*rs(6),sy,sr,0,Math.PI*2);ctx.fillStyle=`rgba(80,180,255,${.65-f*.5})`;ctx.fill();}
+    }
+  }
+
+  // ── Fill Media zone ──
+  const fillY=ty+rs(222),fillH=rs(120);
+  rrPath(tx+rs(4),fillY,tw-rs(8),fillH,rs(4));
+  ctx.fillStyle='rgba(6,18,30,.75)';ctx.fill();
+  ctx.strokeStyle='#1a3a52';ctx.lineWidth=rs(1);ctx.stroke();
+  // Hatch lines
+  ctx.save();ctx.beginPath();rrPath(tx+rs(4),fillY,tw-rs(8),fillH,rs(4));ctx.clip();
+  ctx.strokeStyle='rgba(20,65,100,.55)';ctx.lineWidth=rs(1.2);
+  for(let xi=-fillH;xi<tw+fillH;xi+=rs(9)){ctx.beginPath();ctx.moveTo(tx+xi,fillY);ctx.lineTo(tx+xi+fillH,fillY+fillH);ctx.stroke();}
+  ctx.restore();
+  // Falling droplets
+  for(let dr=0;dr<28;dr++){
+    const dxp=((dr*53)%(tw-rs(20)));
+    const dyp=((T*0.65*60+dr*29)%fillH);
+    ctx.beginPath();ctx.arc(tx+rs(10)+dxp,fillY+dyp,rs(2),0,Math.PI*2);
+    ctx.fillStyle='rgba(70,170,240,.55)';ctx.fill();
+  }
+  ctx.textAlign='center';ctx.fillStyle='#1a5a78';ctx.font=`bold ${rs(10)}px Noto Sans Thai,sans-serif`;
+  ctx.fillText('Fill Media — Heat Exchange Zone',tx+tw/2,fillY+fillH*.55);
+
+  // ── Drift Eliminator bar ──
+  ctx.fillStyle='rgba(10,28,44,.8)';ctx.fillRect(tx+rs(4),fillY-rs(8),tw-rs(8),rs(7));
+  ctx.fillStyle='#1a4a60';ctx.font=`${rs(8.5)}px JetBrains Mono,monospace`;ctx.textAlign='center';
+  ctx.fillText('Drift Eliminator',tx+tw/2,fillY-rs(2));
+
+  // ── Cold Water Basin ──
+  const basinY=ty+rs(352),basinH=rs(90);
+  rrPath(tx+rs(4),basinY,tw-rs(8),basinH,rs(5));
+  ctx.fillStyle='rgba(6,22,40,.85)';ctx.fill();
+  ctx.strokeStyle='#1a4a6a';ctx.lineWidth=rs(1.5);ctx.stroke();
+  // Water surface
+  const wg=ctx.createLinearGradient(tx,basinY,tx,basinY+basinH);
+  wg.addColorStop(0,'rgba(15,90,150,.5)');wg.addColorStop(1,'rgba(8,45,80,.3)');
+  rrPath(tx+rs(4),basinY+rs(6),tw-rs(8),basinH-rs(10),rs(4));ctx.fillStyle=wg;ctx.fill();
+  // Ripples
+  for(let r2=0;r2<5;r2++){
+    const rw2=((T*.5*60+r2*22)%(tw*.48-rs(10)));
+    ctx.beginPath();ctx.ellipse(tx+tw/2,basinY+basinH*.62,rw2,rw2*.12,0,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(50,160,220,${Math.max(0,.22-rw2/(tw*.48)*.22)})`;ctx.lineWidth=rs(1);ctx.stroke();
+  }
+  ctx.textAlign='center';ctx.fillStyle='#1a6a88';ctx.font=`bold ${rs(10.5)}px Noto Sans Thai,sans-serif`;
+  ctx.fillText('Cold Water Basin',tx+tw/2,basinY+rs(20));
+  ctx.fillStyle='#40c4ff';ctx.font=`bold ${rs(13)}px JetBrains Mono,monospace`;
+  ctx.fillText('LWT: '+EQ.tower.lwt.toFixed(2)+' °C',tx+tw/2-rs(95),basinY+basinH*.72);
+  ctx.fillStyle='#ff9800';
+  ctx.fillText('EWT: '+EQ.tower.ewt.toFixed(2)+' °C',tx+tw/2+rs(95),basinY+basinH*.72);
+
+  // ── CDR inlet label (hot water in, orange arrow) ──
+  const inY=ry(75);
+  ctx.fillStyle='rgba(80,30,0,.75)';rrPath(rx(762),inY-rs(10),rs(60),rs(20),rs(3));ctx.fill();
+  ctx.fillStyle='#ff8800';ctx.font=`bold ${rs(9.5)}px JetBrains Mono,monospace`;ctx.textAlign='center';
+  ctx.fillText('CDR IN →',rx(792),inY+rs(4));
+
+  // ── CDS outlet label (cool water out, yellow arrow) ──
+  const outY=basinY+basinH*.5;
+  ctx.fillStyle='rgba(60,50,0,.75)';rrPath(rx(762),outY-rs(10),rs(65),rs(20),rs(3));ctx.fill();
+  ctx.fillStyle='#ddcc00';ctx.font=`bold ${rs(9.5)}px JetBrains Mono,monospace`;ctx.textAlign='center';
+  ctx.fillText('← CDS OUT',rx(795),outY+rs(4));
+
+  // ── Bottom info strip ──
+  rrPath(tx+rs(3),ty+th+rs(3),tw-rs(6),rs(20),rs(4));
+  ctx.fillStyle='rgba(6,18,32,.88)';ctx.fill();ctx.strokeStyle='#1a3a5a';ctx.lineWidth=rs(1);ctx.stroke();
+  ctx.textAlign='center';ctx.fillStyle='#2a6888';ctx.font=`bold ${rs(10)}px Noto Sans Thai,sans-serif`;
+  const runCT=EQ.ct.filter(c=>c.run).length;
+  ctx.fillText('Cooling Tower — '+runCT+'/8 Cells Running  |  EWT '+EQ.tower.ewt.toFixed(1)+'°C  →  LWT '+EQ.tower.lwt.toFixed(1)+'°C',tx+tw/2,ty+th+rs(14));
 }
 
 // ══════════════════════════════════════
@@ -486,7 +598,7 @@ function draw(){
   for(let i=0;i<4;i++) drawChiller3D(i);
   CDP_X.forEach((x,i)=>drawPump3D(rx(x),ry(CDP_Y),EQ.cdp[i],false));
   CHP_X.forEach((x,i)=>drawPump3D(rx(x),ry(CHP_Y),EQ.chp[i],true));
-  for(let i=0;i<8;i++) drawCT3D(i);
+  drawCoolingTower3D();
   drawLabels();
 }
 
