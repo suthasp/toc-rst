@@ -3,592 +3,551 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Chilled Water Cooling System — Data Center TOC-RST</title>
+<title>Chiller Plant Management System (CPMS) — TOC-RST</title>
 <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#06080f;--panel:#0a0d1a;--border:#1a2a3a;
-  --text:#b0c4d8;--bright:#ddeeff;--dim:#334455;
-  --green:#00e676;--yellow:#ffd740;--red:#ff5252;
-  --blue:#40c4ff;--cyan:#00e5ff;--orange:#ff9800;
-}
-body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai','JetBrains Mono',monospace;overflow:hidden;height:100vh;display:flex;flex-direction:column}
-header{background:linear-gradient(135deg,#040b1c,#0b1830);padding:7px 14px;border-bottom:2px solid #1a4a7a;display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0}
-.hdr-title h1{font-size:.95rem;color:#40c4ff;font-weight:700}
-.hdr-title .sub{font-size:.68rem;color:#4a6888}
-.hdr-badges{display:flex;gap:6px;align-items:center;margin-left:auto;flex-wrap:wrap}
+body{background:#06090f;color:#b8ccd8;font-family:'Noto Sans Thai','JetBrains Mono',monospace;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+header{background:linear-gradient(135deg,#04060e,#0a1228);padding:6px 14px;border-bottom:2px solid #1a3a5a;display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0}
+.ht h1{font-size:.95rem;color:#40c4ff;font-weight:700;letter-spacing:.04em}
+.ht .sub{font-size:.65rem;color:#3a5870}
+.hb{display:flex;gap:5px;align-items:center;margin-left:auto}
 .badge{padding:2px 9px;border-radius:10px;font-size:10px;font-weight:700;border:1px solid;white-space:nowrap}
-.bg{background:#0a1f0a;color:#00e676;border-color:#00803a}
-.bb{background:#081828;color:#40c4ff;border-color:#1a5a8a}
-.by{background:#1e1400;color:#ffd740;border-color:#887000}
-.br{background:#1e0505;color:#ff5252;border-color:#882222}
-.clock{font-family:'JetBrains Mono',monospace;font-size:11px;color:#40c4ff;white-space:nowrap}
-.main{display:flex;flex:1;overflow:hidden;min-height:0}
-.cvs-wrap{flex:1;min-width:0;position:relative}
+.bg{background:#071507;color:#00e676;border-color:#005522}
+.bb{background:#050e1a;color:#40c4ff;border-color:#1a4a7a}
+.by{background:#130f00;color:#ffd740;border-color:#775500}
+.br{background:#130404;color:#ff5252;border-color:#771111}
+.clk{font-family:'JetBrains Mono',monospace;font-size:11px;color:#40c4ff;white-space:nowrap}
+.main{flex:1;overflow:hidden;min-height:0}
 canvas{width:100%;height:100%;display:block}
-.rpanel{width:210px;flex-shrink:0;background:#080c18;border-left:1px solid #142030;overflow-y:auto;padding:5px;display:flex;flex-direction:column;gap:4px}
-.scard{background:#0b1220;border:1px solid #162030;border-radius:5px;padding:7px 9px}
-.sc-title{font-size:9px;color:#4a6888;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
-.sc-val{font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:700}
-.sc-unit{font-size:9px;color:#4a6888;margin-left:2px}
-.sc-sub{font-size:9px;color:#304050;margin-top:1px}
-.tc{color:#40c4ff}.tw{color:#ff9800}.th{color:#ff5252}.tg{color:#00e676}.ty{color:#ffd740}
-.eq-row{display:flex;align-items:center;gap:5px;padding:3px 5px;border-radius:3px;background:#090e1c;border:1px solid #121e2c;margin-bottom:2px;cursor:pointer}
-.eq-row:hover{border-color:#2a4a6a}
-.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.dg{background:#00e676;box-shadow:0 0 5px #00e67688}
-.ds{background:#334455}
-.df{background:#ff5252;box-shadow:0 0 5px #ff525288;animation:blink .8s infinite}
-.eq-lbl{font-size:9.5px;font-weight:700;color:#7a9ab8;flex:1}
-.eq-v{font-size:9px;font-family:'JetBrains Mono',monospace;color:#4a6888}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.btm{height:44px;background:#07091a;border-top:1px solid #142030;display:flex;align-items:center;gap:5px;padding:0 10px;flex-shrink:0;overflow-x:auto}
-.cbtn{padding:3px 11px;border-radius:4px;font-size:10px;font-weight:700;border:1px solid;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;transition:background .15s,color .15s;white-space:nowrap}
-.cs{background:#071507;color:#00e676;border-color:#006622}.cs:hover{background:#006622;color:#fff}
-.cx{background:#150707;color:#ff5252;border-color:#660022}.cx:hover{background:#660022;color:#fff}
-.cw{background:#141000;color:#ffd740;border-color:#665500}.cw:hover{background:#665500;color:#fff}
-.bsep{width:1px;height:26px;background:#142030;flex-shrink:0;margin:0 2px}
-.alm-strip{display:flex;gap:3px;align-items:center;margin-left:auto;flex-wrap:nowrap;overflow:hidden}
-.alm-item{padding:1px 6px;border-radius:3px;background:#140a00;color:#ffd740;border:1px solid #553800;font-size:9px;white-space:nowrap;animation:blink .9s infinite}
+.btm{height:40px;background:#05070e;border-top:1px solid #111e2c;display:flex;align-items:center;gap:5px;padding:0 10px;flex-shrink:0;overflow-x:auto}
+.cb{padding:3px 11px;border-radius:4px;font-size:10px;font-weight:700;border:1px solid;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;transition:all .15s;white-space:nowrap}
+.cs{background:#06130a;color:#00e676;border-color:#005522}.cs:hover{background:#005522;color:#fff}
+.cx{background:#130606;color:#ff5252;border-color:#660011}.cx:hover{background:#660011;color:#fff}
+.cw{background:#130d00;color:#ffd740;border-color:#664400}.cw:hover{background:#664400;color:#fff}
+.bsp{width:1px;height:22px;background:#111e2c;margin:0 2px;flex-shrink:0}
+.aw{display:flex;gap:3px;margin-left:auto;overflow:hidden}
+.ai{padding:1px 6px;border-radius:3px;background:#100600;color:#ffd740;border:1px solid #442200;font-size:9px;white-space:nowrap;animation:bl .9s infinite}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.2}}
 </style>
 </head>
 <body>
 <header>
-  <div class="hdr-title">
-    <h1>❄ CHILLED WATER COOLING SYSTEM — DATA CENTER TOC-RST</h1>
-    <div class="sub">Water-Cooled Chiller ×4 &bull; Condenser Water Pump ×4 &bull; Chilled Water Pump ×4 &bull; Cooling Tower 2-Cell</div>
+  <div class="ht">
+    <h1>❄ CHILLER PLANT MANAGEMENT SYSTEM (CPMS) — DATA CENTER TOC-RST</h1>
+    <div class="sub">Water-Cooled Chiller ×4 &bull; CDP ×4 &bull; CHP ×4 &bull; Cooling Tower 8-Cell (CT-1/1 ~ CT-4/2) &bull; Dual Loop</div>
   </div>
-  <div class="hdr-badges">
+  <div class="hb">
     <span class="badge bg" id="bSys">● NORMAL</span>
-    <span class="badge bb" id="bCH">CHILLER 2/4</span>
+    <span class="badge bb" id="bCH">CH 2/4</span>
     <span class="badge bb" id="bPump">PUMP 4/8</span>
-    <span class="badge by" id="bLoad">LOAD 0 kW</span>
+    <span class="badge by" id="bLoad">872 kW</span>
   </div>
-  <div class="clock" id="clk">--</div>
+  <div class="clk" id="clk">--</div>
 </header>
-<div class="main">
-  <div class="cvs-wrap"><canvas id="cvs"></canvas></div>
-  <div class="rpanel" id="rp"></div>
-</div>
+<div class="main"><canvas id="cvs"></canvas></div>
 <div class="btm" id="btm"></div>
 
 <script>
-// ════════════════════════════════════════════
+// ══════════════════════════════════════
 //  STATE
-// ════════════════════════════════════════════
-const EQ = {
-  tower:{
-    cells:[{id:'CT-A',fan:true,fault:false},{id:'CT-B',fan:true,fault:false}],
-    ewt:37.2, lwt:32.0
-  },
-  cdp:[
-    {id:'CDP-01',run:true, fault:false,flow:482,kw:18.6},
-    {id:'CDP-02',run:true, fault:false,flow:476,kw:18.2},
-    {id:'CDP-03',run:false,fault:false,flow:0,  kw:0},
-    {id:'CDP-04',run:false,fault:false,flow:0,  kw:0}
-  ],
+// ══════════════════════════════════════
+const EQ={
   ch:[
     {id:'CH-01',run:true, fault:false,load:74,kw:452,cop:5.22,chws:7.1,chwr:12.3,cws:32.0,cwr:37.1},
     {id:'CH-02',run:true, fault:false,load:69,kw:420,cop:5.28,chws:7.2,chwr:12.1,cws:32.2,cwr:36.8},
     {id:'CH-03',run:false,fault:false,load:0, kw:0,  cop:0,   chws:0,  chwr:0,  cws:0,   cwr:0},
     {id:'CH-04',run:false,fault:false,load:0, kw:0,  cop:0,   chws:0,  chwr:0,  cws:0,   cwr:0}
   ],
+  cdp:[
+    {id:'CDP-01',run:true, fault:false,flow:482,kw:18.6},
+    {id:'CDP-02',run:true, fault:false,flow:476,kw:18.2},
+    {id:'CDP-03',run:false,fault:false,flow:0,  kw:0},
+    {id:'CDP-04',run:false,fault:false,flow:0,  kw:0}
+  ],
   chp:[
     {id:'CHP-01',run:true, fault:false,flow:402,kw:15.3},
     {id:'CHP-02',run:true, fault:false,flow:396,kw:15.0},
     {id:'CHP-03',run:false,fault:false,flow:0,  kw:0},
     {id:'CHP-04',run:false,fault:false,flow:0,  kw:0}
-  ]
+  ],
+  ct:[
+    {id:'CT-1/1',run:true, fault:false,kw:4522},
+    {id:'CT-1/2',run:true, fault:false,kw:3461},
+    {id:'CT-2/1',run:true, fault:false,kw:4297},
+    {id:'CT-2/2',run:false,fault:false,kw:0},
+    {id:'CT-3/1',run:false,fault:false,kw:0},
+    {id:'CT-3/2',run:false,fault:false,kw:0},
+    {id:'CT-4/1',run:false,fault:false,kw:0},
+    {id:'CT-4/2',run:false,fault:false,kw:0}
+  ],
+  tower:{ewt:37.2,lwt:32.0}
 };
 const ALARMS=[];
-function alarm(id,sev,msg){
-  ALARMS.unshift({id,sev,msg,time:new Date().toLocaleTimeString('th-TH',{hour12:false})});
-  if(ALARMS.length>30) ALARMS.pop();
-  renderBtm();
-}
+function pushAlarm(id,msg){ALARMS.unshift({id,msg,t:new Date().toLocaleTimeString('th-TH',{hour12:false})});if(ALARMS.length>20)ALARMS.pop();renderBtm();}
 
-// ════════════════════════════════════════════
-//  CANVAS
-// ════════════════════════════════════════════
+// ══════════════════════════════════════
+//  CANVAS + SCALE
+// ══════════════════════════════════════
 const cvs=document.getElementById('cvs');
 const ctx=cvs.getContext('2d');
 let W,H,T=0;
-
-function rsz(){
-  W=cvs.parentElement.clientWidth;
-  H=cvs.parentElement.clientHeight;
-  cvs.width=W; cvs.height=H;
-}
+function rsz(){W=cvs.parentElement.clientWidth;H=cvs.parentElement.clientHeight;cvs.width=W;cvs.height=H;}
 rsz(); window.addEventListener('resize',rsz);
 
-// Reference space 1300×680, scaled to fit canvas
-function sc(){ return Math.min(W/1300,H/680); }
-function ox(){ return (W-1300*sc())/2; }
-function oy(){ return (H-680*sc())/2; }
-function rx(x){ return ox()+x*sc(); }
-function ry(y){ return oy()+y*sc(); }
-function rs(v){ return v*sc(); }
+const RW=1380, RH=640; // reference space
+function SC(){return Math.min(W/RW,H/RH);}
+function OX(){return (W-RW*SC())/2;}
+function OY(){return (H-RH*SC())/2;}
+function rx(x){return OX()+x*SC();}
+function ry(y){return OY()+y*SC();}
+function rs(v){return v*SC();}
 
-// ════════════════════════════════════════════
-//  DRAW UTILITIES
-// ════════════════════════════════════════════
-function rr(x,y,w,h,r){
+// ══════════════════════════════════════
+//  COLOR HELPERS
+// ══════════════════════════════════════
+function h2rgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+function lighter(col,a){const[r,g,b]=h2rgb(col);return`rgb(${Math.min(255,r+a)},${Math.min(255,g+a)},${Math.min(255,b+a)})`;}
+function darker(col,a){const[r,g,b]=h2rgb(col);return`rgb(${Math.max(0,r-a)},${Math.max(0,g-a)},${Math.max(0,b-a)})`;}
+
+// Pipe palette (CPMS-style)
+const PC={CDR:'#ff7700',CDS:'#ccbb00',CHS:'#00ccff',CHR:'#1155ee'};
+
+// ══════════════════════════════════════
+//  3D DRAW PRIMITIVES
+// ══════════════════════════════════════
+function rrPath(x,y,w,h,r){
   ctx.beginPath();
-  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r);
-  ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
-  ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r);
-  ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r); ctx.closePath();
-}
-function pl(x1,y1,x2,y2,col,w,a=1){
-  ctx.globalAlpha=a; ctx.strokeStyle=col; ctx.lineWidth=w; ctx.lineCap='round';
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.globalAlpha=1;
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
 }
 
-// Animated flow dots along a polyline
-function flowDots(pts,col,on,speed){
-  if(!on||pts.length<2) return;
-  let total=0;
-  for(let i=1;i<pts.length;i++) total+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);
-  if(total<2) return;
-  const offs=[0,0.34,0.67];
-  for(const off of offs){
-    let d=((T*speed*50+off*total)%total); let rem=d;
-    let px=pts[0][0],py=pts[0][1];
-    for(let i=1;i<pts.length;i++){
-      const sg=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);
-      if(rem<=sg){const f=rem/sg;px=pts[i-1][0]+f*(pts[i][0]-pts[i-1][0]);py=pts[i-1][1]+f*(pts[i][1]-pts[i-1][1]);break;}
-      rem-=sg;
-    }
-    ctx.beginPath(); ctx.arc(px,py,rs(3.5),0,Math.PI*2);
-    ctx.fillStyle=col; ctx.globalAlpha=.88; ctx.fill(); ctx.globalAlpha=1;
-  }
-}
-
-// ════════════════════════════════════════════
-//  EQUIPMENT DRAW
-// ════════════════════════════════════════════
-function drawTower(){
-  const x=rx(30),y=ry(18),w=rs(210),h=rs(185);
-  // Shell
-  rr(x,y,w,h,rs(6)); ctx.fillStyle='#060e1c'; ctx.fill();
-  ctx.strokeStyle='#1a4a6a'; ctx.lineWidth=rs(2.5); rr(x,y,w,h,rs(6)); ctx.stroke();
-  // Fill media hatch
-  ctx.save(); ctx.beginPath(); rr(x+rs(4),y+h*.38,w-rs(8),h*.32,rs(3)); ctx.clip();
-  ctx.strokeStyle='rgba(20,70,110,.55)'; ctx.lineWidth=rs(1);
-  for(let i=-h;i<w+h;i+=rs(7)){ ctx.beginPath(); ctx.moveTo(x+i,y+h*.38); ctx.lineTo(x+i+h*.32,y+h*.7); ctx.stroke(); }
+// 3D gradient tube pipe
+function pipe3D(x1,y1,x2,y2,col,w){
+  if(w<rs(1)) return;
+  const ang=Math.atan2(y2-y1,x2-x1);
+  const nx=Math.sin(ang), ny=-Math.cos(ang);
+  // Drop shadow
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,.55)';ctx.shadowBlur=rs(4);ctx.shadowOffsetX=rs(1.5);ctx.shadowOffsetY=rs(2);
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);
+  ctx.strokeStyle='rgba(0,0,0,.3)';ctx.lineWidth=w+rs(3);ctx.lineCap='round';ctx.stroke();
   ctx.restore();
-  // Fan cells
-  const fcs=[{x:x+w*.27,y:y+h*.2},{x:x+w*.73,y:y+h*.2}];
-  fcs.forEach((fc,i)=>{
-    const cell=EQ.tower.cells[i], run=cell.fan&&!cell.fault, fr=rs(28);
-    ctx.beginPath(); ctx.arc(fc.x,fc.y,fr,0,Math.PI*2);
-    ctx.fillStyle='#040b14'; ctx.fill();
-    ctx.strokeStyle=run?'#00bfff':'#2a4455'; ctx.lineWidth=rs(1.5); ctx.stroke();
-    if(run){ for(let b=0;b<4;b++){ const a=T*5+b*Math.PI/2; ctx.save(); ctx.translate(fc.x,fc.y); ctx.rotate(a); ctx.beginPath(); ctx.ellipse(fr*.38,0,fr*.3,fr*.1,0,0,Math.PI*2); ctx.fillStyle='rgba(0,150,200,.32)'; ctx.fill(); ctx.restore(); } }
-    ctx.beginPath(); ctx.arc(fc.x,fc.y,fr*.18,0,Math.PI*2); ctx.fillStyle=run?'#00bfff':'#2a4455'; ctx.fill();
-    ctx.fillStyle='#4a7a9a'; ctx.font=`bold ${rs(12)}px JetBrains Mono,monospace`; ctx.textAlign='center';
-    ctx.fillText(cell.id,fc.x,fc.y+fr+rs(14));
-  });
-  // Water droplets
-  for(let d=0;d<10;d++){
-    const dy=((T*.7*60+d*53)%100)/100, dx=.12+((d*41)%76)/100;
-    ctx.beginPath(); ctx.arc(x+dx*w,y+h*.38+dy*h*.3,rs(2),0,Math.PI*2);
-    ctx.fillStyle='rgba(80,160,240,.6)'; ctx.fill();
-  }
-  // Basin
-  ctx.fillStyle='rgba(15,70,130,.4)'; ctx.fillRect(x+rs(4),y+h*.78,w-rs(8),h*.18);
-  // Label
-  ctx.fillStyle='#3a7a9a'; ctx.font=`bold ${rs(14)}px Noto Sans Thai,sans-serif`; ctx.textAlign='center';
-  ctx.fillText('Cooling Tower',x+w/2,y+h+rs(16));
-  ctx.font=`${rs(12)}px JetBrains Mono,monospace`;
-  ctx.fillStyle='#ff9800'; ctx.fillText('EWT: '+EQ.tower.ewt.toFixed(1)+'°C',x+w/2,y+h+rs(30));
-  ctx.fillStyle='#40c4ff'; ctx.fillText('LWT: '+EQ.tower.lwt.toFixed(1)+'°C',x+w/2,y+h+rs(44));
+  // Gradient across tube width
+  const gx1=x1+nx*(w*.5),gy1=y1+ny*(w*.5),gx2=x1-nx*(w*.5),gy2=y1-ny*(w*.5);
+  const g=ctx.createLinearGradient(gx1,gy1,gx2,gy2);
+  g.addColorStop(0,lighter(col,80));
+  g.addColorStop(.28,col);
+  g.addColorStop(.65,col);
+  g.addColorStop(1,darker(col,70));
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);
+  ctx.strokeStyle=g;ctx.lineWidth=w;ctx.lineCap='round';ctx.stroke();
+  // Specular highlight
+  ctx.beginPath();ctx.moveTo(x1-nx*w*.32,y1-ny*w*.32);ctx.lineTo(x2-nx*w*.32,y2-ny*w*.32);
+  ctx.strokeStyle='rgba(255,255,255,.22)';ctx.lineWidth=w*.18;ctx.stroke();
 }
 
-function drawChiller(i){
-  const xs=[380,505,630,755], cw=110, ch=165;
-  const x=rx(xs[i]),y=ry(195),w=rs(cw),h=rs(ch);
-  const eq=EQ.ch[i], run=eq.run, flt=eq.fault;
-  const bc=flt?'#ff5252':run?'#00aadd':'#1a3040';
-  const bg=flt?'#140404':run?'#05111a':'#07101a';
-  rr(x,y,w,h,rs(7)); ctx.fillStyle=bg; ctx.fill();
-  ctx.strokeStyle=bc; ctx.lineWidth=rs(run?2:1.5); rr(x,y,w,h,rs(7)); ctx.stroke();
-  // Compressor
-  const cx=x+w/2, cy=y+h*.42, cr=rs(22);
-  ctx.beginPath(); ctx.arc(cx,cy,cr,0,Math.PI*2); ctx.fillStyle=run?'#071828':'#060e14'; ctx.fill();
-  ctx.strokeStyle=bc; ctx.lineWidth=rs(1.5); ctx.stroke();
-  if(run){ for(let b=0;b<6;b++){ const a=T*2.5+b*Math.PI/3; ctx.save(); ctx.translate(cx,cy); ctx.rotate(a); ctx.beginPath(); ctx.ellipse(cr*.62,0,cr*.44,cr*.14,.2,0,Math.PI*2); ctx.fillStyle='rgba(0,170,240,.2)'; ctx.fill(); ctx.restore(); } }
-  ctx.beginPath(); ctx.arc(cx,cy,cr*.22,0,Math.PI*2); ctx.fillStyle=bc; ctx.fill();
-  // Labels
-  ctx.textAlign='center';
-  ctx.fillStyle=run?'#40c4ff':'#334455'; ctx.font=`bold ${rs(12)}px JetBrains Mono,monospace`;
-  ctx.fillText(eq.id,cx,y+h*.91);
+// 3D isometric box
+function box3D(x,y,w,h,d,fc,tc,sc){
+  const r=rs(5);
+  // Shadow
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.65)';ctx.shadowBlur=rs(10);ctx.shadowOffsetX=rs(3);ctx.shadowOffsetY=rs(5);
+  rrPath(x,y,w,h,r);ctx.fillStyle='rgba(0,0,0,.5)';ctx.fill();ctx.restore();
+  // Top face
+  ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+d,y-d);ctx.lineTo(x+w+d,y-d);ctx.lineTo(x+w,y);ctx.closePath();
+  ctx.fillStyle=tc;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.25)';ctx.lineWidth=rs(.5);ctx.stroke();
+  // Right face
+  ctx.beginPath();ctx.moveTo(x+w,y);ctx.lineTo(x+w+d,y-d);ctx.lineTo(x+w+d,y+h-d);ctx.lineTo(x+w,y+h);ctx.closePath();
+  ctx.fillStyle=sc;ctx.fill();ctx.stroke();
+  // Front face
+  rrPath(x,y,w,h,r);ctx.fillStyle=fc;ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=rs(1);rrPath(x,y,w,h,r);ctx.stroke();
+}
+
+// 3D cylinder pump
+function cylinder3D(cx,cy,ew,eh,ch,col,run,fault){
+  const fc=fault?'#cc1111':run?lighter(col,45):darker(col,40);
+  const sg=ctx.createLinearGradient(cx-ew,cy,cx+ew,cy);
+  sg.addColorStop(0,darker(col,55));sg.addColorStop(.38,col);sg.addColorStop(.62,col);sg.addColorStop(1,darker(col,60));
+  // Shadow
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=rs(6);ctx.shadowOffsetX=rs(2);ctx.shadowOffsetY=rs(3);
+  ctx.beginPath();ctx.ellipse(cx,cy+ch,ew,eh,0,0,Math.PI*2);ctx.fillStyle=darker(col,55);ctx.fill();ctx.restore();
+  // Barrel
+  ctx.beginPath();
+  ctx.moveTo(cx-ew,cy);ctx.lineTo(cx-ew,cy+ch);
+  ctx.ellipse(cx,cy+ch,ew,eh,0,Math.PI,0,true);
+  ctx.lineTo(cx+ew,cy);ctx.ellipse(cx,cy,ew,eh,0,0,Math.PI,true);
+  ctx.fillStyle=sg;ctx.fill();
+  // Top cap
+  ctx.beginPath();ctx.ellipse(cx,cy,ew,eh,0,0,Math.PI*2);ctx.fillStyle=fc;ctx.fill();
+  // Sheen
+  ctx.beginPath();ctx.ellipse(cx-ew*.22,cy-eh*.22,ew*.45,eh*.38,-.3,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,255,255,.16)';ctx.fill();
+  // Spinning blades
   if(run){
-    ctx.fillStyle='#00e676'; ctx.font=`${rs(10.5)}px JetBrains Mono,monospace`;
-    ctx.fillText(eq.load+'% · '+eq.kw+'kW',cx,y+h*.99);
-    const fs=rs(10);
-    ctx.font=`${fs}px JetBrains Mono,monospace`; ctx.textAlign='left';
-    ctx.fillStyle='#40c4ff'; ctx.fillText('S:'+eq.chws.toFixed(1)+'°',x+rs(4),y+rs(15));
-    ctx.fillStyle='#ff9800'; ctx.fillText('R:'+eq.chwr.toFixed(1)+'°',x+rs(4),y+rs(27));
-    ctx.fillStyle='#ff7755'; ctx.fillText('CWS:'+eq.cws.toFixed(1)+'°',x+rs(4),y+h*.7);
-    ctx.fillStyle='#ff4422'; ctx.fillText('CWR:'+eq.cwr.toFixed(1)+'°',x+rs(4),y+h*.82);
-  } else {
-    ctx.fillStyle='#2a4050'; ctx.font=`${rs(11)}px Noto Sans Thai,sans-serif`;
-    ctx.textAlign='center'; ctx.fillText('STANDBY',cx,y+h*.99);
+    for(let b=0;b<4;b++){const a=T*4.5+b*Math.PI/2;ctx.save();ctx.translate(cx,cy);ctx.rotate(a);ctx.beginPath();ctx.ellipse(ew*.32,0,ew*.3,eh*.25,0,0,Math.PI*2);ctx.fillStyle='rgba(0,200,80,.28)';ctx.fill();ctx.restore();}
+    ctx.beginPath();ctx.ellipse(cx,cy,ew*.16,eh*.16,0,0,Math.PI*2);ctx.fillStyle='rgba(0,255,80,.75)';ctx.fill();
   }
 }
 
-function drawPump(cx,cy,r,run,fault,lbl,kw){
-  const col=fault?'#ff5252':run?'#00e676':'#334455';
-  const bg=fault?'#180404':run?'#041504':'#080d14';
-  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle=bg; ctx.fill();
-  ctx.strokeStyle=col; ctx.lineWidth=rs(2); ctx.stroke();
-  if(run){ for(let b=0;b<4;b++){ const a=T*4+b*Math.PI/2; ctx.save(); ctx.translate(cx,cy); ctx.rotate(a); ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,r*.62,-.2,.6); ctx.closePath(); ctx.fillStyle='rgba(0,180,80,.22)'; ctx.fill(); ctx.restore(); } }
-  ctx.beginPath(); ctx.arc(cx,cy,r*.22,0,Math.PI*2); ctx.fillStyle=col; ctx.fill();
-  ctx.fillStyle=col; ctx.font=`bold ${r*.65}px JetBrains Mono,monospace`; ctx.textAlign='center';
-  ctx.fillText(lbl,cx,cy+r+r*.8);
-  if(run&&kw>0){ ctx.fillStyle='#556677'; ctx.font=`${r*.55}px JetBrains Mono,monospace`; ctx.fillText(kw.toFixed(1)+'kW',cx,cy+r+r*1.45); }
+// ══════════════════════════════════════
+//  LAYOUT CONSTANTS (ref-space pixels)
+// ══════════════════════════════════════
+// Chillers
+const CH_X=[52,178,304,430], CH_Y=140, CH_W=108, CH_H=160;
+// Pipes (horizontal buses)
+const CDR_BUS_Y=126, CDS_BUS_Y=142;
+const CHS_BUS_Y=248, CHR_BUS_Y=332;
+const CHW_BUS_X=558; // vertical bus right of chillers
+const CDP_BUS_Y=545, CDP_DIS_Y=520;
+// Pumps
+const CDP_X=[72,158,244,330], CDP_Y=500;
+const CHP_X=[390,462,534,606], CHP_Y=470;
+// Cooling Tower (right half)
+const CT_OX=760; // x origin of CT section
+const CT_CX=[CT_OX+50,CT_OX+50,CT_OX+182,CT_OX+182,CT_OX+314,CT_OX+314,CT_OX+446,CT_OX+446];
+const CT_CY=[148,308,148,308,148,308,148,308];
+const CT_RW=100,CT_RH=130;
+// AHU/supply label position
+const AHU_X=CT_OX+35, AHU_Y=460;
+// Div line
+const DIV_X=740;
+
+// ══════════════════════════════════════
+//  FLOW DOT ANIMATOR
+// ══════════════════════════════════════
+function flowDots(pts,col,on,spd=1.3){
+  if(!on||pts.length<2)return;
+  let tot=0;
+  for(let i=1;i<pts.length;i++)tot+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);
+  if(tot<2)return;
+  for(const off of[0,.34,.67]){
+    let d=((T*spd*60+off*tot)%tot),rem=d,px=pts[0][0],py=pts[0][1];
+    for(let i=1;i<pts.length;i++){const sg=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);if(rem<=sg){const f=rem/sg;px=pts[i-1][0]+f*(pts[i][0]-pts[i-1][0]);py=pts[i-1][1]+f*(pts[i][1]-pts[i-1][1]);break;}rem-=sg;}
+    ctx.beginPath();ctx.arc(px,py,rs(3.5),0,Math.PI*2);
+    ctx.fillStyle=col;ctx.globalAlpha=.88;ctx.fill();ctx.globalAlpha=1;
+  }
 }
 
-function drawAHU(){
-  const x=rx(1160),y=ry(100),w=rs(75),h=rs(270);
-  rr(x,y,w,h,rs(8)); ctx.fillStyle='#040d18'; ctx.fill();
-  ctx.strokeStyle='#1a5a8a'; ctx.lineWidth=rs(2); rr(x,y,w,h,rs(8)); ctx.stroke();
-  // Fan icon
-  const fcx=x+w/2, fcy=y+h*.35, fr=w*.28;
-  ctx.beginPath(); ctx.arc(fcx,fcy,fr,0,Math.PI*2); ctx.strokeStyle='#1a5a8a'; ctx.lineWidth=rs(1.5); ctx.stroke();
-  for(let b=0;b<3;b++){ const a=T*3+b*Math.PI*2/3; ctx.save(); ctx.translate(fcx,fcy); ctx.rotate(a); ctx.beginPath(); ctx.ellipse(fr*.42,0,fr*.35,fr*.12,.3,0,Math.PI*2); ctx.fillStyle='rgba(0,110,190,.3)'; ctx.fill(); ctx.restore(); }
-  ctx.beginPath(); ctx.arc(fcx,fcy,fr*.15,0,Math.PI*2); ctx.fillStyle='#1a5a8a'; ctx.fill();
-  // CRAH label
-  ctx.fillStyle='#1a7aaa'; ctx.font=`bold ${rs(14)}px Noto Sans Thai,sans-serif`; ctx.textAlign='center';
-  ctx.fillText('CRAH',x+w/2,y+h*.7);
-  ctx.fillStyle='#2a6a8a'; ctx.font=`${rs(12)}px JetBrains Mono,monospace`;
-  ctx.fillText('DC Room',x+w/2,y+h*.82);
-  ctx.fillText('Supply',x+w/2,y+h*.91);
-  ctx.fillText(EQ.ch.filter(c=>c.run).length>0?EQ.ch.filter(c=>c.run).reduce((a,c)=>a+c.chws,0)/EQ.ch.filter(c=>c.run).length|0+'°C':'--',x+w/2,y+h*.99);
-}
-
-// ════════════════════════════════════════════
-//  PIPING
-// ════════════════════════════════════════════
-// Key layout Y values
-const PY = {
-  cdwRet: 130,   // condenser water return bus (above chillers)
-  cdwSup: 175,   // condenser water supply bus (above chillers, below ret)
-  chillerY: 195, // chiller top y (ref)
-  chH: 165,      // chiller height (ref)
-  cdpBus: 440,   // CDP discharge bus
-  cdpY: 505,     // CDP pump center
-  chpBus: 580,   // CHP bus
-  chpY: 505,     // CHP pump center
-  chwSup: 225,   // CHW supply connection (chiller right, evap outlet)
-  chwRet: 320,   // CHW return connection (chiller right, evap inlet)
-};
-const CDPx=[85,150,215,280];
-const CHx=[380,505,630,755]; const CHw=110;
-const CHPx=[890,955,1020,1085];
-const AHUX=1160; const AHUw=75;
-
+// ══════════════════════════════════════
+//  DRAW PIPES
+// ══════════════════════════════════════
 function drawPipes(){
-  const pw=rs(5), pd=rs(1.8);
-  const CDW_S='#1a6aaa', CDW_R='#aa3311';
-  const CHW_S='#0099cc', CHW_R='#1144aa';
+  const PW=rs(7),PD=rs(1.5);
+  const chRun=EQ.ch.some(c=>c.run), cdpRun=EQ.cdp.some(p=>p.run), chpRun=EQ.chp.some(p=>p.run);
 
-  const cdpRun=EQ.cdp.some(p=>p.run), chpRun=EQ.chp.some(p=>p.run);
-  const chRun=EQ.ch.some(c=>c.run);
+  // ── Condenser Water Return (CDR, orange) horizontal bus
+  pipe3D(rx(35),ry(CDR_BUS_Y),rx(DIV_X-10),ry(CDR_BUS_Y),PC.CDR,chRun?PW:PD);
+  // ── Condenser Water Supply (CDS, yellow) horizontal bus
+  pipe3D(rx(35),ry(CDS_BUS_Y),rx(DIV_X-10),ry(CDS_BUS_Y),PC.CDS,cdpRun?PW:PD);
+  // CDR/CDS → CT (right)
+  pipe3D(rx(35),ry(CDR_BUS_Y),rx(35),ry(75),PC.CDR,chRun?PW:PD);
+  pipe3D(rx(35),ry(75),rx(RW-10),ry(75),PC.CDR,chRun?PW:PD);
+  pipe3D(rx(DIV_X-10),ry(CDS_BUS_Y),rx(DIV_X-10),ry(88),PC.CDS,cdpRun?PW:PD);
+  pipe3D(rx(DIV_X-10),ry(88),rx(RW-10),ry(88),PC.CDS,cdpRun?PW:PD);
 
-  // ─ CDW Supply bus (horizontal, blue-grey)
-  pl(rx(35),ry(PY.cdwSup),rx(CHx[3]+CHw),ry(PY.cdwSup),CDW_S,pw);
-  // Tower bottom → CDW supply bus
-  pl(rx(135),ry(200),rx(135),ry(PY.cdwSup),CDW_S,pw);
-  // CDP suction (vertical from bus)
-  CDPx.forEach((x,i)=>{
-    pl(rx(x),ry(PY.cdwSup),rx(x),ry(PY.cdpY-18),CDW_S,EQ.cdp[i].run?pw:pd);
-    pl(rx(x),ry(PY.cdpY+18),rx(x),ry(PY.cdpBus),CDW_S,EQ.cdp[i].run?pw:pd);
-  });
-  // CDP discharge bus
-  pl(rx(CDPx[0]),ry(PY.cdpBus),rx(CHx[3]+CHw/2),ry(PY.cdpBus),CDW_S,cdpRun?pw:pd);
-  // CDW into each chiller bottom
-  CHx.forEach((x,i)=>{
-    const live=cdpRun&&EQ.ch[i].run;
-    pl(rx(x+CHw/2),ry(PY.cdpBus),rx(x+CHw/2),ry(PY.chillerY+PY.chH),CDW_S,live?pw:pd);
+  // Per-chiller CDR out (top-left) / CDS in (top-right)
+  CH_X.forEach((cx,i)=>{
+    pipe3D(rx(cx+CH_W*.32),ry(CH_Y),rx(cx+CH_W*.32),ry(CDR_BUS_Y),PC.CDR,EQ.ch[i].run?PW:PD);
+    pipe3D(rx(cx+CH_W*.68),ry(CDS_BUS_Y),rx(cx+CH_W*.68),ry(CH_Y),PC.CDS,EQ.ch[i].run?PW:PD);
   });
 
-  // ─ CDW Return bus (horizontal, red)
-  pl(rx(35),ry(PY.cdwRet),rx(CHx[3]+CHw),ry(PY.cdwRet),CDW_R,chRun?pw:pd);
-  // Tower left side ↑ return
-  pl(rx(110),ry(PY.cdwRet),rx(110),ry(200),CDW_R,chRun?pw:pd);
-  // Each chiller top → return bus
-  CHx.forEach((x,i)=>{
-    pl(rx(x+CHw/2),ry(PY.chillerY),rx(x+CHw/2),ry(PY.cdwRet),CDW_R,EQ.ch[i].run?pw:pd);
+  // CDP suction from CDS bus downward
+  pipe3D(rx(CDP_X[0]),ry(CDS_BUS_Y),rx(CDP_X[0]),ry(CDP_BUS_Y),PC.CDS,cdpRun?PW:PD);
+  pipe3D(rx(CDP_X[0]),ry(CDP_BUS_Y),rx(CDP_X[3]+20),ry(CDP_BUS_Y),PC.CDS,cdpRun?PW:PD);
+  CDP_X.forEach((x,i)=>{
+    pipe3D(rx(x),ry(CDP_BUS_Y),rx(x),ry(CDP_Y+rs(8)/SC()),PC.CDS,EQ.cdp[i].run?PW:PD);
+    pipe3D(rx(x),ry(CDP_Y-rs(8)/SC()),rx(x),ry(CDP_DIS_Y),PC.CDR,EQ.cdp[i].run?PW:PD);
   });
+  // CDP discharge back up to CDR bus
+  pipe3D(rx(CDP_X[0]),ry(CDP_DIS_Y),rx(CDP_X[3]+20),ry(CDP_DIS_Y),PC.CDR,cdpRun?PW:PD);
 
-  // ─ CHW Supply bus (right side of chillers, cold blue)
-  const chwBusX=rx(CHx[3]+CHw+22);
-  CHx.forEach((x,i)=>{
-    pl(rx(x+CHw),ry(PY.chillerY+40),chwBusX,ry(PY.chillerY+40),CHW_S,EQ.ch[i].run?pw:pd);
+  // ── Chilled Water Supply (CHS, cyan) ──
+  // Horizontal bus on right of chillers
+  CH_X.forEach((cx,i)=>{
+    pipe3D(rx(cx+CH_W),ry(CH_Y+38),rx(CHW_BUS_X),ry(CH_Y+38),PC.CHS,EQ.ch[i].run?PW:PD);
   });
-  pl(chwBusX,ry(PY.chillerY+40),chwBusX,ry(PY.chpY-18),CHW_S,chpRun?pw:pd);
+  pipe3D(rx(CHW_BUS_X),ry(CH_Y+38),rx(CHW_BUS_X),ry(CHS_BUS_Y),PC.CHS,chpRun?PW:PD);
+  pipe3D(rx(CHW_BUS_X),ry(CHS_BUS_Y),rx(RW-20),ry(CHS_BUS_Y),PC.CHS,chpRun?PW:PD);
   // CHP suction
-  CHPx.forEach((x,i)=>{
-    pl(rx(x),ry(PY.chpY-18),rx(x),ry(PY.cdpBus),CHW_S,EQ.chp[i].run?pw:pd);
-    pl(rx(x),ry(PY.chpY+18),rx(x),ry(PY.chpBus),CHW_R,EQ.chp[i].run?pw:pd);
+  CHP_X.forEach((x,i)=>{
+    pipe3D(rx(x),ry(CHS_BUS_Y),rx(x),ry(CHP_Y-rs(8)/SC()),PC.CHS,EQ.chp[i].run?PW:PD);
+    pipe3D(rx(x),ry(CHP_Y+rs(8)/SC()),rx(x),ry(CHR_BUS_Y),PC.CHR,EQ.chp[i].run?PW:PD);
   });
-  // CHW supply bus → AHU
-  pl(chwBusX,ry(PY.chwSup),rx(AHUX+AHUw),ry(PY.chwSup),CHW_S,chpRun?pw:pd);
-  pl(rx(AHUX+AHUw),ry(PY.chwSup),rx(AHUX+AHUw),ry(145),CHW_S,chpRun?pw:pd);
 
-  // ─ CHW Return (warm blue)
-  pl(rx(AHUX+AHUw),ry(340),rx(AHUX+AHUw),ry(PY.chwRet),CHW_R,chpRun?pw:pd);
-  pl(rx(AHUX+AHUw),ry(PY.chwRet),chwBusX,ry(PY.chwRet),CHW_R,chpRun?pw:pd);
-  CHx.forEach((x,i)=>{
-    pl(chwBusX,ry(PY.chwRet),rx(x+CHw),ry(PY.chwRet),CHW_R,EQ.ch[i].run?pw:pd);
-    pl(rx(x+CHw),ry(PY.chwRet),rx(x+CHw),ry(PY.chillerY+PY.chH*.65),CHW_R,EQ.ch[i].run?pw:pd);
+  // ── Chilled Water Return (CHR, blue) ──
+  CH_X.forEach((cx,i)=>{
+    pipe3D(rx(cx+CH_W),ry(CH_Y+CH_H*.6),rx(CHW_BUS_X),ry(CH_Y+CH_H*.6),PC.CHR,EQ.ch[i].run?PW:PD);
   });
-  // CHP discharge bus
-  pl(rx(CHPx[0]),ry(PY.chpBus),chwBusX,ry(PY.chpBus),CHW_R,chpRun?pw:pd);
-  pl(chwBusX,ry(PY.chpBus),chwBusX,ry(PY.chwRet),CHW_R,chpRun?pw:pd);
+  pipe3D(rx(CHW_BUS_X),ry(CH_Y+CH_H*.6),rx(CHW_BUS_X),ry(CHR_BUS_Y),PC.CHR,chpRun?PW:PD);
+  pipe3D(rx(CHW_BUS_X),ry(CHR_BUS_Y),rx(RW-20),ry(CHR_BUS_Y),PC.CHR,chpRun?PW:PD);
 
-  // ─ FLOW DOTS ─
-  // CDW supply: tower → bus → pump → chiller
-  if(cdpRun){
-    EQ.cdp.forEach((p,i)=>{ if(!p.run) return;
-      flowDots([[rx(135),ry(200)],[rx(135),ry(PY.cdwSup)],[rx(CDPx[i]),ry(PY.cdwSup)],[rx(CDPx[i]),ry(PY.cdpY-18)]],'#4488cc',true,1.3);
-      EQ.ch.forEach((c,j)=>{ if(!c.run) return;
-        flowDots([[rx(CDPx[i]),ry(PY.cdpBus)],[rx(CHx[j]+CHw/2),ry(PY.cdpBus)],[rx(CHx[j]+CHw/2),ry(PY.chillerY+PY.chH)]],'#4488cc',true,1.2);
-      });
-    });
-  }
-  // CDW return: chiller → return bus → tower
+  // ── FLOW DOTS ──
   if(chRun){
-    EQ.ch.forEach((c,i)=>{ if(!c.run) return;
-      flowDots([[rx(CHx[i]+CHw/2),ry(PY.chillerY)],[rx(CHx[i]+CHw/2),ry(PY.cdwRet)],[rx(110),ry(PY.cdwRet)],[rx(110),ry(200)]],'#cc5533',true,1.2);
+    CH_X.forEach((cx,i)=>{if(!EQ.ch[i].run)return;
+      flowDots([[rx(cx+CH_W*.32),ry(CH_Y)],[rx(cx+CH_W*.32),ry(CDR_BUS_Y)],[rx(35),ry(CDR_BUS_Y)],[rx(35),ry(75)],[rx(RW-10),ry(75)]],lighter(PC.CDR,40),true,1.1);
     });
   }
-  // CHW supply: chiller → right bus → AHU
+  if(cdpRun){
+    CDP_X.forEach((x,i)=>{if(!EQ.cdp[i].run)return;
+      flowDots([[rx(DIV_X-10),ry(88)],[rx(x),ry(88)],[rx(x),ry(CDS_BUS_Y)],[rx(x),ry(CDP_BUS_Y)],[rx(x),ry(CDP_Y-rs(8)/SC())]],lighter(PC.CDS,40),true,.9);
+    });
+  }
   if(chpRun&&chRun){
-    EQ.ch.forEach((c,i)=>{ if(!c.run) return;
-      flowDots([[rx(CHx[i]+CHw),ry(PY.chillerY+40)],[chwBusX,ry(PY.chillerY+40)],[chwBusX,ry(PY.chwSup)],[rx(AHUX+AHUw),ry(PY.chwSup)],[rx(AHUX+AHUw),ry(145)]],'#00aadd',true,1.5);
-    });
+    flowDots([[rx(CHW_BUS_X),ry(CH_Y+38)],[rx(CHW_BUS_X),ry(CHS_BUS_Y)],[rx(RW-20),ry(CHS_BUS_Y)]],lighter(PC.CHS,30),true,1.4);
   }
-  // CHW return: AHU → pumps → chiller
   if(chpRun){
-    flowDots([[rx(AHUX+AHUw),ry(340)],[rx(AHUX+AHUw),ry(PY.chwRet)],[chwBusX,ry(PY.chwRet)],[rx(CHPx[0]),ry(PY.chwRet)],[rx(CHPx[0]),ry(PY.chpBus)],[rx(CHPx[0]),ry(PY.chpY+18)]],'#2255bb',true,1.3);
+    flowDots([[rx(RW-20),ry(CHR_BUS_Y)],[rx(CHW_BUS_X),ry(CHR_BUS_Y)],[rx(CHW_BUS_X),ry(CH_Y+CH_H*.6)]],lighter(PC.CHR,50),true,1.3);
   }
 }
 
-// ════════════════════════════════════════════
-//  PIPE LABELS
-// ════════════════════════════════════════════
+// ══════════════════════════════════════
+//  DRAW CHILLER (3D)
+// ══════════════════════════════════════
+function drawChiller3D(i){
+  const eq=EQ.ch[i];
+  const x=rx(CH_X[i]),y=ry(CH_Y),w=rs(CH_W),h=rs(CH_H),d=rs(11);
+  const run=eq.run,flt=eq.fault;
+  const fc=flt?'#220606':run?'#061420':'#080f1a';
+  const tc=flt?'#310808':run?'#0a1e30':'#0c1420';
+  const sc=flt?'#180404':run?'#04101a':'#060c14';
+  box3D(x,y,w,h,d,fc,tc,sc);
+  // 3D compressor
+  const ccx=x+w/2,ccy=y+h*.42,cr=rs(26);
+  const cg=ctx.createRadialGradient(ccx-cr*.3,ccy-cr*.3,cr*.05,ccx,ccy,cr);
+  cg.addColorStop(0,run?'#1a4a78':'#1a2232');cg.addColorStop(1,run?'#061828':'#06101a');
+  ctx.beginPath();ctx.arc(ccx,ccy,cr,0,Math.PI*2);ctx.fillStyle=cg;ctx.fill();
+  ctx.strokeStyle=run?'#0099cc':flt?'#880000':'#1a3040';ctx.lineWidth=rs(2);ctx.stroke();
+  if(run){
+    for(let b=0;b<6;b++){const a=T*2.8+b*Math.PI/3;ctx.save();ctx.translate(ccx,ccy);ctx.rotate(a);ctx.beginPath();ctx.ellipse(cr*.58,0,cr*.4,cr*.13,.22,0,Math.PI*2);ctx.fillStyle='rgba(0,155,235,.24)';ctx.fill();ctx.restore();}
+    // Inner glow ring
+    const ig=ctx.createRadialGradient(ccx,ccy,cr*.1,ccx,ccy,cr*.5);
+    ig.addColorStop(0,'rgba(0,200,255,.18)');ig.addColorStop(1,'rgba(0,200,255,0)');
+    ctx.beginPath();ctx.arc(ccx,ccy,cr*.5,0,Math.PI*2);ctx.fillStyle=ig;ctx.fill();
+    ctx.beginPath();ctx.arc(ccx,ccy,cr*.15,0,Math.PI*2);ctx.fillStyle='#00ccff';ctx.fill();
+  }
+  // Labels
+  const lc=flt?'#ff5252':run?'#40c4ff':'#334455';
+  ctx.textAlign='center';
+  ctx.fillStyle=lc;ctx.font=`bold ${rs(12)}px JetBrains Mono,monospace`;
+  ctx.fillText(eq.id,ccx,y+h*.9);
+  if(run){
+    ctx.fillStyle='#00e676';ctx.font=`${rs(10)}px JetBrains Mono,monospace`;
+    ctx.fillText(eq.load+'%  '+eq.kw+'kW',ccx,y+h*1.0);
+    ctx.textAlign='left';ctx.font=`bold ${rs(10)}px JetBrains Mono,monospace`;
+    ctx.fillStyle='#00ccff';ctx.fillText('S:'+eq.chws.toFixed(1)+'°',x+rs(4),y+rs(16));
+    ctx.fillStyle='#ff9800';ctx.fillText('R:'+eq.chwr.toFixed(1)+'°',x+rs(4),y+rs(28));
+    ctx.fillStyle='#ff7744';ctx.fillText('CWS '+eq.cws.toFixed(1)+'°',x+rs(4),y+h*.68);
+    ctx.fillStyle='#ff4422';ctx.fillText('CWR '+eq.cwr.toFixed(1)+'°',x+rs(4),y+h*.8);
+  } else {
+    ctx.textAlign='center';ctx.fillStyle='#2a4050';ctx.font=`${rs(11)}px Noto Sans Thai,sans-serif`;
+    ctx.fillText(flt?'FAULT':'STANDBY',ccx,y+h*.99);
+  }
+}
+
+// ══════════════════════════════════════
+//  DRAW PUMP (3D cylinder)
+// ══════════════════════════════════════
+function drawPump3D(cx,cy,p,isCHP){
+  const col=isCHP?'#006688':'#336611';
+  const ew=rs(19),eh=rs(8),ch=rs(28);
+  cylinder3D(cx,cy,ew,eh,ch,col,p.run,p.fault);
+  const tc=p.fault?'#ff5252':p.run?'#00e676':'#334455';
+  ctx.textAlign='center';
+  ctx.fillStyle=tc;ctx.font=`bold ${rs(10)}px JetBrains Mono,monospace`;
+  ctx.fillText(p.id,cx,cy+ch+rs(14));
+  if(p.run&&p.kw>0){ctx.fillStyle='#445566';ctx.font=`${rs(9)}px JetBrains Mono,monospace`;ctx.fillText(p.kw.toFixed(1)+'kW',cx,cy+ch+rs(25));}
+}
+
+// ══════════════════════════════════════
+//  DRAW COOLING TOWER CELL (3D)
+// ══════════════════════════════════════
+function drawCT3D(i){
+  const eq=EQ.ct[i];
+  const x=rx(CT_CX[i]-CT_RW/2),y=ry(CT_CY[i]),w=rs(CT_RW),h=rs(CT_RH),d=rs(9);
+  const run=eq.run,flt=eq.fault;
+  const fc=flt?'#1a0404':run?'#050e18':'#070d14';
+  const tc=flt?'#260606':run?'#081626':'#0a1018';
+  const sc=flt?'#110303':run?'#030c14':'#060a10';
+  box3D(x,y,w,h,d,fc,tc,sc);
+  // Fan assembly
+  const fcx=x+w/2,fcy=y+h*.38,fr=rs(30);
+  const fg=ctx.createRadialGradient(fcx,fcy,fr*.1,fcx,fcy,fr);
+  fg.addColorStop(0,run?'#092030':'#060c12');fg.addColorStop(1,run?'#030c18':'#050910');
+  ctx.beginPath();ctx.arc(fcx,fcy,fr,0,Math.PI*2);ctx.fillStyle=fg;ctx.fill();
+  ctx.strokeStyle=run?'#0077aa':flt?'#660000':'#1a2a35';ctx.lineWidth=rs(1.5);ctx.stroke();
+  if(run){
+    for(let b=0;b<5;b++){const a=T*5.5+b*Math.PI*2/5;ctx.save();ctx.translate(fcx,fcy);ctx.rotate(a);ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,fr*.78,-.22,.32);ctx.closePath();ctx.fillStyle='rgba(0,130,200,.38)';ctx.fill();ctx.restore();}
+    // Outer glow
+    ctx.beginPath();ctx.arc(fcx,fcy,fr+rs(1.5),0,Math.PI*2);
+    ctx.strokeStyle='rgba(0,170,220,.35)';ctx.lineWidth=rs(2);ctx.stroke();
+    ctx.beginPath();ctx.arc(fcx,fcy,fr*.13,0,Math.PI*2);ctx.fillStyle='#00bbdd';ctx.fill();
+  }
+  const lc=flt?'#ff5252':run?'#40c4ff':'#2a4050';
+  ctx.textAlign='center';
+  ctx.fillStyle=lc;ctx.font=`bold ${rs(10)}px JetBrains Mono,monospace`;
+  ctx.fillText(eq.id,fcx,y+h*.88);
+  ctx.fillStyle=run?'#00e676':'#223344';ctx.font=`${rs(9)}px JetBrains Mono,monospace`;
+  ctx.fillText(run?eq.kw.toFixed(0)+'W':'STANDBY',fcx,y+h*.97);
+  // Auto badge
+  ctx.fillStyle=run?'#006633':'#1a3040';
+  rrPath(fcx-rs(18),y+h+rs(2),rs(36),rs(13),rs(3));ctx.fill();
+  ctx.fillStyle=run?'#00ee77':'#334455';ctx.font=`bold ${rs(8.5)}px JetBrains Mono,monospace`;
+  ctx.textAlign='center';ctx.fillText('Auto',fcx,y+h+rs(12));
+}
+
+// ══════════════════════════════════════
+//  INFO / LABELS PANELS
+// ══════════════════════════════════════
 function drawLabels(){
-  const fs=rs(12);
-  ctx.font=`bold ${fs}px JetBrains Mono,monospace`;
-  ctx.textAlign='left';
-  ctx.fillStyle='#aa4422'; ctx.fillText('CDR — Condenser Return (Hot '+EQ.tower.ewt.toFixed(1)+'°C)',rx(270),ry(PY.cdwRet-5));
-  ctx.fillStyle='#2266aa'; ctx.fillText('CDS — Condenser Supply (Cool '+EQ.tower.lwt.toFixed(1)+'°C)',rx(270),ry(PY.cdwSup-5));
   const rCH=EQ.ch.filter(c=>c.run);
-  const schws=rCH.length?rCH.reduce((a,c)=>a+c.chws,0)/rCH.length:0;
-  const rchwr=rCH.length?rCH.reduce((a,c)=>a+c.chwr,0)/rCH.length:0;
-  ctx.fillStyle='#0099cc'; ctx.fillText('CHWS '+schws.toFixed(1)+'°C',rx(880),ry(PY.chwSup-5));
-  ctx.fillStyle='#2244aa'; ctx.fillText('CHWR '+rchwr.toFixed(1)+'°C',rx(880),ry(PY.chwRet-5));
-
-  // Section titles
-  ctx.fillStyle='#2a5a7a'; ctx.font=`bold ${rs(13)}px Noto Sans Thai,sans-serif`; ctx.textAlign='center';
-  const cdpMx=rx((CDPx[0]+CDPx[3])/2);
-  ctx.fillText('Condenser Water Pump',cdpMx,ry(562));
-  ctx.fillText('CDP-01 ~ CDP-04',cdpMx,ry(576));
-  const chpMx=rx((CHPx[0]+CHPx[3])/2);
-  ctx.fillText('Chilled Water Pump',chpMx,ry(562));
-  ctx.fillText('CHP-01 ~ CHP-04',chpMx,ry(576));
-
-  // Legend
-  const items=[
-    {c:'#1a6aaa',l:'Condenser Water Supply (Cool)'},
-    {c:'#aa3311',l:'Condenser Water Return (Hot)'},
-    {c:'#0099cc',l:'Chilled Water Supply (Cold)'},
-    {c:'#1144aa',l:'Chilled Water Return (Warm)'}
-  ];
-  const lx=rx(380), ly=ry(638);
-  items.forEach((it,i)=>{
-    ctx.strokeStyle=it.c; ctx.lineWidth=rs(3);
-    ctx.beginPath(); ctx.moveTo(lx+i*rs(210),ly); ctx.lineTo(lx+i*rs(210)+rs(20),ly); ctx.stroke();
-    ctx.fillStyle='#445566'; ctx.font=`${rs(11)}px Noto Sans Thai,sans-serif`; ctx.textAlign='left';
-    ctx.fillText(it.l,lx+i*rs(210)+rs(23),ly+rs(4));
-  });
-}
-
-// ════════════════════════════════════════════
-//  MAIN DRAW
-// ════════════════════════════════════════════
-function draw(){
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#06081a'; ctx.fillRect(0,0,W,H);
-  // Grid
-  ctx.strokeStyle='rgba(20,40,70,.25)'; ctx.lineWidth=.5;
-  for(let x=0;x<W;x+=50){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-  for(let y=0;y<H;y+=50){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-
-  drawPipes();
-  drawTower();
-  for(let i=0;i<4;i++) drawChiller(i);
-  EQ.cdp.forEach((p,i)=>drawPump(rx(CDPx[i]),ry(PY.cdpY),rs(20),p.run,p.fault,p.id,p.kw));
-  EQ.chp.forEach((p,i)=>drawPump(rx(CHPx[i]),ry(PY.chpY),rs(20),p.run,p.fault,p.id,p.kw));
-  drawAHU();
-  drawLabels();
-
-  // Condenser water loop label box
-  ctx.save();
-  rr(rx(30),ry(265),rs(145),rs(28),rs(5));
-  ctx.fillStyle='rgba(10,30,60,.8)'; ctx.fill();
-  ctx.strokeStyle='#1a4a7a'; ctx.lineWidth=rs(1.5); ctx.stroke();
-  ctx.fillStyle='#2266aa'; ctx.font=`bold ${rs(12)}px Noto Sans Thai,sans-serif`; ctx.textAlign='center';
-  ctx.fillText('Condenser Water Loop',rx(103),ry(283));
-  ctx.restore();
-
-  // CHW loop label box
-  ctx.save();
-  const bx=rx(CHx[3]+CHw+30);
-  rr(bx,ry(268),rs(120),rs(25),rs(5));
-  ctx.fillStyle='rgba(0,10,30,.8)'; ctx.fill();
-  ctx.strokeStyle='#1a5a8a'; ctx.lineWidth=rs(1.5); ctx.stroke();
-  ctx.fillStyle='#0088cc'; ctx.font=`bold ${rs(12)}px Noto Sans Thai,sans-serif`; ctx.textAlign='center';
-  ctx.fillText('Chilled Water Loop',bx+rs(60),ry(285));
-  ctx.restore();
-}
-
-// ════════════════════════════════════════════
-//  SIMULATION
-// ════════════════════════════════════════════
-let tick=0;
-function rwalk(v,d,lo,hi){return Math.max(lo,Math.min(hi,v+(Math.random()-.5)*d));}
-
-function simulate(){
-  tick++;
-  if(tick%4!==0) return;
-  EQ.ch.forEach(c=>{
-    if(!c.run) return;
-    c.load=rwalk(c.load,1.2,55,90); c.kw=rwalk(c.kw,8,320,580);
-    c.cop=rwalk(c.cop,.04,4.8,6.2); c.chws=rwalk(c.chws,.04,6.5,7.8);
-    c.chwr=rwalk(c.chwr,.04,11.5,13.0); c.cws=rwalk(c.cws,.06,30,34);
-    c.cwr=rwalk(c.cwr,.06,35,38.5);
-  });
-  EQ.cdp.forEach(p=>{if(p.run){p.flow=rwalk(p.flow,4,440,520);p.kw=rwalk(p.kw,.2,16,22);}});
-  EQ.chp.forEach(p=>{if(p.run){p.flow=rwalk(p.flow,4,360,440);p.kw=rwalk(p.kw,.2,13,18);}});
-  const rCH=EQ.ch.filter(c=>c.run);
-  if(rCH.length>0){
-    EQ.tower.ewt=rwalk(rCH.reduce((a,c)=>a+c.cwr,0)/rCH.length,.08,35,39);
-    EQ.tower.lwt=rwalk(EQ.tower.ewt-5.5,.05,28,33);
-  }
-  renderPanel(); renderBtm();
-}
-
-// ════════════════════════════════════════════
-//  RIGHT PANEL
-// ════════════════════════════════════════════
-function card(t,v,u,s,cls='tg'){
-  return `<div class="scard"><div class="sc-title">${t}</div><div class="sc-val ${cls}">${v}<span class="sc-unit">${u}</span></div><div class="sc-sub">${s}</div></div>`;
-}
-function eqRow(eq,fn){
-  const dc=eq.fault?'df':eq.run?'dg':'ds';
-  const st=eq.fault?'FAULT':eq.run?'RUN':'STBY';
-  const val=eq.kw?eq.kw.toFixed(1)+'kW':(eq.flow?eq.flow.toFixed(0)+' L/m':'---');
-  return `<div class="eq-row" onclick="${fn}('${eq.id}')"><div class="dot ${dc}"></div><div class="eq-lbl">${eq.id}</div><div class="eq-v">${st} ${val}</div></div>`;
-}
-function renderPanel(){
-  const rp=document.getElementById('rp');
-  const rCH=EQ.ch.filter(c=>c.run), rCDP=EQ.cdp.filter(p=>p.run), rCHP=EQ.chp.filter(p=>p.run);
   const chws=rCH.length?rCH.reduce((a,c)=>a+c.chws,0)/rCH.length:0;
   const chwr=rCH.length?rCH.reduce((a,c)=>a+c.chwr,0)/rCH.length:0;
   const totalKW=EQ.ch.reduce((a,c)=>a+c.kw,0);
-  const avgCOP=rCH.length?rCH.reduce((a,c)=>a+c.cop,0)/rCH.length:0;
-  const totalFlow=EQ.chp.reduce((a,p)=>a+p.flow,0);
 
-  rp.innerHTML=
-    card('CHWS Temp',chws.toFixed(1),'°C','Chilled Water Supply','tc')+
-    card('CHWR Temp',chwr.toFixed(1),'°C','Chilled Water Return','tw')+
-    card('Tower LWT',EQ.tower.lwt.toFixed(1),'°C','Leaving Water Temp','tg')+
-    card('Tower EWT',EQ.tower.ewt.toFixed(1),'°C','Entering Water Temp','th')+
-    card('Total Load',totalKW.toFixed(0),'kW',rCH.length+'/4 Chillers','ty')+
-    card('Avg COP',avgCOP.toFixed(2),'','Coeff. of Performance','tg')+
-    card('CHW Flow',totalFlow.toFixed(0),'L/m',rCHP.length+'/4 CHP running','tc')+
-    `<div class="scard"><div class="sc-title">Chillers</div>${EQ.ch.map(e=>eqRow(e,'toggleCH')).join('')}</div>`+
-    `<div class="scard"><div class="sc-title">Condenser Water Pumps</div>${EQ.cdp.map(e=>eqRow(e,'toggleCDP')).join('')}</div>`+
-    `<div class="scard"><div class="sc-title">Chilled Water Pumps</div>${EQ.chp.map(e=>eqRow(e,'toggleCHP')).join('')}</div>`;
+  // ── Left info panel ──
+  const px=rx(8),py=ry(22),pw=rs(148),ph=rs(100);
+  rrPath(px,py,pw,ph,rs(5));ctx.fillStyle='rgba(5,12,25,.92)';ctx.fill();
+  ctx.strokeStyle='#1a3a5a';ctx.lineWidth=rs(1.2);rrPath(px,py,pw,ph,rs(5));ctx.stroke();
+  ctx.textAlign='left';
+  ctx.fillStyle='#3a6a88';ctx.font=`bold ${rs(9.5)}px Noto Sans Thai,sans-serif`;ctx.fillText('PLANT SYSTEM',px+rs(8),py+rs(14));
+  ctx.fillStyle='#00e676';ctx.font=`bold ${rs(9.5)}px JetBrains Mono,monospace`;ctx.fillText('● Enable',px+rs(88),py+rs(14));
+  ctx.fillStyle='#3a6a88';ctx.font=`${rs(9)}px sans-serif`;ctx.fillText('CHILLED SUPPLY',px+rs(8),py+rs(28));
+  ctx.fillStyle='#00ccff';ctx.font=`bold ${rs(14)}px JetBrains Mono,monospace`;ctx.fillText(chws.toFixed(2)+' °C',px+rs(8),py+rs(44));
+  ctx.fillStyle='#3a6a88';ctx.font=`${rs(9)}px sans-serif`;ctx.fillText('CHILLED SETPOINT',px+rs(8),py+rs(58));
+  ctx.fillStyle='#ffd740';ctx.font=`bold ${rs(13)}px JetBrains Mono,monospace`;ctx.fillText('7.22 °C',px+rs(8),py+rs(73));
+  ctx.fillStyle='#3a5a70';ctx.font=`${rs(9)}px JetBrains Mono,monospace`;ctx.fillText('TOTAL: '+totalKW.toFixed(0)+' kW',px+rs(8),py+rs(88));
 
-  const any=EQ.ch.some(c=>c.fault)||EQ.cdp.some(p=>p.fault)||EQ.chp.some(p=>p.fault);
-  document.getElementById('bSys').textContent=any?'⚠ FAULT':'● NORMAL';
-  document.getElementById('bSys').className='badge '+(any?'br':'bg');
-  document.getElementById('bCH').textContent='CHILLER '+rCH.length+'/4';
-  document.getElementById('bPump').textContent='PUMP '+(rCDP.length+rCHP.length)+'/8';
-  document.getElementById('bLoad').textContent='LOAD '+totalKW.toFixed(0)+' kW';
+  // ── Tower temperatures ──
+  ctx.textAlign='left';ctx.font=`bold ${rs(10)}px JetBrains Mono,monospace`;
+  ctx.fillStyle='#ff7700';ctx.fillText('CDR-A TEMP: '+EQ.tower.ewt.toFixed(2)+'°C',rx(CT_OX+5),ry(75));
+  ctx.fillStyle='#ccbb00';ctx.fillText('CDS-A TEMP: '+EQ.tower.lwt.toFixed(2)+'°C',rx(CT_OX+5),ry(88));
+
+  // ── Section divider ──
+  ctx.setLineDash([rs(5),rs(4)]);
+  ctx.beginPath();ctx.moveTo(rx(DIV_X),ry(18));ctx.lineTo(rx(DIV_X),ry(RH-18));
+  ctx.strokeStyle='rgba(25,70,110,.5)';ctx.lineWidth=rs(1);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // ── Section titles ──
+  ctx.textAlign='center';ctx.fillStyle='#1a4a6a';ctx.font=`bold ${rs(12)}px Noto Sans Thai,sans-serif`;
+  ctx.fillText('— Chiller Plant —',rx(DIV_X/2),ry(RH-10));
+  ctx.fillText('— Cooling Tower Plant —',rx((DIV_X+RW)/2),ry(RH-10));
+
+  // ── Pipe section headers ──
+  ctx.textAlign='left';ctx.font=`bold ${rs(10)}px JetBrains Mono,monospace`;
+  ctx.fillStyle='#ff7700';ctx.fillText('CDR',rx(170),ry(CDR_BUS_Y-4));
+  ctx.fillStyle='#ccbb00';ctx.fillText('CDS',rx(170),ry(CDS_BUS_Y+12));
+  ctx.fillStyle='#00ccff';ctx.fillText('CHS  '+chws.toFixed(1)+'°C',rx(CHW_BUS_X+5),ry(CHS_BUS_Y-4));
+  ctx.fillStyle='#1155ee';ctx.fillText('CHR  '+chwr.toFixed(1)+'°C',rx(CHW_BUS_X+5),ry(CHR_BUS_Y-4));
+
+  // ── Pump section labels ──
+  ctx.fillStyle='#1a4a5a';ctx.font=`bold ${rs(11)}px Noto Sans Thai,sans-serif`;ctx.textAlign='center';
+  ctx.fillText('Condenser Water Pump',rx((CDP_X[0]+CDP_X[3])/2),ry(548));
+  ctx.fillText('CDP-01 ~ CDP-04',rx((CDP_X[0]+CDP_X[3])/2),ry(560));
+  ctx.fillText('Chilled Water Pump',rx((CHP_X[0]+CHP_X[3])/2),ry(520));
+  ctx.fillText('CHP-01 ~ CHP-04',rx((CHP_X[0]+CHP_X[3])/2),ry(532));
+
+  // ── Legend (bottom) ──
+  const lgY=ry(RH-28), lgX=rx(172);
+  const lgItems=[
+    {c:PC.CDR,l:'CDR — Condenser Return (Hot)'},
+    {c:PC.CDS,l:'CDS — Condenser Supply (Cool)'},
+    {c:PC.CHS,l:'CHS — Chilled Supply (Cold)'},
+    {c:PC.CHR,l:'CHR — Chilled Return (Warm)'}
+  ];
+  lgItems.forEach((it,i)=>{
+    pipe3D(lgX+i*rs(200),lgY,lgX+i*rs(200)+rs(24),lgY,it.c,rs(5));
+    ctx.fillStyle='#3a5060';ctx.font=`${rs(10.5)}px Noto Sans Thai,sans-serif`;ctx.textAlign='left';
+    ctx.fillText(it.l,lgX+i*rs(200)+rs(28),lgY+rs(4));
+  });
 }
 
-// ════════════════════════════════════════════
+// ══════════════════════════════════════
+//  MAIN DRAW
+// ══════════════════════════════════════
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  // Background
+  const bg=ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#04060c');bg.addColorStop(1,'#060e18');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  // Grid
+  ctx.strokeStyle='rgba(12,36,60,.2)';ctx.lineWidth=.5;
+  for(let x=0;x<W;x+=rs(40)){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=rs(40)){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  drawPipes();
+  for(let i=0;i<4;i++) drawChiller3D(i);
+  CDP_X.forEach((x,i)=>drawPump3D(rx(x),ry(CDP_Y),EQ.cdp[i],false));
+  CHP_X.forEach((x,i)=>drawPump3D(rx(x),ry(CHP_Y),EQ.chp[i],true));
+  for(let i=0;i<8;i++) drawCT3D(i);
+  drawLabels();
+}
+
+// ══════════════════════════════════════
+//  SIMULATION
+// ══════════════════════════════════════
+let tick=0;
+function rw(v,d,lo,hi){return Math.max(lo,Math.min(hi,v+(Math.random()-.5)*d));}
+function simulate(){
+  tick++;if(tick%4!==0)return;
+  EQ.ch.forEach(c=>{if(!c.run)return;c.load=rw(c.load,1.2,55,90);c.kw=rw(c.kw,8,320,580);c.cop=rw(c.cop,.04,4.8,6.2);c.chws=rw(c.chws,.04,6.5,7.8);c.chwr=rw(c.chwr,.04,11.5,13.0);c.cws=rw(c.cws,.06,30,34);c.cwr=rw(c.cwr,.06,35,38.5);});
+  EQ.cdp.forEach(p=>{if(p.run){p.flow=rw(p.flow,4,440,520);p.kw=rw(p.kw,.2,16,22);}});
+  EQ.chp.forEach(p=>{if(p.run){p.flow=rw(p.flow,4,360,440);p.kw=rw(p.kw,.2,13,18);}});
+  EQ.ct.forEach(c=>{if(c.run)c.kw=rw(c.kw,50,3000,5200);});
+  const rCH=EQ.ch.filter(c=>c.run);
+  if(rCH.length){EQ.tower.ewt=rw(rCH.reduce((a,c)=>a+c.cwr,0)/rCH.length,.08,35,39);EQ.tower.lwt=rw(EQ.tower.ewt-5.5,.05,28,33);}
+  updateBadges();
+}
+function updateBadges(){
+  const rCH=EQ.ch.filter(c=>c.run);
+  const rP=[...EQ.cdp,...EQ.chp].filter(p=>p.run);
+  const flt=[...EQ.ch,...EQ.cdp,...EQ.chp].some(e=>e.fault);
+  document.getElementById('bSys').textContent=flt?'⚠ FAULT':'● NORMAL';
+  document.getElementById('bSys').className='badge '+(flt?'br':'bg');
+  document.getElementById('bCH').textContent='CH '+rCH.length+'/4';
+  document.getElementById('bPump').textContent='PUMP '+rP.length+'/8';
+  document.getElementById('bLoad').textContent=EQ.ch.reduce((a,c)=>a+c.kw,0).toFixed(0)+' kW';
+}
+
+// ══════════════════════════════════════
 //  CONTROLS
-// ════════════════════════════════════════════
-function toggleCH(id){
-  const e=EQ.ch.find(c=>c.id===id); if(!e||e.fault) return;
-  e.run=!e.run;
-  if(e.run && !EQ.cdp.some(p=>p.run)){EQ.cdp[0].run=true;EQ.cdp[1].run=true;alarm('AUTO','info','Auto-start CDP-01 CDP-02');}
-  if(e.run && !EQ.chp.some(p=>p.run)){EQ.chp[0].run=true;EQ.chp[1].run=true;alarm('AUTO','info','Auto-start CHP-01 CHP-02');}
-  renderPanel(); renderBtm();
-}
-function toggleCDP(id){const e=EQ.cdp.find(p=>p.id===id);if(!e||e.fault)return;e.run=!e.run;renderPanel();renderBtm();}
-function toggleCHP(id){const e=EQ.chp.find(p=>p.id===id);if(!e||e.fault)return;e.run=!e.run;renderPanel();renderBtm();}
-
-function allOn(){
-  [...EQ.ch,...EQ.cdp,...EQ.chp].forEach(e=>{e.run=true;e.fault=false;});
-  EQ.tower.cells.forEach(c=>c.fault=false);
-  alarm('SYS','info','All equipment started'); renderPanel(); renderBtm();
-}
-function allOff(){
-  [...EQ.ch,...EQ.cdp,...EQ.chp].forEach(e=>e.run=false);
-  alarm('SYS','warning','All equipment stopped'); renderPanel(); renderBtm();
-}
-function injectFault(){
-  EQ.ch[0].run=false; EQ.ch[0].fault=true;
-  alarm('CH-01','critical','High discharge pressure — Chiller trip'); renderPanel(); renderBtm();
-}
-function clearFaults(){
-  [...EQ.ch,...EQ.cdp,...EQ.chp].forEach(e=>e.fault=false);
-  alarm('SYS','info','All faults cleared'); renderPanel(); renderBtm();
-}
-
+// ══════════════════════════════════════
+function allOn(){[...EQ.ch,...EQ.cdp,...EQ.chp,...EQ.ct].forEach(e=>{e.run=true;e.fault=false;});pushAlarm('SYS','All equipment started');renderBtm();}
+function allOff(){[...EQ.ch,...EQ.cdp,...EQ.chp,...EQ.ct].forEach(e=>e.run=false);pushAlarm('SYS','All equipment stopped');renderBtm();}
+function injectFault(){EQ.ch[0].run=false;EQ.ch[0].fault=true;pushAlarm('CH-01','High discharge pressure — tripped');renderBtm();}
+function clearFaults(){[...EQ.ch,...EQ.cdp,...EQ.chp,...EQ.ct].forEach(e=>e.fault=false);pushAlarm('SYS','All faults cleared');renderBtm();}
 function renderBtm(){
   const b=document.getElementById('btm');
-  const recent=ALARMS.slice(0,3).map(a=>`<span class="alm-item">⚠ ${a.id}: ${a.msg}</span>`).join('');
+  const ah=ALARMS.slice(0,3).map(a=>`<span class="ai">⚠ ${a.id}: ${a.msg}</span>`).join('');
   b.innerHTML=`
-    <span style="font-size:9px;color:#334455">ระบบ:</span>
-    <button class="cbtn cs" onclick="allOn()">▶ All ON</button>
-    <button class="cbtn cx" onclick="allOff()">■ All OFF</button>
-    <div class="bsep"></div>
-    <span style="font-size:9px;color:#334455">Fault:</span>
-    <button class="cbtn cw" onclick="injectFault()">⚡ Inject CH-01</button>
-    <button class="cbtn cs" onclick="clearFaults()">✓ Clear Faults</button>
-    <div class="bsep"></div>
-    <div class="alm-strip">${recent||'<span style="color:#2a3a4a;font-size:9px">No Active Alarms</span>'}</div>`;
+    <span style="font-size:9px;color:#223344">ระบบ:</span>
+    <button class="cb cs" onclick="allOn()">▶ All ON</button>
+    <button class="cb cx" onclick="allOff()">■ All OFF</button>
+    <div class="bsp"></div>
+    <button class="cb cw" onclick="injectFault()">⚡ Fault CH-01</button>
+    <button class="cb cs" onclick="clearFaults()">✓ Clear</button>
+    <div class="aw">${ah||'<span style="color:#1a2a36;font-size:9px">No Active Alarms</span>'}</div>`;
 }
 
-// ════════════════════════════════════════════
+// ══════════════════════════════════════
 //  CLOCK
-// ════════════════════════════════════════════
-const TH_MON=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-function clk(){
-  const d=new Date();
-  document.getElementById('clk').textContent=
-    d.toLocaleTimeString('th-TH',{hour12:false})+' '+d.getDate()+' '+TH_MON[d.getMonth()]+' '+(d.getFullYear()+543);
-}
-setInterval(clk,1000); clk();
+// ══════════════════════════════════════
+const TM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function clkTick(){const d=new Date();document.getElementById('clk').textContent=d.toLocaleTimeString('th-TH',{hour12:false})+' '+d.getDate()+' '+TM[d.getMonth()]+' '+(d.getFullYear()+543);}
+setInterval(clkTick,1000);clkTick();
 
-// ════════════════════════════════════════════
+// ══════════════════════════════════════
 //  LOOP
-// ════════════════════════════════════════════
-function loop(){ T+=0.016; simulate(); draw(); requestAnimationFrame(loop); }
-renderPanel(); renderBtm(); loop();
+// ══════════════════════════════════════
+function loop(){T+=0.016;simulate();draw();requestAnimationFrame(loop);}
+updateBadges();renderBtm();loop();
 </script>
 </body>
 </html>
