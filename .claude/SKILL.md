@@ -1,6 +1,6 @@
 ---
 name: datacenter-facility-simulation
-description: Build interactive web simulations of Data Center Facility equipment and systems. Use this skill whenever the user asks to simulate, visualize, or build a web-based demo of any Data Center equipment including Transformer, Generator, ATS, MDB, ACB, UPS, Rectifier, HVAC/CRAC/CRAH, Grounding System, Lightning Protection System, Fire Alarm System, or Fire Suppression System. Trigger on keywords like "simulate", "web sim", "facility", "data center", "HVAC", "UPS", "generator", "single-line diagram", "SLD", "power system", "cooling", "electrical equipment", "fire alarm", "fire suppression", "FM200", "VESDA", "smoke detector", "sprinkler", or any Thai equivalents (หม้อแปลง, เครื่องกำเนิดไฟฟ้า, ระบบปรับอากาศ, ระบบกราวด์, ระบบแจ้งเตือนอัคคีภัย, ระบบดับเพลิง ฯลฯ). Always apply this skill even for partial requests like "show me how ATS switching works", "build a UPS status panel", "simulate fire detection zones", or "show FM200 discharge sequence".
+description: Build interactive web simulations of Data Center Facility equipment and systems. Use this skill whenever the user asks to simulate, visualize, or build a web-based demo of any Data Center equipment including Transformer, Generator, ATS, MDB, ACB, UPS, Rectifier, HVAC/CRAC/CRAH, Chilled Water Cooled (Chiller Plant/CPMS), Chilled Air Cooled (DX/CRAC precision cooling), Grounding System, Lightning Protection System, Fire Alarm System, or Fire Suppression System. Trigger on keywords like "simulate", "web sim", "facility", "data center", "HVAC", "UPS", "generator", "single-line diagram", "SLD", "power system", "cooling", "chiller", "CRAC", "CRAH", "chilled water", "chilled air", "cooling tower", "CPMS", "precision cooling", "DX cooling", "electrical equipment", "fire alarm", "fire suppression", "FM200", "VESDA", "smoke detector", "sprinkler", or any Thai equivalents (หม้อแปลง, เครื่องกำเนิดไฟฟ้า, ระบบปรับอากาศ, ระบบน้ำเย็น, ระบบระบายความร้อน, ชิลเลอร์, คูลลิ่งทาวเวอร์, ระบบกราวด์, ระบบแจ้งเตือนอัคคีภัย, ระบบดับเพลิง ฯลฯ). Always apply this skill even for partial requests like "show me how ATS switching works", "build a UPS status panel", "simulate fire detection zones", "show FM200 discharge sequence", "build a chiller plant CPMS", or "show CRAC cooling operation".
 ---
 
 # Data Center Facility Web Simulation Skill
@@ -340,6 +340,148 @@ function onSuppressionPreDischarge(zoneId) {
 
 ---
 
+### 12. Chilled Water Cooled System (Chiller Plant / CPMS)
+
+**System topology:**
+```text
+Cooling Tower (CT) ← condenser water loop ← Condenser Water Pump (CDP) ← Chiller (CH)
+                                                                             ↓
+                                                             Chilled Water Pump (CHP)
+                                                                             ↓
+                                                                   IT Load (Server Rooms)
+```
+
+**Equipment state objects:**
+```javascript
+const chiller = {
+  id: 'CH-01', run: true, fault: false,
+  load: 74,          // % of rated capacity
+  kw: 452,           // compressor input power kW
+  cop: 5.22,         // coefficient of performance
+  chws: 7.1,         // chilled water supply temp °C
+  chwr: 12.3,        // chilled water return temp °C
+  cws: 32.0,         // condenser water supply temp °C
+  cwr: 37.1          // condenser water return temp °C
+};
+const pump = { id: 'CDP-01', run: true, fault: false, flow: 480, kw: 18.6 };  // L/s, kW
+const ctCell = { id: 'CT-1/1', run: true, fault: false, kw: 4500 };           // fan power W
+const tower  = { ewt: 37.2, lwt: 32.0 };  // entering/leaving water temp °C
+```
+
+**Chiller state machine:**
+```text
+STANDBY → STARTING (pre-lube, purge ~30s) → LOADING (ramp load 0→rated) → RUNNING
+RUNNING → UNLOADING → COOLDOWN → STANDBY
+Any state → FAULT (high discharge pressure, low suction pressure, motor overcurrent, oil pressure low)
+```
+
+**Key parameters to display:**
+- Per chiller: Load %, kW, COP, CHWS/CHWR °C, CWS/CWR °C, compressor status
+- Per pump: Flow (L/s), Differential pressure (kPa), Power (kW), VFD speed %
+- Per CT cell: Fan status (RUN/STBY), Fan kW, cell ID
+- Tower summary: EWT/LWT °C, running cells count
+- Plant KPIs: Total plant kW, System COP, ΔCHW temperature, ΔCW temperature
+
+**Typical operating config (N+1):** 3 chillers running / 1 standby, 3 CDP / 1 standby, 3 CHP / 1 standby, 6 CT cells / 2 standby
+
+**Canvas drawing style (3D CPMS):**
+- Isometric `box3D()` for chiller bodies — color = run: `#0a3a55`, standby: `#1a3040`, fault: `#4a0a0a`
+- `cylinder3D()` for pump casings — CDW orange `#ff7700`, CHW cyan `#00ccff`
+- `pipe3D()` gradient tubes — CDR=orange, CDS=yellow, CHS=cyan, CHR=blue
+- Cooling tower: large isometric shell, 4×2 fan cell grid, spray + fill + basin animation
+- Flow dots animated along pipe paths when `run: true`
+
+**Alarms:**
+- `HIGH DISCHARGE PRESSURE — CH-0X` (critical)
+- `LOW SUCTION PRESSURE — CH-0X` (critical)
+- `CHILLED WATER HIGH TEMP — CHWR > 14°C` (warning)
+- `COOLING TOWER FAN FAULT — CT-X/X` (warning)
+- `PUMP FLOW LOW — CDP/CHP < 400 L/s` (warning)
+- `PLANT COP LOW — System COP < 3.5` (warning)
+
+**Controls:** Start/Stop per chiller, pump, CT cell | Fault inject | All ON / All OFF | Mode: Auto / Manual
+
+---
+
+### 13. Chilled Air Cooled System (CRAC / DX Precision Cooling)
+
+**System topology:**
+```text
+Air-Cooled Condenser Unit (outdoor)
+        ↕  refrigerant circuit (DX)
+Computer Room Air Conditioner (CRAC) — indoor
+        ↓  supply air (cold)
+  [ Server Rack Rows ]
+        ↑  return air (hot)
+```
+
+**Equipment state objects:**
+```javascript
+const crac = {
+  id: 'CRAC-01', run: true, fault: false,
+  mode: 'COOLING',     // COOLING | DEHUMIDIFY | FREECOOLING | STANDBY | FAULT
+  supplyTemp: 18.2,    // °C — cold air delivered to room
+  returnTemp: 26.8,    // °C — hot air from server rows
+  setpoint: 21.0,      // °C — target supply air temperature
+  humidity: 47,        // %RH
+  humiditySetpoint: 50,// %RH
+  coolingCapacity: 48, // kW
+  compressorKw: 14.2,  // kW input
+  fanSpeedPct: 78,     // % VFD speed
+  filterDp: 62,        // Pa — differential pressure across filter
+  suctionPressure: 4.8,// bar (refrigerant suction side)
+  dischargePressure: 18.4, // bar (refrigerant discharge side)
+  refrigerant: 'R410A'
+};
+```
+
+**CRAC state machine:**
+```text
+OFF → STARTING (fan + compressor pre-start checks ~5s) → COOLING
+COOLING → DEHUMIDIFY  (humidity > setpoint + 5%RH)
+COOLING → FREECOOLING (outdoor temp < 18°C — economizer active, compressor off)
+COOLING → STANDBY     (lead-lag rotation or low load)
+Any state → FAULT     (high discharge pressure, low suction pressure, high supply temp, filter clog, fan motor fault)
+```
+
+**Key parameters to display:**
+- Supply Air Temp (°C) vs setpoint — trend bar
+- Return Air Temp (°C) — server inlet proxy
+- Humidity %RH vs setpoint
+- Cooling Capacity (kW), Compressor Input (kW), EER (kW/kW)
+- Fan Speed % (VFD), Filter DP (Pa)
+- Refrigerant: suction pressure (bar), discharge pressure (bar), superheat (°C)
+- Run hours, last maintenance date
+
+**Room airflow visualization (Canvas):**
+- Hot aisle / Cold aisle layout with airflow arrows
+- Color gradient: blue (cold supply) → red (hot return)
+- Animate airflow particles from CRAC → server rows → CRAC return
+
+**Alarm thresholds:**
+| Parameter | Warning | Critical |
+|-----------|---------|----------|
+| Supply Air Temp | > 22°C | > 25°C |
+| Return Air Temp | > 30°C | > 35°C |
+| Humidity | > 60%RH or < 30%RH | > 70%RH |
+| Filter DP | > 150 Pa | > 250 Pa |
+| Discharge Pressure (R410A) | > 25 bar | > 28 bar |
+| Suction Pressure (R410A) | < 3.5 bar | < 2.5 bar |
+
+**Controls:** Start/Stop, setpoint adjust, force dehumidify, force freecooling, fault inject (high discharge pressure, filter clog, fan fault), Reset
+
+**Lead-lag logic (multiple units):**
+```javascript
+// Rotate lead unit every 8h to equalize run hours
+function rotateLead(units) {
+  const sorted = [...units].sort((a, b) => a.runHours - b.runHours);
+  sorted[0].mode = 'COOLING';   // lowest run hours → lead
+  sorted.slice(1).forEach(u => u.mode = u.run ? 'STANDBY' : 'OFF');
+}
+```
+
+---
+
 ## Alarm System (Required in Every Simulation)
 
 Every simulation **must** include a central alarm panel. Implement this pattern:
@@ -487,3 +629,18 @@ Fire Safety:
 | ระบบดับเพลิงด้วยก๊าซเฉื่อย | Inert Gas Suppression (IG-541) | IG-541 |
 | ระบบสปริงเกลอร์ชนิดพรีแอ็กชั่น | Pre-action Sprinkler System | Pre-action |
 | ความเข้มข้นการออกแบบ | Design Concentration | % vol |
+| ระบบน้ำเย็น / ระบบชิลเลอร์ | Chilled Water Cooled / Chiller Plant | CHW |
+| ชิลเลอร์ | Chiller | CH |
+| ปั๊มน้ำเย็น | Chilled Water Pump | CHP |
+| ปั๊มน้ำระบายความร้อน | Condenser Water Pump | CDP |
+| หอระบายความร้อน | Cooling Tower | CT |
+| อุณหภูมิน้ำเข้า/ออกหอระบายความร้อน | Entering/Leaving Water Temp | EWT / LWT |
+| อุณหภูมิน้ำจ่าย/น้ำกลับ (เย็น) | Chilled Water Supply/Return Temp | CHWS / CHWR |
+| อุณหภูมิน้ำจ่าย/น้ำกลับ (ระบาย) | Condenser Water Supply/Return Temp | CWS / CWR |
+| ระบบอัตราส่วนสมรรถนะ | Coefficient of Performance | COP |
+| ระบบปรับอากาศแม่นยำแบบ DX | DX Precision Cooling / CRAC | CRAC |
+| เครื่องส่งลมเย็น (ใช้น้ำเย็น) | Chilled Air Cooled / CRAH | CRAH |
+| แผงควบคุมระบบชิลเลอร์ | Chiller Plant Management System | CPMS |
+| ตู้ระบายความร้อนอากาศ (นอกอาคาร) | Air-Cooled Condenser Unit | ACU |
+| อุณหภูมิลมจ่าย/ลมกลับ | Supply Air Temp / Return Air Temp | SAT / RAT |
+| สารทำความเย็น | Refrigerant | R410A / R32 |

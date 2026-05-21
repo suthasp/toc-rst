@@ -20,6 +20,8 @@ This workspace is for building **interactive web simulations** of Data Center Fa
 ### Mechanical / Environmental Systems
 - **HVAC** — Cooling units (CRAC/CRAH), temperature/humidity control, setpoints
 - **Precision Cooling** — Floor-mount / overhead units, airflow simulation
+- **Chilled Water Cooled (Chiller Plant)** — Chiller (CH), Condenser Water Pump (CDP), Chilled Water Pump (CHP), Cooling Tower (CT), CPMS display, COP monitoring
+- **Chilled Air Cooled (DX/CRAC)** — DX refrigerant circuit, air-cooled condenser unit, compressor/evaporator/expansion valve, hot-aisle/cold-aisle airflow, lead-lag rotation
 
 ### Safety & Protection Systems
 - **Grounding System** — Ground resistance, bonding paths, fault current flow
