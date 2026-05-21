@@ -131,6 +131,25 @@
                         </a>
                     </div>
 
+                    <!-- Card 5: Fire Alarm & Suppression -->
+                    <div class="col-lg-4 col-md-6 mb-5">
+                        <a href="firealarm.html" class="text-decoration-none">
+                            <div class="card h-100 border-0 shadow-lg project-card card-fire" style="background: linear-gradient(160deg, rgba(30,5,5,0.88) 0%, rgba(80,10,10,0.82) 100%); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer;">
+                                <div class="card-body p-5 text-center">
+                                    <div class="mb-4" style="font-size: 4rem; line-height: 1;">
+                                        <i class="bi bi-fire" style="color: #ff5252;"></i>
+                                    </div>
+                                    <div class="badge mb-3 px-3 py-2" style="background: rgba(255,82,82,0.15); color: #ff5252; border: 1px solid rgba(255,82,82,0.3); font-size: 0.75rem; letter-spacing: 0.1em;">FIRE SAFETY SYSTEM</div>
+                                    <h4 class="fw-bold text-white mb-3">Fire Alarm &amp; Suppression</h4>
+                                    <p class="text-white-50 mb-4">ระบบแจ้งเตือนอัคคีภัย FACP — FM-200 Clean Agent Suppression พร้อม Discharge Sequence</p>
+                                    <span class="btn btn-sm px-4 py-2" style="background: rgba(255,82,82,0.15); color: #ff5252; border: 1px solid rgba(255,82,82,0.4); border-radius: 50px;">
+                                        เข้าสู่เนื้อหา <i class="bi bi-arrow-right ms-1"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
                     <!-- Card 3: Transformer Simulation -->
                     <div class="col-lg-4 col-md-6 mb-5">
                         <a href="transformer_simulation.html" class="text-decoration-none">
@@ -192,11 +211,11 @@
             .dropdown-divider {
                 border-color: rgba(0,188,212,0.15) !important;
             }
-            .card-nfv, .card-power, .card-transformer, .card-chilled {
+            .card-nfv, .card-power, .card-transformer, .card-chilled, .card-fire {
                 position: relative;
                 overflow: hidden;
             }
-            .card-nfv::before, .card-power::before, .card-transformer::before, .card-chilled::before {
+            .card-nfv::before, .card-power::before, .card-transformer::before, .card-chilled::before, .card-fire::before {
                 content: '';
                 position: absolute;
                 inset: 0;
@@ -206,7 +225,7 @@
                 pointer-events: none;
                 z-index: 0;
             }
-            .card-nfv .card-body, .card-power .card-body, .card-transformer .card-body, .card-chilled .card-body {
+            .card-nfv .card-body, .card-power .card-body, .card-transformer .card-body, .card-chilled .card-body, .card-fire .card-body {
                 position: relative;
                 z-index: 1;
             }
@@ -221,6 +240,9 @@
             }
             .card-chilled::before {
                 background-image: radial-gradient(ellipse at 75% 40%, rgba(64,196,255,0.18) 0%, transparent 65%);
+            }
+            .card-fire::before {
+                background-image: radial-gradient(ellipse at 30% 40%, rgba(255,82,82,0.22) 0%, transparent 65%);
             }
             .project-card:hover {
                 transform: translateY(-8px);
