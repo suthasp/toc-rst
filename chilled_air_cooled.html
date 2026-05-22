@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a2d42;color:#b8ccd8;font-family:'Noto Sans Thai','JetBrains Mono',monospace;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+body{background:#0e1e2e;color:#b8ccd8;font-family:'Noto Sans Thai','JetBrains Mono',monospace;overflow:hidden;height:100vh;display:flex;flex-direction:column}
 header{background:linear-gradient(135deg,#0e1c2e,#162840);padding:6px 14px;border-bottom:2px solid #1a3a5a;display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0}
 .ht h1{font-size:.92rem;color:#40c4ff;font-weight:700;letter-spacing:.04em}
 .ht p{font-size:.68rem;color:#486a88}
@@ -146,29 +146,29 @@ function flowDot(pts,frac,col,r){
 }
 
 // ══ PIPE PATHS (reference coords) ══
-// Hot gas: compressor top → condenser bottom
-const PH=[[130,363],[130,207]];
-// Condenser outlet → liquid tank top
-const PL1=[[283,52],[390,52],[390,28]];
-// Liquid tank bottom → dry filter
-const PL2=[[390,202],[390,225],[452,225],[452,91]];
-// Dry filter → TXV
+// Hot gas: compressor top → condenser front-face bottom-center
+const PH=[[130,362],[130,222]];
+// Condenser right outlet → liquid tank top
+const PL1=[[283,52],[390,52],[390,50]];
+// Liquid tank bottom → dry filter left port
+const PL2=[[390,180],[390,220],[452,220],[452,91]];
+// Dry filter right → TXV left point
 const PL3=[[568,91],[596,91]];
-// TXV → evaporator right-bottom (low pressure after expansion)
-const PV1=[[618,113],[618,430],[738,430]];
-// Suction: evap left-mid → compressor top
-const PS=[[440,340],[175,340],[175,363]];
-// Water pump → evap bottom
-const PW1=[[512,488],[590,488],[590,430]];
-// Water evap top → water tank
-const PW2=[[590,252],[802,252]];
-// Water tank → pump
+// TXV bottom → evaporator right face (low pressure after expansion)
+const PV1=[[618,113],[618,200],[750,200],[750,340]];
+// Suction: evap left → compressor left side (avoids conflict with discharge)
+const PS=[[440,340],[88,340],[88,415]];
+// Water pump right → evap bottom-right area
+const PW1=[[512,488],[590,488],[590,442]];
+// Water evap top-left → water tank left
+const PW2=[[480,264],[480,252],[802,252]];
+// Water tank lower → pump right inlet
 const PW3=[[931,426],[931,490],[512,490],[512,488]];
 
 // ══ DRAW COMPONENTS ══
 function drawOutdoorUnit(){
   const x=rx(18),y=ry(12),w=rs(265),h=rs(195),d=rs(15);
-  box3D(x,y,w,h,d,'#071e2c','#092433','#041418');
+  box3D(x,y,w,h,d,'#0d3f5e','#1a5578','#082838');
   // Fin lines
   ctx.save();ctx.beginPath();ctx.rect(x+rs(2),y+d+rs(2),w-rs(4),h-rs(4));ctx.clip();
   ctx.strokeStyle='rgba(10,40,60,.55)';ctx.lineWidth=rs(.7);
@@ -183,36 +183,36 @@ function drawOutdoorUnit(){
     ctx.beginPath();ctx.arc(fcx,fcy,fr*.11,0,Math.PI*2);ctx.fillStyle='#00aaee';ctx.fill();
     ctx.beginPath();ctx.arc(fcx,fcy,fr+rs(1.5),0,Math.PI*2);ctx.strokeStyle='rgba(0,170,215,.22)';ctx.lineWidth=rs(2.2);ctx.stroke();
   }else{ctx.beginPath();ctx.arc(fcx,fcy,fr,0,Math.PI*2);ctx.fillStyle='rgba(10,30,45,.45)';ctx.fill();}
-  ctx.textAlign='center';ctx.fillStyle='#1a5070';ctx.font='bold '+rs(9.5)+'px JetBrains Mono,monospace';
+  ctx.textAlign='center';ctx.fillStyle='#5ab8d8';ctx.font='bold '+rs(9.5)+'px JetBrains Mono,monospace';
   ctx.fillText('AIR-COOLED FIN CONDENSER',rx(153),ry(207)+rs(14));
-  ctx.fillStyle=EQ.fan.run?'#00d26a':'#4a6a7a';ctx.font='bold '+rs(8.5)+'px JetBrains Mono,monospace';
+  ctx.fillStyle=EQ.fan.run?'#00d26a':'#607080';ctx.font='bold '+rs(8.5)+'px JetBrains Mono,monospace';
   ctx.fillText(EQ.fan.run?'FAN RUN  '+EQ.fan.kw.toFixed(1)+' kW':'FAN STOPPED',rx(153),ry(207)+rs(25));
-  ctx.fillStyle='#2a5a78';ctx.font=rs(8.5)+'px JetBrains Mono,monospace';
+  ctx.fillStyle='#4a8aaa';ctx.font=rs(8.5)+'px JetBrains Mono,monospace';
   ctx.fillText('Ambient: '+EQ.sys.ambient.toFixed(1)+'°C  |  Condensing: '+EQ.ref.liqTemp.toFixed(1)+'°C',rx(153),ry(207)+rs(36));
 }
 
 function drawCompressor(){
   const cx=rx(130),cy=ry(415),ew=rs(84),eh=rs(42),ch=rs(105);
-  cyl3D(cx,cy,ew,eh,ch,'#0a3a5a',EQ.comp.run,EQ.comp.fault);
+  cyl3D(cx,cy,ew,eh,ch,'#1258a0',EQ.comp.run,EQ.comp.fault);
   if(EQ.comp.run){
     for(let b=0;b<4;b++){const a=T*9+b*Math.PI/2;ctx.save();ctx.translate(cx,cy-ch/2);ctx.rotate(a);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(ew*.28,0);ctx.strokeStyle='rgba(0,175,225,.7)';ctx.lineWidth=rs(2);ctx.stroke();ctx.restore();}
   }
-  ctx.textAlign='center';ctx.fillStyle='#1a5070';ctx.font='bold '+rs(9.5)+'px JetBrains Mono,monospace';
+  ctx.textAlign='center';ctx.fillStyle='#5ab0e0';ctx.font='bold '+rs(9.5)+'px JetBrains Mono,monospace';
   ctx.fillText('SCROLL COMPRESSOR',cx,cy+ch/2+rs(14));
   const cc=EQ.comp.fault?'#ef4444':EQ.comp.run?'#00d26a':'#6b7280';
   ctx.fillStyle=cc;ctx.font='bold '+rs(8.5)+'px JetBrains Mono,monospace';
   ctx.fillText(EQ.comp.fault?'FAULT':EQ.comp.run?EQ.comp.mode:'STOPPED',cx,cy+ch/2+rs(24));
-  ctx.fillStyle='#2a5a78';ctx.font=rs(8.5)+'px JetBrains Mono,monospace';
+  ctx.fillStyle='#4a90c0';ctx.font=rs(8.5)+'px JetBrains Mono,monospace';
   ctx.fillText(EQ.comp.kw.toFixed(1)+' kW  |  P↑'+EQ.ref.disch.toFixed(1)+'  P↓'+EQ.ref.suct.toFixed(1)+' bar',cx,cy+ch/2+rs(34));
 }
 
 function drawLiquidTank(){
   const cx=rx(390),cy=ry(115),ew=rs(52),eh=rs(22),ch=rs(130);
-  cyl3D(cx,cy,ew,eh,ch,'#2a1800',EQ.comp.run,false);
+  cyl3D(cx,cy,ew,eh,ch,'#5a3010',EQ.comp.run,false);
   if(EQ.comp.run){const lh=ch*.72;ctx.beginPath();ctx.rect(cx-ew/2+rs(2),cy+ch/2-lh,ew-rs(4),lh);ctx.fillStyle='rgba(255,130,0,.35)';ctx.fill();}
-  ctx.textAlign='center';ctx.fillStyle='#885500';ctx.font='bold '+rs(8.5)+'px JetBrains Mono,monospace';
+  ctx.textAlign='center';ctx.fillStyle='#c88840';ctx.font='bold '+rs(8.5)+'px JetBrains Mono,monospace';
   ctx.fillText('LIQUID',cx,cy-ch/2-rs(14));ctx.fillText('TANK',cx,cy-ch/2-rs(5));
-  ctx.fillStyle='#664400';ctx.font=rs(8.5)+'px JetBrains Mono,monospace';
+  ctx.fillStyle='#aa7030';ctx.font=rs(8.5)+'px JetBrains Mono,monospace';
   ctx.fillText(EQ.ref.liqTemp.toFixed(1)+'°C',cx,cy+ch/2+rs(15));
 }
 
@@ -224,7 +224,7 @@ function drawDryFilter(){
   ctx.fillStyle=grd;ctx.fill();ctx.strokeStyle='#1a5878';ctx.lineWidth=rs(1.5);ctx.stroke();
   ctx.beginPath();ctx.arc(x+r,y+h/2,r,0,Math.PI*2);ctx.fillStyle='#182a38';ctx.fill();ctx.strokeStyle='#285878';ctx.lineWidth=rs(1);ctx.stroke();
   ctx.beginPath();ctx.arc(x+w-r,y+h/2,r,0,Math.PI*2);ctx.fillStyle='#182a38';ctx.fill();ctx.stroke();
-  ctx.textAlign='center';ctx.fillStyle='#1a6280';ctx.font='bold '+rs(8.5)+'px JetBrains Mono,monospace';
+  ctx.textAlign='center';ctx.fillStyle='#4ab8d8';ctx.font='bold '+rs(8.5)+'px JetBrains Mono,monospace';
   ctx.fillText('DRY FILTER',x+w/2,y-rs(6));
 }
 
@@ -234,15 +234,15 @@ function drawTXV(){
   ctx.fillStyle='#12283a';ctx.fill();ctx.strokeStyle='#00aacc';ctx.lineWidth=rs(2);ctx.stroke();
   ctx.beginPath();ctx.moveTo(cx,cy-s*.45);ctx.lineTo(cx+s*.45,cy);ctx.lineTo(cx,cy+s*.45);ctx.lineTo(cx-s*.45,cy);ctx.closePath();
   ctx.fillStyle='rgba(0,165,200,.28)';ctx.fill();
-  ctx.textAlign='center';ctx.fillStyle='#0a8aaa';ctx.font='bold '+rs(8)+'px JetBrains Mono,monospace';
+  ctx.textAlign='center';ctx.fillStyle='#00d4ff';ctx.font='bold '+rs(8)+'px JetBrains Mono,monospace';
   ctx.fillText('TXV',cx,cy-s-rs(5));
-  ctx.fillStyle='#0a6a88';ctx.font=rs(8)+'px JetBrains Mono,monospace';
+  ctx.fillStyle='#00a8cc';ctx.font=rs(8)+'px JetBrains Mono,monospace';
   ctx.fillText(EQ.txv.pos.toFixed(0)+'%',cx,cy+s+rs(11));
 }
 
 function drawEvaporator(){
   const x=rx(440),y=ry(252),w=rs(298),h=rs(178),d=rs(12);
-  box3D(x,y,w,h,d,'#071820','#091f28','#040f16');
+  box3D(x,y,w,h,d,'#0d2e50','#163862','#08202e');
   // Coil serpentine lines
   const rows=8,sp=h/rows;
   for(let i=0;i<rows;i++){
@@ -255,18 +255,17 @@ function drawEvaporator(){
       ctx.strokeStyle=lc;ctx.lineWidth=rs(2.5);ctx.stroke();
     }
   }
-  ctx.textAlign='center';ctx.fillStyle='#1a5070';ctx.font='bold '+rs(11)+'px JetBrains Mono,monospace';
+  ctx.textAlign='center';ctx.fillStyle='#5ac0e8';ctx.font='bold '+rs(11)+'px JetBrains Mono,monospace';
   ctx.fillText('EVAPORATOR COIL',x+w/2,y+d+h/2-rs(8));
-  ctx.fillStyle='#0a4060';ctx.font=rs(9)+'px JetBrains Mono,monospace';
+  ctx.fillStyle='#3a90c8';ctx.font=rs(9)+'px JetBrains Mono,monospace';
   ctx.fillText('EWT '+EQ.evap.wIn.toFixed(1)+'°C  →  LWT '+EQ.evap.wOut.toFixed(1)+'°C  |  ΔT '+EQ.evap.dT.toFixed(1)+'K',x+w/2,y+d+h/2+rs(8));
-  // Superheat label
-  ctx.fillStyle='#2a4a6a';ctx.font=rs(8.5)+'px JetBrains Mono,monospace';
+  ctx.fillStyle='#4a80b8';ctx.font=rs(8.5)+'px JetBrains Mono,monospace';
   ctx.fillText('SH: '+EQ.ref.superheat.toFixed(1)+'K  |  SC: '+EQ.ref.subcool.toFixed(1)+'K  |  '+EQ.ref.ref,x+w/2,y+d+h/2+rs(20));
 }
 
 function drawWaterTank(){
   const x=rx(802),y=ry(248),w=rs(258),h=rs(178),d=rs(13);
-  box3D(x,y,w,h,d,'#081c10','#0a2416','#04100a');
+  box3D(x,y,w,h,d,'#0d3520','#1a4428','#082012');
   // Water fill
   ctx.beginPath();ctx.rect(x+rs(2),y+d+h*.3,w-rs(4),h*.68);ctx.fillStyle='rgba(0,80,160,.22)';ctx.fill();
   // Heater element
@@ -274,21 +273,21 @@ function drawWaterTank(){
   ctx.beginPath();ctx.moveTo(hx,hy);ctx.lineTo(hx+hw,hy);
   ctx.strokeStyle=EQ.tank.heater?'rgba(255,90,0,.78)':'rgba(25,55,25,.4)';ctx.lineWidth=rs(4.5);ctx.stroke();
   if(EQ.tank.heater){ctx.shadowColor='#ff6600';ctx.shadowBlur=rs(7);ctx.beginPath();ctx.moveTo(hx,hy);ctx.lineTo(hx+hw,hy);ctx.strokeStyle='rgba(255,140,40,.55)';ctx.lineWidth=rs(2);ctx.stroke();ctx.shadowBlur=0;}
-  ctx.textAlign='center';ctx.fillStyle='#1a6830';ctx.font='bold '+rs(13)+'px JetBrains Mono,monospace';
+  ctx.textAlign='center';ctx.fillStyle='#40d880';ctx.font='bold '+rs(13)+'px JetBrains Mono,monospace';
   ctx.fillText(EQ.tank.temp.toFixed(1)+'°C',x+w/2,y+d+h/2);
-  ctx.fillStyle='#0a4820';ctx.font=rs(9)+'px JetBrains Mono,monospace';
+  ctx.fillStyle='#30a860';ctx.font=rs(9)+'px JetBrains Mono,monospace';
   ctx.fillText('SP: '+EQ.tank.setpoint.toFixed(1)+'°C',x+w/2,y+d+h/2+rs(14));
-  ctx.fillStyle='#1a5a28';ctx.font='bold '+rs(9.5)+'px JetBrains Mono,monospace';
+  ctx.fillStyle='#40b868';ctx.font='bold '+rs(9.5)+'px JetBrains Mono,monospace';
   ctx.fillText('WATER STORAGE TANK',x+w/2,y+h+rs(16));
-  ctx.fillStyle=EQ.tank.heater?'#ff8844':'#1e3a22';ctx.font='bold '+rs(8.5)+'px JetBrains Mono,monospace';
+  ctx.fillStyle=EQ.tank.heater?'#ff8844':'#386850';ctx.font='bold '+rs(8.5)+'px JetBrains Mono,monospace';
   ctx.fillText(EQ.tank.heater?'⚡ HEATER ON':'HEATER OFF',x+w/2,y+h+rs(26));
 }
 
 function drawPump(){
   const cx=rx(486),cy=ry(488),ew=rs(52),eh=rs(26),ch=rs(58);
-  cyl3D(cx,cy,ew,eh,ch,'#183a28',EQ.pump.run,false);
+  cyl3D(cx,cy,ew,eh,ch,'#226040',EQ.pump.run,false);
   if(EQ.pump.run){for(let b=0;b<4;b++){const a=T*10+b*Math.PI/2;ctx.save();ctx.translate(cx,cy-ch/2);ctx.rotate(a);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(ew*.28,0);ctx.strokeStyle='rgba(0,200,100,.72)';ctx.lineWidth=rs(1.8);ctx.stroke();ctx.restore();}}
-  ctx.textAlign='center';ctx.fillStyle='#1a6838';ctx.font='bold '+rs(9)+'px JetBrains Mono,monospace';
+  ctx.textAlign='center';ctx.fillStyle='#36c870';ctx.font='bold '+rs(9)+'px JetBrains Mono,monospace';
   ctx.fillText('PUMP',cx,cy+ch/2+rs(13));
   ctx.fillStyle=EQ.pump.run?'#00d26a':'#6b7280';ctx.font=rs(8.5)+'px JetBrains Mono,monospace';
   ctx.fillText(EQ.pump.run?EQ.pump.flow.toFixed(1)+' L/s':'STOP',cx,cy+ch/2+rs(23));
@@ -325,43 +324,85 @@ function drawPipes(){
 
 // ══ LEGEND ══
 function drawLegend(){
-  const lx=rx(1060),ly=ry(16),lw=rs(302),lh=rs(70);
-  rrP(lx,ly,lw,lh,rs(5));ctx.fillStyle='rgba(6,16,26,.88)';ctx.fill();ctx.strokeStyle='#1a3a5a';ctx.lineWidth=rs(1);ctx.stroke();
-  ctx.textAlign='left';ctx.fillStyle='#2a5a78';ctx.font='bold '+rs(8.5)+'px JetBrains Mono,monospace';
-  ctx.fillText('CIRCUIT LEGEND',lx+rs(10),ly+rs(13));
-  const items=[[C_HOT,'Hot Gas (Discharge)'],[C_LIQ,'Liquid Refrigerant'],[C_VAP,'Low-Pres / Suction'],[C_CW,'Chilled Water']];
+  const lx=rx(1060),ly=ry(16),lw=rs(302),lh=rs(82);
+  rrP(lx,ly,lw,lh,rs(5));ctx.fillStyle='rgba(6,14,26,.92)';ctx.fill();ctx.strokeStyle='rgba(80,160,200,.35)';ctx.lineWidth=rs(1);ctx.stroke();
+  ctx.textAlign='left';ctx.fillStyle='#80b8d8';ctx.font='bold '+rs(8.5)+'px JetBrains Mono,monospace';
+  ctx.fillText('CIRCUIT LEGEND',lx+rs(10),ly+rs(14));
+  const items=[[C_HOT,'Hot Gas — Discharge'],[C_LIQ,'Liquid Refrigerant'],[C_VAP,'Low-Pres / Suction'],[C_CW,'Chilled Water Supply'],[C_CR,'Chilled Water Return']];
   items.forEach(function(it,i){
-    const ix=lx+rs(10),iy=ly+rs(24)+i*rs(12);
-    ctx.beginPath();ctx.moveTo(ix,iy);ctx.lineTo(ix+rs(22),iy);ctx.strokeStyle=it[0];ctx.lineWidth=rs(3.5);ctx.stroke();
-    ctx.fillStyle='#7a9aaa';ctx.font=rs(8.5)+'px JetBrains Mono,monospace';ctx.fillText(it[1],ix+rs(28),iy+rs(4));
+    const ix=lx+rs(10),iy=ly+rs(26)+i*rs(11);
+    ctx.beginPath();ctx.moveTo(ix,iy);ctx.lineTo(ix+rs(24),iy);ctx.strokeStyle=it[0];ctx.lineWidth=rs(3.5);ctx.stroke();
+    ctx.fillStyle='#8ab8cc';ctx.font=rs(8.5)+'px JetBrains Mono,monospace';ctx.fillText(it[1],ix+rs(30),iy+rs(3.5));
   });
 }
 
 // ══ VALUE LABELS ══
 function lbl(x,y,txt,val,col){
-  const bw=rs(148),bh=rs(42),br=rs(4);
-  rrP(x-bw/2,y-bh/2,bw,bh,br);ctx.fillStyle='rgba(6,14,24,.88)';ctx.fill();ctx.strokeStyle=col+'44';ctx.lineWidth=rs(.8);ctx.stroke();
-  ctx.textAlign='center';ctx.fillStyle='#3a6a88';ctx.font=rs(8)+'px JetBrains Mono,monospace';ctx.fillText(txt,x,y-rs(5));
-  ctx.fillStyle=col;ctx.font='bold '+rs(11)+'px JetBrains Mono,monospace';ctx.fillText(val,x,y+rs(8));
+  const bw=rs(152),bh=rs(44),br=rs(4);
+  rrP(x-bw/2,y-bh/2,bw,bh,br);ctx.fillStyle='rgba(8,18,32,.92)';ctx.fill();ctx.strokeStyle=col+'88';ctx.lineWidth=rs(1);ctx.stroke();
+  ctx.textAlign='center';ctx.fillStyle='#7aaac8';ctx.font=rs(8)+'px JetBrains Mono,monospace';ctx.fillText(txt,x,y-rs(5));
+  ctx.fillStyle=col;ctx.font='bold '+rs(12)+'px JetBrains Mono,monospace';ctx.fillText(val,x,y+rs(9));
 }
 
 function drawLabels(){
-  lbl(rx(162),ry(248),'DISCH PRESSURE',EQ.ref.disch.toFixed(1)+' bar','#ff4444');
-  lbl(rx(162),ry(295),'SUCT PRESSURE', EQ.ref.suct.toFixed(1)+' bar','#9955ff');
-  lbl(rx(330),ry(460),'SUPERHEAT',     EQ.ref.superheat.toFixed(1)+' K','#aa66ff');
-  lbl(rx(490),ry(460),'SUBCOOLING',    EQ.ref.subcool.toFixed(1)+' K','#ff9900');
-  lbl(rx(666),ry(460),'COOLING',       EQ.sys.coolingKw.toFixed(0)+' kW','#40c4ff');
-  lbl(rx(846),ry(460),'COP / EER',     EQ.sys.cop.toFixed(2)+'/'+EQ.sys.eer.toFixed(1),'#00d26a');
-  lbl(rx(618),ry(160),'TXV POSITION',  EQ.txv.pos.toFixed(0)+'%','#00aacc');
+  // Refrigerant side — cluster around compressor area
+  lbl(rx(220),ry(308),'DISCH PRESSURE',EQ.ref.disch.toFixed(1)+' bar','#ff5555');
+  lbl(rx(220),ry(356),'SUCT PRESSURE', EQ.ref.suct.toFixed(1)+' bar','#bb77ff');
+  lbl(rx(220),ry(404),'SUPERHEAT',     EQ.ref.superheat.toFixed(1)+' K','#dd99ff');
+  lbl(rx(220),ry(452),'SUBCOOLING',    EQ.ref.subcool.toFixed(1)+' K','#ffaa22');
+  // Evaporator/system performance
+  lbl(rx(600),ry(475),'COOLING OUTPUT',EQ.sys.coolingKw.toFixed(0)+' kW','#40c4ff');
+  lbl(rx(760),ry(475),'COP / EER',     EQ.sys.cop.toFixed(2)+' / '+EQ.sys.eer.toFixed(1),'#00d26a');
+  lbl(rx(920),ry(475),'CHILLED WATER', EQ.tank.temp.toFixed(1)+'°C','#1de9b6');
+  // TXV position inline
+  lbl(rx(635),ry(155),'TXV POSITION',  EQ.txv.pos.toFixed(0)+'%','#00d4ff');
+}
+
+// ══ SECTION DIVIDERS ══
+function drawSections(){
+  // Outdoor unit boundary
+  const ox=rx(5),oy=ry(4),ow=rs(305),oh=rs(510);
+  ctx.save();ctx.setLineDash([rs(5),rs(4)]);ctx.strokeStyle='rgba(0,170,215,.25)';ctx.lineWidth=rs(1.2);
+  rrP(ox,oy,ow,oh,rs(7));ctx.stroke();ctx.restore();
+  ctx.textAlign='left';ctx.fillStyle='rgba(0,175,220,.38)';ctx.font='bold '+rs(9)+'px JetBrains Mono,monospace';
+  ctx.fillText('◈ OUTDOOR UNIT',ox+rs(8),oy+rs(14));
+
+  // Indoor unit boundary
+  const ix=rx(425),iy=ry(4),iw=rs(945),ih=rs(510);
+  ctx.save();ctx.setLineDash([rs(5),rs(4)]);ctx.strokeStyle='rgba(29,233,182,.18)';ctx.lineWidth=rs(1.2);
+  rrP(ix,iy,iw,ih,rs(7));ctx.stroke();ctx.restore();
+  ctx.textAlign='left';ctx.fillStyle='rgba(29,220,170,.38)';ctx.font='bold '+rs(9)+'px JetBrains Mono,monospace';
+  ctx.fillText('◈ INDOOR UNIT',ix+rs(8),iy+rs(14));
+
+  // Refrigerant circuit label
+  ctx.textAlign='center';ctx.fillStyle='rgba(255,140,0,.40)';ctx.font='bold '+rs(8)+'px JetBrains Mono,monospace';
+  ctx.fillText('─── REFRIGERANT CIRCUIT (R410A) ───',rx(690),ry(35));
+
+  // Water circuit label
+  ctx.fillStyle='rgba(0,200,255,.35)';
+  ctx.fillText('─── CHILLED WATER CIRCUIT ───',rx(800),ry(540));
+
+  // Flow direction arrows
+  const arr=function(x,y,ang){
+    ctx.save();ctx.translate(rx(x),ry(y));ctx.rotate(ang);
+    ctx.beginPath();ctx.moveTo(-rs(6),-rs(4));ctx.lineTo(rs(6),0);ctx.lineTo(-rs(6),rs(4));ctx.closePath();
+    ctx.fillStyle='rgba(255,255,255,.30)';ctx.fill();ctx.restore();
+  };
+  arr(207,52,0);             // liquid line → right
+  arr(130,295,-Math.PI/2);   // hot gas ↑ (going up, negative y)
+  arr(264,340,Math.PI);      // suction ← (going left)
+  arr(700,252,0);            // water → right to tank
+  arr(700,490,-Math.PI);     // water ← return from tank
 }
 
 // ══ MAIN DRAW ══
 function draw(){
   T+=.016;
-  ctx.fillStyle='#1a2d42';ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='rgba(18,38,58,.28)';ctx.lineWidth=rs(.4);
-  for(let xi=0;xi<W;xi+=rs(40)){ctx.beginPath();ctx.moveTo(xi,0);ctx.lineTo(xi,H);ctx.stroke();}
-  for(let yi=0;yi<H;yi+=rs(40)){ctx.beginPath();ctx.moveTo(0,yi);ctx.lineTo(W,yi);ctx.stroke();}
+  ctx.fillStyle='#0e1e2e';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(20,45,70,.22)';ctx.lineWidth=rs(.4);
+  for(let xi=0;xi<W;xi+=rs(50)){ctx.beginPath();ctx.moveTo(xi,0);ctx.lineTo(xi,H);ctx.stroke();}
+  for(let yi=0;yi<H;yi+=rs(50)){ctx.beginPath();ctx.moveTo(0,yi);ctx.lineTo(W,yi);ctx.stroke();}
+  drawSections();
   drawPipes();
   drawOutdoorUnit();drawCompressor();drawLiquidTank();drawDryFilter();drawTXV();
   drawEvaporator();drawWaterTank();drawPump();
