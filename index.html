@@ -1,321 +1,598 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
-    <title>Technical Projects</title>
-    <!-- Favicon-->
+    <title>Technical Projects — TOC Data Center</title>
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
-    <!-- Google Fonts: Noto Sans Thai -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    <!-- Bootstrap icons-->
+    <!-- Google Fonts: Inter + Instrument Serif + Noto Sans Thai -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
-    <!-- Core theme CSS (includes Bootstrap)-->
+    <!-- Bootstrap CSS -->
     <link href="css/styles.css" rel="stylesheet" />
+    <!-- hls.js -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
+
+    <style>
+        /* ── Base ────────────────────────────────────────────────── */
+        :root {
+            --font-sans: 'Inter', 'Noto Sans Thai', ui-sans-serif, system-ui, sans-serif;
+            --font-serif: 'Instrument Serif', Georgia, serif;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: #000;
+            color: #fff;
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: -0.01em;
+            overflow-x: hidden;
+        }
+        ::selection { background: #fff; color: #000; }
+
+        /* ── Liquid-glass ────────────────────────────────────────── */
+        .liquid-glass {
+            background: rgba(255,255,255,0.01);
+            background-blend-mode: luminosity;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: none;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.10);
+            position: relative;
+            overflow: hidden;
+        }
+        .liquid-glass::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            padding: 1.4px;
+            border-radius: inherit;
+            background: linear-gradient(180deg,
+                rgba(255,255,255,0.45) 0%,
+                rgba(255,255,255,0.15) 20%,
+                rgba(255,255,255,0.00) 40%,
+                rgba(255,255,255,0.00) 60%,
+                rgba(255,255,255,0.15) 80%,
+                rgba(255,255,255,0.45) 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+        .glass-pill {
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border-radius: 9999px;
+            box-shadow: none !important;
+        }
+
+        /* ── Background video ────────────────────────────────────── */
+        #bg-video-wrap {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        #hero-video {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 1;
+        }
+        #bg-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(160deg, rgba(0,0,0,0.52) 0%, rgba(0,5,18,0.65) 100%);
+        }
+
+        /* ── Navbar ──────────────────────────────────────────────── */
+        #main-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 1.25rem 1.5rem;
+            background: transparent !important;
+            border: none;
+            animation: navSlideDown 0.9s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        @keyframes navSlideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .nav-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.55rem 1.5rem;
+            border-radius: 9999px;
+        }
+        .nav-brand img { height: 38px; width: auto; display: block; }
+        .nav-links {
+            display: flex; align-items: center; gap: 2rem;
+        }
+        .nav-links a, .nav-text-btn {
+            color: rgba(255,255,255,0.80);
+            text-decoration: none;
+            font-size: .85rem;
+            font-weight: 500;
+            transition: color .3s;
+            background: none; border: none; cursor: pointer; padding: 0;
+        }
+        .nav-links a:hover, .nav-text-btn:hover { color: #fff; }
+        .nav-right { display: flex; align-items: center; gap: 1rem; }
+        .nav-login {
+            padding: .45rem 1.4rem;
+            border-radius: 9999px;
+            font-size: .85rem;
+            font-weight: 500;
+            color: #fff;
+            text-decoration: none;
+            transition: opacity .3s;
+        }
+        .nav-login:hover { opacity: .8; color: #fff; }
+        /* Dropdown */
+        .nav-dropdown { position: relative; }
+        .nav-dropdown-toggle { cursor: pointer; }
+        .nav-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 12px);
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 210px;
+            background: rgba(6,10,20,0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0,188,212,0.25);
+            border-radius: 8px;
+            padding: .5rem 0;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            z-index: 200;
+        }
+        .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+        .nav-dropdown-menu a {
+            display: block;
+            padding: .55rem 1.2rem;
+            font-size: .85rem;
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            border-left: 2px solid transparent;
+            transition: all .2s;
+        }
+        .nav-dropdown-menu a:hover {
+            background: rgba(0,188,212,0.10);
+            color: #4dd0e1;
+            border-left-color: #4dd0e1;
+        }
+        /* Mobile nav toggle */
+        .nav-toggler {
+            display: none;
+            background: none; border: none; cursor: pointer;
+            color: rgba(255,255,255,0.85);
+            font-size: 1.4rem; padding: 0;
+        }
+        @media (max-width: 767px) {
+            .nav-links { display: none; }
+            .nav-text-btn { display: none; }
+            .nav-toggler { display: block; }
+        }
+        #mobile-menu {
+            display: none;
+            max-width: 900px;
+            margin: .5rem auto 0;
+            padding: .75rem 1.25rem;
+            border-radius: 14px;
+        }
+        #mobile-menu.open { display: block; }
+        #mobile-menu a {
+            display: block; padding: .6rem .5rem;
+            color: rgba(255,255,255,0.80);
+            font-size: .9rem; font-weight: 500;
+            text-decoration: none; transition: color .2s;
+        }
+        #mobile-menu a:hover { color: #fff; }
+
+        /* ── Hero ────────────────────────────────────────────────── */
+        .hero-section {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 1.5rem 2rem;
+            text-align: center;
+            z-index: 1;
+        }
+        .hero-tagline {
+            font-family: var(--font-sans);
+            font-size: .68rem;
+            font-weight: 500;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.70);
+            margin-bottom: 1.5rem;
+            animation: fadeUp .8s .1s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .hero-heading {
+            font-family: var(--font-serif);
+            font-size: clamp(2.4rem, 6vw, 4.4rem);
+            font-weight: 400;
+            line-height: 1.10;
+            letter-spacing: -.01em;
+            margin: 0 auto 1.5rem;
+            max-width: 860px;
+            background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.95) 60%, rgba(255,255,255,0.65) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeUp 1s .0s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .hero-sub {
+            font-size: .95rem;
+            font-weight: 300;
+            color: rgba(255,255,255,0.55);
+            max-width: 500px;
+            margin: 0 auto 2.5rem;
+            animation: fadeUp .8s .15s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── CTA ─────────────────────────────────────────────────── */
+        #cta-wrap {
+            display: flex;
+            justify-content: center;
+            min-height: 50px;
+            margin-bottom: 2rem;
+            animation: fadeUp .8s .4s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .cta-btn {
+            padding: .72rem 2.5rem;
+            font-size: .88rem;
+            font-weight: 500;
+            font-family: var(--font-sans);
+            background: transparent;
+            color: rgba(255,255,255,0.90);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 9999px;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            transition: border-color .3s, background .3s, transform .2s;
+        }
+        .cta-btn:hover {
+            border-color: rgba(255,255,255,0.34);
+            background: rgba(255,255,255,0.03);
+        }
+        .cta-btn:active { transform: scale(.97); }
+        .cta-form {
+            display: none;
+            align-items: center;
+            gap: .5rem;
+            padding: .4rem .4rem .4rem 1.25rem;
+            font-size: .88rem;
+            font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 9999px;
+            background: rgba(255,255,255,0.02);
+            backdrop-filter: blur(4px);
+            width: 100%;
+            max-width: 340px;
+            transition: border-color .3s;
+            animation: scaleIn .2s ease both;
+        }
+        .cta-form:focus-within { border-color: rgba(255,255,255,0.42); }
+        .cta-form.visible { display: flex; }
+        .cta-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-size: .88rem;
+            font-family: var(--font-sans);
+        }
+        .cta-input::placeholder { color: rgba(255,255,255,0.42); }
+        .cta-submit {
+            width: 36px; height: 36px;
+            border-radius: 9999px;
+            border: none;
+            background: rgba(255,255,255,0.10);
+            color: #fff;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .95rem;
+            transition: background .2s, transform .2s;
+            flex-shrink: 0;
+        }
+        .cta-submit:hover { background: rgba(255,255,255,0.18); }
+        .cta-submit:active { transform: scale(.92); }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(.95); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        .hero-demo-link {
+            font-size: .82rem;
+            font-weight: 500;
+            letter-spacing: .04em;
+            color: rgba(255,255,255,0.55);
+            text-decoration: none;
+            transition: color .3s;
+            animation: fadeUp .8s .8s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .hero-demo-link:hover { color: rgba(255,255,255,0.30); }
+
+        /* ── Projects section ────────────────────────────────────── */
+        #projects {
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            background:
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cg stroke='%2300bcd4' stroke-width='1.2' fill='none' opacity='0.18'%3E%3Cpath d='M0 55H60V28H110V58H160V80H220M0 130H50V105H90V135H170V155H220M0 180H38V160H80V188H220M60 0V28M60 58V95H38V220M110 0V28M110 58V85H132V220M160 0V80M160 108H178V220'/%3E%3Ccircle cx='60' cy='28' r='4'/%3E%3Ccircle cx='110' cy='28' r='4'/%3E%3Ccircle cx='60' cy='58' r='4'/%3E%3Ccircle cx='110' cy='58' r='4'/%3E%3Ccircle cx='160' cy='80' r='4'/%3E%3Ccircle cx='50' cy='130' r='4'/%3E%3Ccircle cx='90' cy='105' r='4'/%3E%3Ccircle cx='170' cy='155' r='4'/%3E%3Ccircle cx='38' cy='160' r='4'/%3E%3Ccircle cx='80' cy='188' r='4'/%3E%3Crect x='102' y='20' width='16' height='16' rx='2'/%3E%3Crect x='42' y='97' width='16' height='16' rx='2'/%3E%3Crect x='152' y='72' width='16' height='16' rx='2'/%3E%3Crect x='162' y='100' width='16' height='16' rx='2'/%3E%3C/g%3E%3Cg fill='%2300bcd4' opacity='0.55'%3E%3Ccircle cx='60' cy='28' r='2.5'/%3E%3Ccircle cx='110' cy='58' r='2.5'/%3E%3Ccircle cx='160' cy='80' r='2.5'/%3E%3Ccircle cx='50' cy='130' r='2.5'/%3E%3Ccircle cx='90' cy='105' r='2.5'/%3E%3Ccircle cx='38' cy='160' r='2.5'/%3E%3C/g%3E%3C/svg%3E"),
+                radial-gradient(ellipse at 10% 50%, rgba(0,80,180,0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 50%, rgba(0,188,212,0.15) 0%, transparent 48%),
+                radial-gradient(ellipse at 50% 0%, rgba(0,50,120,0.2) 0%, transparent 60%),
+                linear-gradient(135deg, #060a12 0%, #0d1117 50%, #091420 100%);
+            background-size: 220px 220px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+        }
+        #projects::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,188,212,0.05) 50%, transparent 100%);
+            background-size: 100% 280px;
+            animation: dc-scan 7s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        #projects > * { position: relative; z-index: 1; }
+        @keyframes dc-scan {
+            0%   { background-position: 0 -280px; }
+            100% { background-position: 0 calc(100% + 280px); }
+        }
+
+        /* ── Cards ───────────────────────────────────────────────── */
+        .project-card {
+            position: relative;
+            overflow: hidden;
+            transition: transform .3s ease, box-shadow .3s ease;
+            cursor: pointer;
+        }
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5) !important;
+        }
+        .project-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center bottom;
+            background-repeat: no-repeat;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .project-card .card-body { position: relative; z-index: 1; }
+        .card-nfv::before         { background-image: radial-gradient(ellipse at 75% 40%, rgba(0,188,212,0.18) 0%, transparent 65%); }
+        .card-power::before       { background-image: radial-gradient(ellipse at 75% 40%, rgba(165,214,167,0.15) 0%, transparent 65%); }
+        .card-transformer::before { background-image: radial-gradient(ellipse at 75% 40%, rgba(255,183,77,0.15) 0%, transparent 65%); }
+        .card-chilled::before     { background-image: radial-gradient(ellipse at 75% 40%, rgba(64,196,255,0.18) 0%, transparent 65%); }
+        .card-fire::before        { background-image: radial-gradient(ellipse at 30% 40%, rgba(255,82,82,0.22) 0%, transparent 65%); }
+
+        /* ── Dropdown (Bootstrap override) ──────────────────────── */
+        .dropdown-menu {
+            background: rgba(6,10,20,0.95) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0,188,212,0.25) !important;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            border-radius: 8px !important;
+            margin-top: 8px !important;
+        }
+        .dropdown-menu .dropdown-item {
+            color: rgba(255,255,255,0.75) !important;
+            font-size: .875rem;
+            padding: .55rem 1.2rem;
+            border-left: 2px solid transparent;
+            transition: all .2s;
+        }
+        .dropdown-menu .dropdown-item:hover {
+            background: rgba(0,188,212,0.10) !important;
+            color: #4dd0e1 !important;
+            border-left-color: #4dd0e1;
+        }
+
+        /* ── Footer ──────────────────────────────────────────────── */
+        footer.bg-dark {
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid rgba(0,188,212,0.25);
+            background-image:
+                radial-gradient(ellipse at 50% 120%, rgba(0,188,212,0.14) 0%, transparent 55%),
+                linear-gradient(rgba(0,188,212,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,188,212,0.025) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+    </style>
 </head>
 
-<body class="d-flex flex-column h-100 bg-dark">
-    <main class="flex-shrink-0">
-        <!-- Navigation-->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-            <div class="container px-5">
-                <a class="navbar-brand" href="index.html"><img src="assets/img/logobrand.png" alt="oblyz.com" style="height:50px;width:auto;"></a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-                        <!-- <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
-                        <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
-                        <li class="nav-item"><a class="nav-link" href="pricing.html">Pricing</a></li>
-                        <li class="nav-item"><a class="nav-link" href="faq.html">FAQ</a></li> -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdownBlog" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">WebApp</a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownBlog">
-                                <li><a class="dropdown-item" href="https://www.kasetfair.com" target="_blank">Repair Air Condition</a></li>
-                                <li><a class="dropdown-item" href="https://www.kasetfair.com/stock" target="_blank">Spare Parts Management System</a></li>
-                                <li><a class="dropdown-item" href="https://www.oblyz.com" target="_blank">PM Planner</a></li>
-                            </ul>
-                        </li>
-                        <!-- <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdownPortfolio" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Portfolio</a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownPortfolio">
-                                <li><a class="dropdown-item" href="portfolio-overview.html">Portfolio Overview</a></li>
-                                <li><a class="dropdown-item" href="portfolio-item.html">Portfolio Item</a></li>
-                            </ul>
-                        </li> -->
-                    </ul>
-                </div>
-            </div>
-        </nav>
-        <!-- Header-->
-        <header class="bg-dark py-5" style="padding-top: calc(76px + 3rem) !important;">
-            <div class="container px-5">
-                <div class="row gx-5 align-items-center justify-content-center">
-                    <div class="col-lg-8 col-xl-7 col-xxl-6">
-                        <div class="my-5 text-center text-xl-start">
-                            <h1 class="display-7 fw-bolder text-white mb-2">นวัตกรรมที่ล้ำสมัยที่สุด คือนวัตกรรมที่ทำให้เรื่องซับซ้อนดูเป็นเรื่องง่าย</h1>
-                            <p class="lead fw-normal text-white-50 mb-4">The most cutting-edge innovation is one that makes complex things look effortless.</p>
-                            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start">
-                                <a class="btn btn-primary btn-lg px-4" href="#projects">สำรวจโปรเจกต์</a>
-                            </div>
+<body>
+    <!-- ── Background video ───────────────────────────────────── -->
+    <div id="bg-video-wrap">
+        <video id="hero-video" autoplay muted loop playsinline></video>
+        <div id="bg-overlay"></div>
+    </div>
+
+    <!-- ── Navbar ────────────────────────────────────────────── -->
+    <nav id="main-nav">
+        <div style="max-width:1200px;margin:0 auto;padding:0 1rem;">
+            <div class="nav-inner liquid-glass">
+                <!-- Logo -->
+                <a href="index.html" class="nav-brand">
+                    <img src="assets/img/logobrand.png" alt="oblyz.com">
+                </a>
+                <!-- Desktop links -->
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <div class="nav-dropdown">
+                        <span class="nav-dropdown-toggle" style="color:rgba(255,255,255,0.8);font-size:.85rem;font-weight:500;cursor:pointer;">WebApp ▾</span>
+                        <div class="nav-dropdown-menu">
+                            <a href="https://www.kasetfair.com" target="_blank">Repair Air Condition</a>
+                            <a href="https://www.kasetfair.com/stock" target="_blank">Spare Parts Management</a>
+                            <a href="https://www.oblyz.com" target="_blank">PM Planner</a>
                         </div>
                     </div>
                 </div>
-            </div>
-        </header>
-        <!-- Projects section -->
-        <section class="py-5" id="projects">
-            <div class="container px-5 my-5">
-                <div class="row gx-5 justify-content-center mb-5">
-                    <div class="col-lg-8 text-center">
-                        <h2 class="fw-bolder text-white mb-3">Central Network Operations</h2>
-                        <p class="lead text-white-50">เลือกหัวข้อที่คุณสนใจ</p>
-                    </div>
-                </div>
-                <div class="row gx-5 justify-content-center">
-                    <!-- Card 1: NFV Room - RAC In-row Cooling -->
-                    <div class="col-lg-4 col-md-6 mb-5">
-                        <a href="nfv_room_toc-rst.html" class="text-decoration-none">
-                            <div class="card h-100 border-0 shadow-lg project-card card-nfv" style="background: linear-gradient(160deg, rgba(8,18,32,0.80) 0%, rgba(5,28,55,0.75) 100%), url('assets/img/pac-vertiv.jpg') center/contain no-repeat; transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer;">
-                                <div class="card-body p-5 text-center">
-                                    <div class="mb-4" style="font-size: 4rem; line-height: 1;">
-                                        <i class="bi bi-wind" style="color: #4dd0e1;"></i>
-                                    </div>
-                                    <div class="badge mb-3 px-3 py-2" style="background: rgba(77,208,225,0.15); color: #4dd0e1; border: 1px solid rgba(77,208,225,0.3); font-size: 0.75rem; letter-spacing: 0.1em;">IN-ROW COOLING</div>
-                                    <h4 class="fw-bold text-white mb-3">NFV Room — RAC Containment</h4>
-                                    <p class="text-white-50 mb-4">In-row Cooling — วิเคราะห์ระบบระบบทำความเย็นภายใน NFV Room</p>
-                                    <span class="btn btn-sm px-4 py-2" style="background: rgba(77,208,225,0.15); color: #4dd0e1; border: 1px solid rgba(77,208,225,0.4); border-radius: 50px;">
-                                        เข้าสู่เนื้อหา <i class="bi bi-arrow-right ms-1"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <!-- Card 2: Power System Simulation -->
-                    <div class="col-lg-4 col-md-6 mb-5">
-                        <a href="power_system_simulation.html" class="text-decoration-none">
-                            <div class="card h-100 border-0 shadow-lg project-card card-power" style="background: linear-gradient(160deg, rgba(8,20,8,0.80) 0%, rgba(10,45,15,0.75) 100%), url('assets/img/generator.jpg') center/contain no-repeat; transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer;">
-                                <div class="card-body p-5 text-center">
-                                    <div class="mb-4" style="font-size: 4rem; line-height: 1;">
-                                        <i class="bi bi-lightning-charge" style="color: #a5d6a7;"></i>
-                                    </div>
-                                    <div class="badge mb-3 px-3 py-2" style="background: rgba(165,214,167,0.15); color: #a5d6a7; border: 1px solid rgba(165,214,167,0.3); font-size: 0.75rem; letter-spacing: 0.1em;">ENERGY</div>
-                                    <h4 class="fw-bold text-white mb-3">Power System Simulation</h4>
-                                    <p class="text-white-50 mb-4">จำลองระบบไฟฟ้ากำลัง — วิเคราะห์ระบบจ่ายไฟ TOC-RST</p>
-                                    <span class="btn btn-sm px-4 py-2" style="background: rgba(165,214,167,0.15); color: #a5d6a7; border: 1px solid rgba(165,214,167,0.4); border-radius: 50px;">
-                                        เข้าสู่เนื้อหา <i class="bi bi-arrow-right ms-1"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <!-- Card 4: Chilled Water Cooled -->
-                    <div class="col-lg-4 col-md-6 mb-5">
-                        <a href="Chilled_Water_Cooled.html" class="text-decoration-none">
-                            <div class="card h-100 border-0 shadow-lg project-card card-chilled" style="background: linear-gradient(160deg, rgba(0,15,30,0.85) 0%, rgba(0,40,70,0.80) 100%), url('assets/img/chiller.jpg') center/cover no-repeat; transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer;">
-                                <div class="card-body p-5 text-center">
-                                    <div class="mb-4" style="font-size: 4rem; line-height: 1;">
-                                        <i class="bi bi-thermometer-snow" style="color: #40c4ff;"></i>
-                                    </div>
-                                    <div class="badge mb-3 px-3 py-2" style="background: rgba(64,196,255,0.15); color: #40c4ff; border: 1px solid rgba(64,196,255,0.3); font-size: 0.75rem; letter-spacing: 0.1em;">MECHANICAL COOLING</div>
-                                    <h4 class="fw-bold text-white mb-3">Chilled Water Cooled</h4>
-                                    <p class="text-white-50 mb-4">ระบบทำความเย็นแบบ Chilled Water — Chiller, Cooling Tower, CDP &amp; CHP Pumps</p>
-                                    <span class="btn btn-sm px-4 py-2" style="background: rgba(64,196,255,0.15); color: #40c4ff; border: 1px solid rgba(64,196,255,0.4); border-radius: 50px;">
-                                        เข้าสู่เนื้อหา <i class="bi bi-arrow-right ms-1"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Card 5: Fire Alarm & Suppression -->
-                    <div class="col-lg-4 col-md-6 mb-5">
-                        <a href="firealarm.html" class="text-decoration-none">
-                            <div class="card h-100 border-0 shadow-lg project-card card-fire" style="background: linear-gradient(160deg, rgba(30,5,5,0.88) 0%, rgba(80,10,10,0.82) 100%); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer;">
-                                <div class="card-body p-5 text-center">
-                                    <div class="mb-4" style="font-size: 4rem; line-height: 1;">
-                                        <i class="bi bi-fire" style="color: #ff5252;"></i>
-                                    </div>
-                                    <div class="badge mb-3 px-3 py-2" style="background: rgba(255,82,82,0.15); color: #ff5252; border: 1px solid rgba(255,82,82,0.3); font-size: 0.75rem; letter-spacing: 0.1em;">FIRE SAFETY SYSTEM</div>
-                                    <h4 class="fw-bold text-white mb-3">Fire Alarm &amp; Suppression</h4>
-                                    <p class="text-white-50 mb-4">ระบบแจ้งเตือนอัคคีภัย FACP — FM-200 Clean Agent Suppression พร้อม Discharge Sequence</p>
-                                    <span class="btn btn-sm px-4 py-2" style="background: rgba(255,82,82,0.15); color: #ff5252; border: 1px solid rgba(255,82,82,0.4); border-radius: 50px;">
-                                        เข้าสู่เนื้อหา <i class="bi bi-arrow-right ms-1"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Card 3: Transformer Simulation -->
-                    <div class="col-lg-4 col-md-6 mb-5">
-                        <a href="transformer_simulation.html" class="text-decoration-none">
-                            <div class="card h-100 border-0 shadow-lg project-card card-transformer" style="background: linear-gradient(160deg, rgba(25,15,5,0.80) 0%, rgba(60,30,5,0.75) 100%), url('assets/img/Transformer.jpg') center/contain no-repeat; transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer;">
-                                <div class="card-body p-5 text-center">
-                                    <div class="mb-4" style="font-size: 4rem; line-height: 1;">
-                                        <i class="bi bi-cpu" style="color: #ffb74d;"></i>
-                                    </div>
-                                    <div class="badge mb-3 px-3 py-2" style="background: rgba(255,183,77,0.15); color: #ffb74d; border: 1px solid rgba(255,183,77,0.3); font-size: 0.75rem; letter-spacing: 0.1em;">POWER TRANSFORMATION</div>
-                                    <h4 class="fw-bold text-white mb-3">Transformer Simulation</h4>
-                                    <p class="text-white-50 mb-4">หม้อแปลงไฟฟ้า — จำลองการทำงานของหม้อแปลงในระบบไฟฟ้า</p>
-                                    <span class="btn btn-sm px-4 py-2" style="background: rgba(255,183,77,0.15); color: #ffb74d; border: 1px solid rgba(255,183,77,0.4); border-radius: 50px;">
-                                        เข้าสู่เนื้อหา <i class="bi bi-arrow-right ms-1"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
+                <!-- Right side -->
+                <div class="nav-right">
+                    <button class="nav-text-btn">Sign Up</button>
+                    <a href="#" class="nav-login liquid-glass">Login</a>
+                    <button class="nav-toggler" onclick="toggleMobileMenu()" aria-label="menu">
+                        <i class="bi bi-list"></i>
+                    </button>
                 </div>
             </div>
-        </section>
-        <style>
-            * { font-family: 'Noto Sans Thai', sans-serif !important; }
-            footer.bg-dark {
-                position: relative;
-                border-top: 1px solid rgba(0,188,212,0.25);
-                background-image:
-                    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='100' viewBox='0 0 600 100'%3E%3Cg stroke='%234dd0e1' stroke-width='0.6' fill='none' opacity='0.13'%3E%3Cline x1='0' y1='82' x2='600' y2='82'/%3E%3Cline x1='0' y1='90' x2='600' y2='90'/%3E%3Cline x1='0' y1='98' x2='600' y2='98'/%3E%3Cline x1='50' y1='76' x2='50' y2='100'/%3E%3Cline x1='100' y1='76' x2='100' y2='100'/%3E%3Cline x1='150' y1='76' x2='150' y2='100'/%3E%3Cline x1='200' y1='76' x2='200' y2='100'/%3E%3Cline x1='250' y1='76' x2='250' y2='100'/%3E%3Cline x1='300' y1='76' x2='300' y2='100'/%3E%3Cline x1='350' y1='76' x2='350' y2='100'/%3E%3Cline x1='400' y1='76' x2='400' y2='100'/%3E%3Cline x1='450' y1='76' x2='450' y2='100'/%3E%3Cline x1='500' y1='76' x2='500' y2='100'/%3E%3Cline x1='550' y1='76' x2='550' y2='100'/%3E%3C/g%3E%3Cg stroke='%234dd0e1' stroke-width='1.3' fill='none' opacity='0.22'%3E%3Cline x1='100' y1='4' x2='100' y2='38'/%3E%3Cline x1='76' y1='38' x2='124' y2='38'/%3E%3Cline x1='82' y1='48' x2='118' y2='48'/%3E%3Cline x1='88' y1='58' x2='112' y2='58'/%3E%3C/g%3E%3Cg stroke='%234dd0e1' stroke-width='1.3' fill='none' opacity='0.22'%3E%3Cline x1='300' y1='4' x2='300' y2='38'/%3E%3Cline x1='276' y1='38' x2='324' y2='38'/%3E%3Cline x1='282' y1='48' x2='318' y2='48'/%3E%3Cline x1='288' y1='58' x2='312' y2='58'/%3E%3C/g%3E%3Cg stroke='%234dd0e1' stroke-width='1.3' fill='none' opacity='0.22'%3E%3Cline x1='500' y1='4' x2='500' y2='38'/%3E%3Cline x1='476' y1='38' x2='524' y2='38'/%3E%3Cline x1='482' y1='48' x2='518' y2='48'/%3E%3Cline x1='488' y1='58' x2='512' y2='58'/%3E%3C/g%3E%3Cg stroke='%234dd0e1' stroke-width='0.9' fill='none' opacity='0.14'%3E%3Cpath d='M0 14 H76'/%3E%3Cpath d='M124 4 H200 V18 H276'/%3E%3Cpath d='M324 4 H400 V18 H476'/%3E%3Cpath d='M524 4 H600'/%3E%3C/g%3E%3Cg stroke='%234dd0e1' stroke-width='0.9' fill='none' opacity='0.1'%3E%3Cpath d='M210 100 A90 38 0 0 1 390 100'/%3E%3Cpath d='M160 100 A140 55 0 0 1 440 100'/%3E%3Cpath d='M90 100 A210 72 0 0 1 510 100'/%3E%3C/g%3E%3Cg fill='%234dd0e1' opacity='0.5'%3E%3Ccircle cx='100' cy='4' r='2.5'/%3E%3Ccircle cx='300' cy='4' r='2.5'/%3E%3Ccircle cx='500' cy='4' r='2.5'/%3E%3Ccircle cx='200' cy='18' r='2'/%3E%3Ccircle cx='400' cy='18' r='2'/%3E%3C/g%3E%3C/svg%3E"),
-                    radial-gradient(ellipse at 50% 120%, rgba(0,188,212,0.14) 0%, transparent 55%),
-                    linear-gradient(rgba(0,188,212,0.025) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(0,188,212,0.025) 1px, transparent 1px);
-                background-size: 600px 100px, 100% 100%, 40px 40px, 40px 40px;
-            }
-            .dropdown-menu {
-                background: rgba(6, 10, 20, 0.95) !important;
-                backdrop-filter: blur(16px);
-                -webkit-backdrop-filter: blur(16px);
-                border: 1px solid rgba(0, 188, 212, 0.25) !important;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 20px rgba(0,188,212,0.06);
-                background-image:
-                    linear-gradient(rgba(0,188,212,0.03) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(0,188,212,0.03) 1px, transparent 1px) !important;
-                background-size: 30px 30px !important;
-                border-radius: 6px !important;
-                margin-top: 6px !important;
-            }
-            .dropdown-menu .dropdown-item {
-                color: rgba(255,255,255,0.75) !important;
-                font-size: 0.9rem;
-                padding: 0.6rem 1.2rem;
-                border-left: 2px solid transparent;
-                transition: all 0.2s ease;
-            }
-            .dropdown-menu .dropdown-item:hover {
-                background: rgba(0,188,212,0.1) !important;
-                color: #4dd0e1 !important;
-                border-left-color: #4dd0e1;
-            }
-            .dropdown-divider {
-                border-color: rgba(0,188,212,0.15) !important;
-            }
-            .card-nfv, .card-power, .card-transformer, .card-chilled, .card-fire, .card-cac {
-                position: relative;
-                overflow: hidden;
-            }
-            .card-nfv::before, .card-power::before, .card-transformer::before, .card-chilled::before, .card-fire::before, .card-cac::before {
-                content: '';
-                position: absolute;
-                inset: 0;
-                background-size: cover;
-                background-position: center bottom;
-                background-repeat: no-repeat;
-                pointer-events: none;
-                z-index: 0;
-            }
-            .card-nfv .card-body, .card-power .card-body, .card-transformer .card-body, .card-chilled .card-body, .card-fire .card-body, .card-cac .card-body {
-                position: relative;
-                z-index: 1;
-            }
-            .card-nfv::before {
-                background-image: radial-gradient(ellipse at 75% 40%, rgba(0,188,212,0.18) 0%, transparent 65%);
-            }
-            .card-power::before {
-                background-image: radial-gradient(ellipse at 75% 40%, rgba(165,214,167,0.15) 0%, transparent 65%);
-            }
-            .card-transformer::before {
-                background-image: radial-gradient(ellipse at 75% 40%, rgba(255,183,77,0.15) 0%, transparent 65%);
-            }
-            .card-chilled::before {
-                background-image: radial-gradient(ellipse at 75% 40%, rgba(64,196,255,0.18) 0%, transparent 65%);
-            }
-            .card-fire::before {
-                background-image: radial-gradient(ellipse at 30% 40%, rgba(255,82,82,0.22) 0%, transparent 65%);
-            }
-            .card-cac::before {
-                background-image: radial-gradient(ellipse at 70% 35%, rgba(29,233,182,0.20) 0%, transparent 65%);
-            }
-            .project-card:hover {
-                transform: translateY(-8px);
-                box-shadow: 0 20px 40px rgba(0,0,0,0.5) !important;
-            }
-            nav.navbar {
-                position: fixed !important;
-                background: rgba(6, 10, 20, 0.85) !important;
-                backdrop-filter: blur(16px);
-                -webkit-backdrop-filter: blur(16px);
-                border-bottom: 1px solid rgba(0, 188, 212, 0.2);
-                box-shadow: 0 4px 30px rgba(0,0,0,0.5), 0 0 60px rgba(0,188,212,0.04);
-                background-image:
-                    linear-gradient(rgba(0,188,212,0.03) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(0,188,212,0.03) 1px, transparent 1px) !important;
-                background-size: 40px 40px !important;
-            }
-            nav.navbar::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 1px;
-                background: linear-gradient(90deg, transparent 0%, rgba(0,188,212,0.6) 30%, rgba(0,188,212,0.8) 50%, rgba(0,188,212,0.6) 70%, transparent 100%);
-            }
-            header.bg-dark {
-                background-image:
-                    radial-gradient(circle, rgba(0,188,212,0.15) 1px, transparent 1px),
-                    linear-gradient(rgba(0,188,212,0.04) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(0,188,212,0.04) 1px, transparent 1px),
-                    radial-gradient(ellipse at 15% 70%, rgba(0,60,160,0.35) 0%, transparent 50%),
-                    radial-gradient(ellipse at 85% 15%, rgba(0,188,212,0.1) 0%, transparent 40%);
-                background-size: 40px 40px, 40px 40px, 40px 40px, 100% 100%, 100% 100%;
-            }
-            #projects {
-                position: relative;
-                overflow: hidden;
-                background:
-                    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cg stroke='%2300bcd4' stroke-width='1.2' fill='none' opacity='0.18'%3E%3Cpath d='M0 55H60V28H110V58H160V80H220M0 130H50V105H90V135H170V155H220M0 180H38V160H80V188H220M60 0V28M60 58V95H38V220M110 0V28M110 58V85H132V220M160 0V80M160 108H178V220'/%3E%3Ccircle cx='60' cy='28' r='4'/%3E%3Ccircle cx='110' cy='28' r='4'/%3E%3Ccircle cx='60' cy='58' r='4'/%3E%3Ccircle cx='110' cy='58' r='4'/%3E%3Ccircle cx='160' cy='80' r='4'/%3E%3Ccircle cx='50' cy='130' r='4'/%3E%3Ccircle cx='90' cy='105' r='4'/%3E%3Ccircle cx='170' cy='155' r='4'/%3E%3Ccircle cx='38' cy='160' r='4'/%3E%3Ccircle cx='80' cy='188' r='4'/%3E%3Crect x='102' y='20' width='16' height='16' rx='2'/%3E%3Crect x='42' y='97' width='16' height='16' rx='2'/%3E%3Crect x='152' y='72' width='16' height='16' rx='2'/%3E%3Crect x='162' y='100' width='16' height='16' rx='2'/%3E%3C/g%3E%3Cg fill='%2300bcd4' opacity='0.55'%3E%3Ccircle cx='60' cy='28' r='2.5'/%3E%3Ccircle cx='110' cy='58' r='2.5'/%3E%3Ccircle cx='160' cy='80' r='2.5'/%3E%3Ccircle cx='50' cy='130' r='2.5'/%3E%3Ccircle cx='90' cy='105' r='2.5'/%3E%3Ccircle cx='38' cy='160' r='2.5'/%3E%3C/g%3E%3C/svg%3E"),
-                    radial-gradient(ellipse at 10% 50%, rgba(0,80,180,0.3) 0%, transparent 50%),
-                    radial-gradient(ellipse at 90% 50%, rgba(0,188,212,0.15) 0%, transparent 48%),
-                    radial-gradient(ellipse at 50% 0%, rgba(0,50,120,0.2) 0%, transparent 60%),
-                    linear-gradient(135deg, #060a12 0%, #0d1117 50%, #091420 100%) !important;
-                background-size: 220px 220px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
-            }
-            #projects::before {
-                content: '';
-                position: absolute;
-                inset: 0;
-                background: linear-gradient(180deg, transparent 0%, rgba(0,188,212,0.05) 50%, transparent 100%);
-                background-size: 100% 280px;
-                animation: dc-scan 7s linear infinite;
-                pointer-events: none;
-                z-index: 0;
-            }
-            #projects > * { position: relative; z-index: 1; }
-            @keyframes dc-scan {
-                0%   { background-position: 0 -280px; }
-                100% { background-position: 0 calc(100% + 280px); }
-            }
-        </style>
-    </main>
-    <!-- Footer-->
-    <footer class="bg-dark py-4 mt-auto">
+            <!-- Mobile menu -->
+            <div id="mobile-menu" class="liquid-glass">
+                <a href="index.html">Home</a>
+                <a href="https://www.kasetfair.com" target="_blank">Repair Air Condition</a>
+                <a href="https://www.kasetfair.com/stock" target="_blank">Spare Parts Management</a>
+                <a href="https://www.oblyz.com" target="_blank">PM Planner</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── Hero ──────────────────────────────────────────────── -->
+    <section class="hero-section">
+        <div style="position:relative;z-index:2;text-align:center;width:100%;max-width:900px;">
+            <p class="hero-tagline">DATA CENTER FACILITY SIMULATION</p>
+            <h1 class="hero-heading">
+                นวัตกรรมที่ล้ำสมัยที่สุด<br>
+                คือนวัตกรรมที่ทำให้เรื่องซับซ้อน<br>
+                ดูเป็นเรื่องง่าย
+            </h1>
+            <p class="hero-sub">The most cutting-edge innovation is one that makes complex things look effortless.</p>
+
+            <!-- CTA area -->
+            <div id="cta-wrap">
+                <button class="cta-btn" id="cta-open" onclick="openEmailForm()">สำรวจโปรเจกต์</button>
+                <form class="cta-form" id="cta-form" onsubmit="submitEmail(event)" autocomplete="off">
+                    <input type="email" id="cta-input" class="cta-input" placeholder="" />
+                    <button type="submit" class="cta-submit" id="cta-submit">
+                        <i class="bi bi-arrow-right" id="cta-icon"></i>
+                    </button>
+                </form>
+            </div>
+
+            <a href="#projects" class="hero-demo-link">
+                <i class="bi bi-play-circle me-1"></i>Play Video Demo
+            </a>
+        </div>
+    </section>
+
+    <!-- ── Projects ──────────────────────────────────────────── -->
+    <section class="py-5" id="projects">
+        <div class="container px-5 my-5">
+            <div class="row gx-5 justify-content-center mb-5">
+                <div class="col-lg-8 text-center">
+                    <h2 class="fw-bolder text-white mb-3" style="font-family:var(--font-sans);">Central Network Operations</h2>
+                    <p class="lead text-white-50">เลือกหัวข้อที่คุณสนใจ</p>
+                </div>
+            </div>
+            <div class="row gx-5 justify-content-center">
+
+                <!-- Card 1: NFV Room -->
+                <div class="col-lg-4 col-md-6 mb-5">
+                    <a href="nfv_room_toc-rst.html" class="text-decoration-none">
+                        <div class="card h-100 border-0 shadow-lg project-card card-nfv" style="background: linear-gradient(160deg, rgba(8,18,32,0.80) 0%, rgba(5,28,55,0.75) 100%), url('assets/img/pac-vertiv.jpg') center/contain no-repeat;">
+                            <div class="card-body p-5 text-center">
+                                <div class="mb-4" style="font-size:4rem;line-height:1;"><i class="bi bi-wind" style="color:#4dd0e1;"></i></div>
+                                <div class="badge mb-3 px-3 py-2" style="background:rgba(77,208,225,0.15);color:#4dd0e1;border:1px solid rgba(77,208,225,0.3);font-size:.75rem;letter-spacing:.1em;">IN-ROW COOLING</div>
+                                <h4 class="fw-bold text-white mb-3">NFV Room — RAC Containment</h4>
+                                <p class="text-white-50 mb-4">In-row Cooling — วิเคราะห์ระบบทำความเย็นภายใน NFV Room</p>
+                                <span class="btn btn-sm px-4 py-2" style="background:rgba(77,208,225,0.15);color:#4dd0e1;border:1px solid rgba(77,208,225,0.4);border-radius:50px;">เข้าสู่เนื้อหา <i class="bi bi-arrow-right ms-1"></i></span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Card 2: Power System -->
+                <div class="col-lg-4 col-md-6 mb-5">
+                    <a href="power_system_simulation.html" class="text-decoration-none">
+                        <div class="card h-100 border-0 shadow-lg project-card card-power" style="background: linear-gradient(160deg, rgba(8,20,8,0.80) 0%, rgba(10,45,15,0.75) 100%), url('assets/img/generator.jpg') center/contain no-repeat;">
+                            <div class="card-body p-5 text-center">
+                                <div class="mb-4" style="font-size:4rem;line-height:1;"><i class="bi bi-lightning-charge" style="color:#a5d6a7;"></i></div>
+                                <div class="badge mb-3 px-3 py-2" style="background:rgba(165,214,167,0.15);color:#a5d6a7;border:1px solid rgba(165,214,167,0.3);font-size:.75rem;letter-spacing:.1em;">ENERGY</div>
+                                <h4 class="fw-bold text-white mb-3">Power System Simulation</h4>
+                                <p class="text-white-50 mb-4">จำลองระบบไฟฟ้ากำลัง — วิเคราะห์ระบบจ่ายไฟ TOC-RST</p>
+                                <span class="btn btn-sm px-4 py-2" style="background:rgba(165,214,167,0.15);color:#a5d6a7;border:1px solid rgba(165,214,167,0.4);border-radius:50px;">เข้าสู่เนื้อหา <i class="bi bi-arrow-right ms-1"></i></span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Card 3: Chilled Water Cooled -->
+                <div class="col-lg-4 col-md-6 mb-5">
+                    <a href="Chilled_Water_Cooled.html" class="text-decoration-none">
+                        <div class="card h-100 border-0 shadow-lg project-card card-chilled" style="background: linear-gradient(160deg, rgba(0,15,30,0.85) 0%, rgba(0,40,70,0.80) 100%), url('assets/img/chiller.jpg') center/cover no-repeat;">
+                            <div class="card-body p-5 text-center">
+                                <div class="mb-4" style="font-size:4rem;line-height:1;"><i class="bi bi-thermometer-snow" style="color:#40c4ff;"></i></div>
+                                <div class="badge mb-3 px-3 py-2" style="background:rgba(64,196,255,0.15);color:#40c4ff;border:1px solid rgba(64,196,255,0.3);font-size:.75rem;letter-spacing:.1em;">MECHANICAL COOLING</div>
+                                <h4 class="fw-bold text-white mb-3">Chilled Water Cooled</h4>
+                                <p class="text-white-50 mb-4">ระบบทำความเย็นแบบ Chilled Water — Chiller, Cooling Tower, CDP &amp; CHP Pumps</p>
+                                <span class="btn btn-sm px-4 py-2" style="background:rgba(64,196,255,0.15);color:#40c4ff;border:1px solid rgba(64,196,255,0.4);border-radius:50px;">เข้าสู่เนื้อหา <i class="bi bi-arrow-right ms-1"></i></span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Card 4: Fire Alarm & Suppression -->
+                <div class="col-lg-4 col-md-6 mb-5">
+                    <a href="firealarm.html" class="text-decoration-none">
+                        <div class="card h-100 border-0 shadow-lg project-card card-fire" style="background: linear-gradient(160deg, rgba(30,5,5,0.88) 0%, rgba(80,10,10,0.82) 100%);">
+                            <div class="card-body p-5 text-center">
+                                <div class="mb-4" style="font-size:4rem;line-height:1;"><i class="bi bi-fire" style="color:#ff5252;"></i></div>
+                                <div class="badge mb-3 px-3 py-2" style="background:rgba(255,82,82,0.15);color:#ff5252;border:1px solid rgba(255,82,82,0.3);font-size:.75rem;letter-spacing:.1em;">FIRE SAFETY SYSTEM</div>
+                                <h4 class="fw-bold text-white mb-3">Fire Alarm &amp; Suppression</h4>
+                                <p class="text-white-50 mb-4">ระบบแจ้งเตือนอัคคีภัย FACP — FM-200 Clean Agent Suppression พร้อม Discharge Sequence</p>
+                                <span class="btn btn-sm px-4 py-2" style="background:rgba(255,82,82,0.15);color:#ff5252;border:1px solid rgba(255,82,82,0.4);border-radius:50px;">เข้าสู่เนื้อหา <i class="bi bi-arrow-right ms-1"></i></span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Card 5: Transformer -->
+                <div class="col-lg-4 col-md-6 mb-5">
+                    <a href="transformer_simulation.html" class="text-decoration-none">
+                        <div class="card h-100 border-0 shadow-lg project-card card-transformer" style="background: linear-gradient(160deg, rgba(25,15,5,0.80) 0%, rgba(60,30,5,0.75) 100%), url('assets/img/Transformer.jpg') center/contain no-repeat;">
+                            <div class="card-body p-5 text-center">
+                                <div class="mb-4" style="font-size:4rem;line-height:1;"><i class="bi bi-cpu" style="color:#ffb74d;"></i></div>
+                                <div class="badge mb-3 px-3 py-2" style="background:rgba(255,183,77,0.15);color:#ffb74d;border:1px solid rgba(255,183,77,0.3);font-size:.75rem;letter-spacing:.1em;">POWER TRANSFORMATION</div>
+                                <h4 class="fw-bold text-white mb-3">Transformer Simulation</h4>
+                                <p class="text-white-50 mb-4">หม้อแปลงไฟฟ้า — จำลองการทำงานของหม้อแปลงในระบบไฟฟ้า</p>
+                                <span class="btn btn-sm px-4 py-2" style="background:rgba(255,183,77,0.15);color:#ffb74d;border:1px solid rgba(255,183,77,0.4);border-radius:50px;">เข้าสู่เนื้อหา <i class="bi bi-arrow-right ms-1"></i></span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Footer ────────────────────────────────────────────── -->
+    <footer class="bg-dark py-4">
         <div class="container px-5">
             <div class="row align-items-center justify-content-between flex-column flex-sm-row">
-                <div class="col-auto">
-                    <div class="small m-0 text-white">Copyright &copy; OBLYZ.com 2026</div>
-                </div>
+                <div class="col-auto"><div class="small m-0 text-white">Copyright &copy; OBLYZ.com 2026</div></div>
                 <div class="col-auto">
                     <a class="link-light small" href="#!">Privacy</a>
                     <span class="text-white mx-1">&middot;</span>
@@ -326,10 +603,88 @@
             </div>
         </div>
     </footer>
-    <!-- Bootstrap core JS-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Core theme JS-->
-    <script src="js/scripts.js"></script>
-</body>
 
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core JS -->
+    <script src="js/scripts.js"></script>
+
+    <script>
+    // ── HLS video ──────────────────────────────────────────────
+    (function(){
+        const video = document.getElementById('hero-video');
+        const src   = 'https://stream.mux.com/kimF2ha9zLrX64H00UgLGPflCzNtl1T0215MlAmeOztv8.m3u8';
+        if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = src;
+        } else if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(src);
+            hls.attachMedia(video);
+        }
+    })();
+
+    // ── Mobile nav toggle ──────────────────────────────────────
+    function toggleMobileMenu(){
+        const m = document.getElementById('mobile-menu');
+        m.classList.toggle('open');
+    }
+
+    // ── Typewriter helper ──────────────────────────────────────
+    let typeTimer = null;
+    function typeInto(el, text, speed, done){
+        el.placeholder = '';
+        let i = 0;
+        clearInterval(typeTimer);
+        typeTimer = setInterval(function(){
+            el.placeholder += text[i++];
+            if(i >= text.length){ clearInterval(typeTimer); if(done) done(); }
+        }, speed);
+    }
+
+    // ── CTA open / close ──────────────────────────────────────
+    let ctaOpen = false, ctaDone = false;
+    function openEmailForm(){
+        if(ctaOpen) return;
+        ctaOpen = true;
+        const btn  = document.getElementById('cta-open');
+        const form = document.getElementById('cta-form');
+        const inp  = document.getElementById('cta-input');
+        btn.style.display  = 'none';
+        form.classList.add('visible');
+        inp.focus();
+        typeInto(inp, 'Enter Your Email Here For Early Access', 55);
+    }
+    function closeCTA(){
+        ctaOpen = false; ctaDone = false;
+        const btn  = document.getElementById('cta-open');
+        const form = document.getElementById('cta-form');
+        const inp  = document.getElementById('cta-input');
+        const icon = document.getElementById('cta-icon');
+        form.classList.remove('visible');
+        form.style.display = '';
+        btn.style.display  = '';
+        inp.value = '';
+        inp.placeholder = '';
+        icon.className = 'bi bi-arrow-right';
+        clearInterval(typeTimer);
+    }
+    function submitEmail(e){
+        e.preventDefault();
+        if(ctaDone) return;
+        ctaDone = true;
+        const icon = document.getElementById('cta-icon');
+        const inp  = document.getElementById('cta-input');
+        icon.className = 'bi bi-check';
+        inp.value = '';
+        typeInto(inp, 'You Will Receive Notifications By Email', 45, function(){
+            setTimeout(closeCTA, 4000);
+        });
+    }
+
+    // Smooth scroll for hero "สำรวจโปรเจกต์" button fallback
+    document.getElementById('cta-open').addEventListener('click', function(){
+        // small delay so form can open first; hero click → open form
+    });
+    </script>
+</body>
 </html>
