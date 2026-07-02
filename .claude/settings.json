@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(npx --version)",
+      "Bash(where npx *)",
+      "Bash(npx --yes http-server -p 8843 -s)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8843/index.html)",
+      "Bash(chromium-cli --help)",
+      "Bash(node -e \"require.resolve\\('playwright'\\)\")",
+      "Bash(npm ls *)",
+      "Bash(npx --yes playwright --version)",
+      "Bash(command -v magick convert)",
+      "Bash(convert 'C:\\\\Users\\\\Suthas\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--OneDrive-Documents-GitHub-toc-rst\\\\e1cbd6d9-b7c1-4a37-8b5c-f59f2efbcbbf\\\\scratchpad/logo.png' -crop 420x70+140+0 +repage 'C:\\\\Users\\\\Suthas\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--OneDrive-Documents-GitHub-toc-rst\\\\e1cbd6d9-b7c1-4a37-8b5c-f59f2efbcbbf\\\\scratchpad/logo_crop.png')"
+    ]
+  }
+}
