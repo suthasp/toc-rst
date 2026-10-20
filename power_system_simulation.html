@@ -135,13 +135,19 @@ h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.
   opacity:.7;text-align:center;margin:4px 0 6px;}
 .section-label{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);
   margin:6px 0 4px;padding-left:2px;}
+.sub-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.sub-header{font-size:10px;font-weight:700;color:var(--purple);text-align:center;
+  padding:3px 0 5px;border-bottom:1px dashed rgba(206,147,216,.3);margin-bottom:4px;}
+.gen-note{margin-bottom:4px;font-size:9px;text-align:center;}
+.gen-note.ok{color:var(--green);}
+.gen-note.risk{color:var(--red);animation:blink .8s infinite;}
 
 /* Generator brand + PM info row */
-.gen-info-row{display:flex;justify-content:space-between;align-items:center;
+.gen-info-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:2px 6px;
   margin-top:4px;padding:3px 5px;border-radius:4px;
   background:rgba(255,152,0,.07);border:1px solid rgba(255,152,0,.18);}
 .gen-brand{font-size:9px;color:var(--orange);font-weight:600;letter-spacing:.3px;}
-.gen-pm{font-size:9px;color:rgba(255,152,0,.65);}
+.gen-pm{font-size:9px;color:rgba(255,152,0,.65);white-space:nowrap;}
 
 /* Alert badge */
 .alert-badge{background:rgba(255,82,82,.15);border:1px solid var(--red);border-radius:4px;
@@ -220,6 +226,7 @@ h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.
 @media (max-width:768px){
   .sections-grid{grid-template-columns:1fr;min-width:0;}
   .area.a1314{grid-column:auto;}
+  .sub-grid{grid-template-columns:1fr;}
   header{padding:8px 12px;}
   .logo-icon{width:34px;height:34px;font-size:18px;}
   h1{font-size:13px;}
@@ -317,10 +324,10 @@ h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.
 <div class="alert-strip" id="alertStrip">
   <div class="alert-dot"></div>
   <strong>⚠ ALERT:</strong>
-  <span id="alertMsg">Single Generator overload detected — Area 12 (91.1%) &amp; Area 13-14 (92.6%) exceed 80% threshold when running on single GEN.</span>
+  <span id="alertMsg"></span>
 </div>
 
-<!-- ── STATS BAR ── -->
+<!-- ── STATS BAR ── (ค่าคำนวณจาก DB ใน script) -->
 <div class="stats-bar">
   <div class="stat">
     <div class="stat-name">โหมดปัจจุบัน</div>
@@ -328,38 +335,33 @@ h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.
     <div class="stat-sub" id="statModeSub">PEA 22kV Active</div>
   </div>
   <div class="stat">
-    <div class="stat-name">Total TR Load</div>
-    <div class="stat-val s-blue">4,996 <span style="font-size:11px">KVA</span></div>
-    <div class="stat-sub">จาก 14,000 KVA (35.7%)</div>
+    <div class="stat-name">TR Capacity</div>
+    <div class="stat-val s-blue" id="statTrCap">—</div>
+    <div class="stat-sub" id="statTrCapSub">—</div>
   </div>
   <div class="stat">
-    <div class="stat-name">Total TR Power</div>
-    <div class="stat-val s-green">5,494 <span style="font-size:11px">KW</span></div>
-    <div class="stat-sub">จาก 11,200 KW max</div>
+    <div class="stat-name">TR Actual Load</div>
+    <div class="stat-val s-green" id="statTrLoad">—</div>
+    <div class="stat-sub" id="statTrLoadSub">—</div>
   </div>
   <div class="stat">
-    <div class="stat-name">Total GEN Load</div>
-    <div class="stat-val s-orange">4,811 <span style="font-size:11px">KW</span></div>
-    <div class="stat-sub">จาก 11,200 KW max (42.9%)</div>
+    <div class="stat-name">GEN Capacity</div>
+    <div class="stat-val s-orange" id="statGenCap">—</div>
+    <div class="stat-sub" id="statGenCapSub">—</div>
   </div>
   <div class="stat">
-    <div class="stat-name">Transformers</div>
-    <div class="stat-val s-green">8 <span style="font-size:11px">Units</span></div>
-    <div class="stat-sub">TR7,TR8,TR1,TR2,TR3,TR5,TR4,TR6</div>
-  </div>
-  <div class="stat">
-    <div class="stat-name">Generators</div>
-    <div class="stat-val s-orange">7 <span style="font-size:11px">Units</span></div>
-    <div class="stat-sub">GEN1–GEN7 (Standby)</div>
+    <div class="stat-name">GEN Actual Load</div>
+    <div class="stat-val s-orange" id="statGenLoad">—</div>
+    <div class="stat-sub" id="statGenLoadSub">—</div>
   </div>
   <div class="stat">
     <div class="stat-name">Single GEN Risk</div>
-    <div class="stat-val s-red">2 <span style="font-size:11px">Areas</span></div>
-    <div class="stat-sub">A12: 91.1% | A13-14: 92.6%</div>
+    <div class="stat-val s-red" id="statRisk">—</div>
+    <div class="stat-sub" id="statRiskSub">—</div>
   </div>
 </div>
 
-<!-- ── MAIN DIAGRAM ── -->
+<!-- ── MAIN DIAGRAM ── (เนื้อหาในแต่ละ .comp ถูก render จาก DB) -->
 <div class="main">
 <div class="sections-grid">
 
@@ -382,82 +384,34 @@ h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.
     <!-- TRs -->
     <div class="section-label">🔄 Transformer (Step Down: 22kV → 400V)</div>
     <div class="comp-pair">
-      <div class="comp c-tr" id="tr7" onclick="showDetail('tr7')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr7-led"></span>TR7</span><span class="comp-cap">2,000 KVA / 1,600 KW</span></div>
-        <div class="comp-row2"><span>Used: 761 KVA</span><span>MDB12A → 697 KW</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" id="tr7-bar" style="width:38.1%"></div></div>
-        <div class="load-pct" id="tr7-pct"><span style="color:var(--green)">38.1%</span> Load</div>
-      </div>
-      <div class="comp c-tr" id="tr8" onclick="showDetail('tr8')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr8-led"></span>TR8</span><span class="comp-cap">2,000 KVA / 1,600 KW</span></div>
-        <div class="comp-row2"><span>Used: 825 KVA</span><span>MDB12B → 761 KW</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" id="tr8-bar" style="width:41.3%"></div></div>
-        <div class="load-pct" id="tr8-pct"><span style="color:var(--green)">41.3%</span> Load</div>
-      </div>
+      <div class="comp c-tr" id="tr7" onclick="showDetail('tr7')"></div>
+      <div class="comp c-tr" id="tr8" onclick="showDetail('tr8')"></div>
     </div>
 
     <!-- MDBs -->
     <div class="section-label">🔌 Main Distribution Board (400V)</div>
     <div class="comp-pair">
-      <div class="comp c-mdb" id="mdb12a" onclick="showDetail('mdb12a')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb12a-led"></span>MDB12A</span></div>
-        <div class="comp-row2"><span>Load: 697 KW</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:43.6%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">697 KW</span></div>
-      </div>
-      <div class="comp c-mdb" id="mdb12b" onclick="showDetail('mdb12b')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb12b-led"></span>MDB12B</span></div>
-        <div class="comp-row2"><span>Load: 761 KW</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:47.6%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">761 KW</span></div>
-      </div>
+      <div class="comp c-mdb" id="mdb12a" onclick="showDetail('mdb12a')"></div>
+      <div class="comp c-mdb" id="mdb12b" onclick="showDetail('mdb12b')"></div>
     </div>
 
     <!-- EMDBs -->
     <div class="section-label">🏭 Emergency Distribution Board</div>
     <div class="comp-quad">
-      <div class="comp c-emdb" id="emdb12a1" onclick="showDetail('emdb12a1')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb12a1-led"></span>EMDB12A1</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:55%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">297 KW</span></div>
-      </div>
-      <div class="comp c-emdb" id="emdb12a2" onclick="showDetail('emdb12a2')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb12a2-led"></span>EMDB12A2</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:75%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">400 KW</span></div>
-      </div>
-      <div class="comp c-emdb" id="emdb12b1" onclick="showDetail('emdb12b1')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb12b1-led"></span>EMDB12B1</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:35%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">186 KW</span></div>
-      </div>
-      <div class="comp c-emdb" id="emdb12b2" onclick="showDetail('emdb12b2')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb12b2-led"></span>EMDB12B2</span></div>
-        <div class="load-bar"><div class="load-fill fill-y" style="width:75%"></div></div>
-        <div class="load-pct"><span style="color:var(--yellow)">575 KW</span></div>
-      </div>
+      <div class="comp c-emdb" id="emdb12a1" onclick="showDetail('emdb12a1')"></div>
+      <div class="comp c-emdb" id="emdb12a2" onclick="showDetail('emdb12a2')"></div>
+      <div class="comp c-emdb" id="emdb12b1" onclick="showDetail('emdb12b1')"></div>
+      <div class="comp c-emdb" id="emdb12b2" onclick="showDetail('emdb12b2')"></div>
     </div>
 
     <hr class="divider">
     <div class="gen-label">🔋 Emergency Generator (Backup Power)</div>
+    <div class="gen-note" id="note12"></div>
 
     <!-- GENs -->
     <div class="comp-pair">
-      <div class="comp c-gen" id="gen1" onclick="showDetail('gen1')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-off" id="gen1-led"></span>GEN1</span><span class="comp-cap">2,000 KVA</span></div>
-        <div class="comp-row2"><span>1,600 KW max</span><span id="gen1-load-txt">Standby</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" id="gen1-bar" style="width:0%"></div></div>
-        <div class="load-pct" id="gen1-pct"><span style="color:var(--dim)">0%</span></div>
-        <div class="gen-info-row"><span class="gen-brand">🏭 Cummins</span><span class="gen-pm">🔧 PM: 26 Nov 2024</span></div>
-        <div class="alert-badge" style="display:none" id="gen1-alert"><span class="a-dot"></span>Single: 91.1% ⚠</div>
-      </div>
-      <div class="comp c-gen" id="gen2" onclick="showDetail('gen2')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-off" id="gen2-led"></span>GEN2</span><span class="comp-cap">2,000 KVA</span></div>
-        <div class="comp-row2"><span>1,600 KW max</span><span id="gen2-load-txt">Standby</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" id="gen2-bar" style="width:0%"></div></div>
-        <div class="load-pct" id="gen2-pct"><span style="color:var(--dim)">0%</span></div>
-        <div class="gen-info-row"><span class="gen-brand">🏭 Cummins</span><span class="gen-pm">🔧 PM: 02 Mar 2025</span></div>
-      </div>
+      <div class="comp c-gen" id="gen1" onclick="showDetail('gen1')"></div>
+      <div class="comp c-gen" id="gen2" onclick="showDetail('gen2')"></div>
     </div>
   </div>
 
@@ -478,70 +432,28 @@ h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.
 
     <div class="section-label">🔄 Transformer (Step Down: 22kV → 400V)</div>
     <div class="comp-pair">
-      <div class="comp c-tr" id="tr1" onclick="showDetail('tr1')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr1-led"></span>TR1</span><span class="comp-cap">1,500 KVA / 1,200 KW</span></div>
-        <div class="comp-row2"><span>Used: 463 KVA</span><span>MDB11A → 463 KW</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" id="tr1-bar" style="width:30.9%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">30.9%</span> Load</div>
-      </div>
-      <div class="comp c-tr" id="tr2" onclick="showDetail('tr2')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr2-led"></span>TR2</span><span class="comp-cap">1,500 KVA / 1,200 KW</span></div>
-        <div class="comp-row2"><span>Used: 400 KVA</span><span>MDB11B → 400 KW</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" id="tr2-bar" style="width:26.7%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">26.7%</span> Load</div>
-      </div>
+      <div class="comp c-tr" id="tr1" onclick="showDetail('tr1')"></div>
+      <div class="comp c-tr" id="tr2" onclick="showDetail('tr2')"></div>
     </div>
 
     <div class="section-label">🔌 Main Distribution Board (400V)</div>
     <div class="comp-pair">
-      <div class="comp c-mdb" id="mdb11a" onclick="showDetail('mdb11a')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb11a-led"></span>MDB11A</span></div>
-        <div class="comp-row2"><span>Load: 463 KW</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:38.6%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">463 KW</span></div>
-      </div>
-      <div class="comp c-mdb" id="mdb11b" onclick="showDetail('mdb11b')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb11b-led"></span>MDB11B</span></div>
-        <div class="comp-row2"><span>Load: 400 KW</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:33.3%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">400 KW</span></div>
-      </div>
+      <div class="comp c-mdb" id="mdb11a" onclick="showDetail('mdb11a')"></div>
+      <div class="comp c-mdb" id="mdb11b" onclick="showDetail('mdb11b')"></div>
     </div>
 
     <div class="section-label">🏭 Emergency Distribution Board</div>
     <div class="comp-pair">
-      <div class="comp c-emdb" id="emdb11a" onclick="showDetail('emdb11a')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb11a-led"></span>EMDB11A</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:82.5%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">495 KW</span></div>
-      </div>
-      <div class="comp c-emdb" id="emdb11b" onclick="showDetail('emdb11b')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb11b-led"></span>EMDB11B</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:66.7%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">400 KW</span></div>
-      </div>
+      <div class="comp c-emdb" id="emdb11a" onclick="showDetail('emdb11a')"></div>
+      <div class="comp c-emdb" id="emdb11b" onclick="showDetail('emdb11b')"></div>
     </div>
 
     <hr class="divider">
     <div class="gen-label">🔋 Emergency Generator (Backup Power)</div>
-    <div style="margin-bottom:4px;font-size:9px;color:var(--green);text-align:center;">
-      ✅ Single GEN: 72.1% — ปลอดภัย (ต่ำกว่า 80%)
-    </div>
+    <div class="gen-note" id="note11"></div>
     <div class="comp-pair">
-      <div class="comp c-gen" id="gen3" onclick="showDetail('gen3')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-off" id="gen3-led"></span>GEN3</span><span class="comp-cap">1,500 KVA</span></div>
-        <div class="comp-row2"><span>1,200 KW max</span><span id="gen3-load-txt">Standby</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" id="gen3-bar" style="width:0%"></div></div>
-        <div class="load-pct" id="gen3-pct"><span style="color:var(--dim)">0%</span></div>
-        <div class="gen-info-row"><span class="gen-brand">🏭 MTU</span><span class="gen-pm">🔧 PM: 23 Dec 2024</span></div>
-      </div>
-      <div class="comp c-gen" id="gen4" onclick="showDetail('gen4')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-off" id="gen4-led"></span>GEN4</span><span class="comp-cap">1,500 KVA</span></div>
-        <div class="comp-row2"><span>1,200 KW max</span><span id="gen4-load-txt">Standby</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" id="gen4-bar" style="width:0%"></div></div>
-        <div class="load-pct" id="gen4-pct"><span style="color:var(--dim)">0%</span></div>
-        <div class="gen-info-row"><span class="gen-brand">🏭 Cummins</span><span class="gen-pm">🔧 PM: 26 Nov 2024</span></div>
-      </div>
+      <div class="comp c-gen" id="gen3" onclick="showDetail('gen3')"></div>
+      <div class="comp c-gen" id="gen4" onclick="showDetail('gen4')"></div>
     </div>
   </div>
 
@@ -560,114 +472,68 @@ h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.
       </div>
     </div>
 
-    <div class="section-label">🔄 Transformer (Step Down: 22kV → 400V)</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:6px;">
-      <div class="comp c-tr" id="tr3" onclick="showDetail('tr3')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr3-led"></span>TR3</span><span class="comp-cap">1,500 KVA</span></div>
-        <div class="comp-row2"><span>493 KVA</span><span>MDB13A</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:32.9%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">32.9%</span></div>
-      </div>
-      <div class="comp c-tr" id="tr5" onclick="showDetail('tr5')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr5-led"></span>TR5</span><span class="comp-cap">2,000 KVA</span></div>
-        <div class="comp-row2"><span>899 KVA</span><span>MDB14A</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:45%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">45.0%</span></div>
-      </div>
-      <div class="comp c-tr" id="tr4" onclick="showDetail('tr4')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr4-led"></span>TR4</span><span class="comp-cap">1,500 KVA</span></div>
-        <div class="comp-row2"><span>520 KVA</span><span>MDB13B</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:34.7%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">34.7%</span></div>
-      </div>
-      <div class="comp c-tr" id="tr6" onclick="showDetail('tr6')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="tr6-led"></span>TR6</span><span class="comp-cap">2,000 KVA</span></div>
-        <div class="comp-row2"><span>635 KVA</span><span>MDB14B</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:31.8%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">31.8%</span></div>
-      </div>
-    </div>
+    <div class="sub-grid">
+      <!-- ── Area 13 ── -->
+      <div class="sub-area">
+        <div class="sub-header">Area 13 (MDB 13)</div>
+        <div class="section-label">🔄 Transformer (22kV → 400V)</div>
+        <div class="comp-pair">
+          <div class="comp c-tr" id="tr3" onclick="showDetail('tr3')"></div>
+          <div class="comp c-tr" id="tr4" onclick="showDetail('tr4')"></div>
+        </div>
 
-    <div class="section-label">🔌 Main Distribution Board (400V)</div>
-    <div class="comp-quad">
-      <div class="comp c-mdb" id="mdb13a" onclick="showDetail('mdb13a')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb13a-led"></span>MDB13A</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:40.8%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">490 KW</span></div>
-      </div>
-      <div class="comp c-mdb" id="mdb14a" onclick="showDetail('mdb14a')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb14a-led"></span>MDB14A</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:52.7%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">843 KW</span></div>
-      </div>
-      <div class="comp c-mdb" id="mdb13b" onclick="showDetail('mdb13b')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb13b-led"></span>MDB13B</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:43.3%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">519 KW</span></div>
-      </div>
-      <div class="comp c-mdb" id="mdb14b" onclick="showDetail('mdb14b')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="mdb14b-led"></span>MDB14B</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:38%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">608 KW</span></div>
-      </div>
-    </div>
+        <div class="section-label">🔌 Main Distribution Board (400V)</div>
+        <div class="comp-pair">
+          <div class="comp c-mdb" id="mdb13a" onclick="showDetail('mdb13a')"></div>
+          <div class="comp c-mdb" id="mdb13b" onclick="showDetail('mdb13b')"></div>
+        </div>
 
-    <div class="section-label">🏭 Emergency Distribution Board</div>
-    <div class="comp-quad">
-      <div class="comp c-emdb" id="emdb13a" onclick="showDetail('emdb13a')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb13a-led"></span>EMDB13A</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:80%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">490 KW</span></div>
-      </div>
-      <div class="comp c-emdb" id="emdb14a1" onclick="showDetail('emdb14a1')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb14a1-led"></span>EMDB14A1</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" style="width:65%"></div></div>
-        <div class="load-pct"><span style="color:var(--green)">400 KW</span></div>
-      </div>
-      <div class="comp c-emdb" id="emdb14a2" onclick="showDetail('emdb14a2')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb14a2-led"></span>EMDB14A2</span></div>
-        <div class="load-bar"><div class="load-fill fill-y" style="width:72%"></div></div>
-        <div class="load-pct"><span style="color:var(--yellow)">443 KW</span></div>
-      </div>
-      <div class="comp c-emdb" id="emdb13b" onclick="showDetail('emdb13b')">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb13b-led"></span>EMDB13B</span></div>
-        <div class="load-bar"><div class="load-fill fill-y" style="width:85%"></div></div>
-        <div class="load-pct"><span style="color:var(--yellow)">519 KW</span></div>
-      </div>
-      <div class="comp c-emdb" id="emdb14b" onclick="showDetail('emdb14b')" style="grid-column:span 2;">
-        <div class="comp-head"><span class="comp-id"><span class="led led-on" id="emdb14b-led"></span>EMDB14B</span></div>
-        <div class="load-bar"><div class="load-fill fill-y" style="width:76%"></div></div>
-        <div class="load-pct"><span style="color:var(--yellow)">608 KW</span></div>
-      </div>
-    </div>
+        <div class="section-label">🏭 Emergency Distribution Board</div>
+        <div class="comp-quad">
+          <div class="comp c-emdb" id="emdb13a" onclick="showDetail('emdb13a')"></div>
+          <div class="comp c-emdb" id="emdb13a2" onclick="showDetail('emdb13a2')"></div>
+          <div class="comp c-emdb" id="emdb13b" onclick="showDetail('emdb13b')"></div>
+          <div class="comp c-emdb" id="emdb13b2" onclick="showDetail('emdb13b2')"></div>
+        </div>
 
-    <hr class="divider">
-    <div class="gen-label">🔋 Emergency Generator (Backup Power)</div>
-    <div style="margin-bottom:4px;font-size:9px;color:var(--red);text-align:center;animation:blink .8s infinite;">
-      ⚠ Single GEN: 92.6% — เกิน 80% (ต้องใช้ทั้งสอง GEN)
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;align-items:stretch;">
-      <div class="comp c-gen" id="gen5" onclick="showDetail('gen5')" style="margin-bottom:0;">
-        <div class="comp-head"><span class="comp-id"><span class="led led-off" id="gen5-led"></span>GEN5</span><span class="comp-cap">2,500 KVA</span></div>
-        <div class="comp-row2"><span>2,000 KW max</span><span id="gen5-load-txt">Standby</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" id="gen5-bar" style="width:0%"></div></div>
-        <div class="load-pct" id="gen5-pct"><span style="color:var(--dim)">0%</span></div>
-        <div class="gen-info-row"><span class="gen-brand">🏭 Cummins</span><span class="gen-pm">🔧 PM: 28 Nov 2024</span></div>
-        <div class="alert-badge" style="display:none" id="gen5-alert"><span class="a-dot"></span>Single: 92.6% ⚠</div>
+        <hr class="divider">
+        <div class="gen-label">🔋 Emergency Generator</div>
+        <div class="gen-note" id="note13"></div>
+        <div class="comp-pair">
+          <div class="comp c-gen" id="gen5" onclick="showDetail('gen5')"></div>
+          <div class="comp c-gen" id="gen6" onclick="showDetail('gen6')"></div>
+        </div>
       </div>
-      <div class="comp c-gen" id="gen6" onclick="showDetail('gen6')" style="margin-bottom:0;">
-        <div class="comp-head"><span class="comp-id"><span class="led led-off" id="gen6-led"></span>GEN6</span><span class="comp-cap">2,500 KVA</span></div>
-        <div class="comp-row2"><span>2,000 KW max</span><span id="gen6-load-txt">Standby</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" id="gen6-bar" style="width:0%"></div></div>
-        <div class="load-pct" id="gen6-pct"><span style="color:var(--dim)">0%</span></div>
-        <div class="gen-info-row"><span class="gen-brand">🏭 Cummins</span><span class="gen-pm">🔧 PM: 30 Nov 2024</span></div>
-      </div>
-      <div class="comp c-gen" id="gen7" onclick="showDetail('gen7')" style="margin-bottom:0;">
-        <div class="comp-head"><span class="comp-id"><span class="led led-off" id="gen7-led"></span>GEN7</span><span class="comp-cap">2,000 KVA</span></div>
-        <div class="comp-row2"><span>1,600 KW max</span><span id="gen7-load-txt">Standby</span></div>
-        <div class="load-bar"><div class="load-fill fill-g" id="gen7-bar" style="width:0%"></div></div>
-        <div class="load-pct" id="gen7-pct"><span style="color:var(--dim)">0%</span></div>
-        <div class="gen-info-row"><span class="gen-brand">🏭 Cummins</span><span class="gen-pm">🔧 PM: 27 Nov 2024</span></div>
+
+      <!-- ── Area 14 ── -->
+      <div class="sub-area">
+        <div class="sub-header">Area 14 (MDB 14)</div>
+        <div class="section-label">🔄 Transformer (22kV → 400V)</div>
+        <div class="comp-pair">
+          <div class="comp c-tr" id="tr5" onclick="showDetail('tr5')"></div>
+          <div class="comp c-tr" id="tr6" onclick="showDetail('tr6')"></div>
+        </div>
+
+        <div class="section-label">🔌 Main Distribution Board (400V)</div>
+        <div class="comp-pair">
+          <div class="comp c-mdb" id="mdb14a" onclick="showDetail('mdb14a')"></div>
+          <div class="comp c-mdb" id="mdb14b" onclick="showDetail('mdb14b')"></div>
+        </div>
+
+        <div class="section-label">🏭 Emergency Distribution Board</div>
+        <div class="comp-quad">
+          <div class="comp c-emdb" id="emdb14a1" onclick="showDetail('emdb14a1')"></div>
+          <div class="comp c-emdb" id="emdb14a2" onclick="showDetail('emdb14a2')"></div>
+          <div class="comp c-emdb" id="emdb14b" onclick="showDetail('emdb14b')" style="grid-column:span 2;"></div>
+        </div>
+
+        <hr class="divider">
+        <div class="gen-label">🔋 Emergency Generator</div>
+        <div class="gen-note" id="note14"></div>
+        <div class="comp-pair">
+          <div class="comp c-gen" id="gen8" onclick="showDetail('gen8')"></div>
+          <div class="comp c-gen" id="gen7" onclick="showDetail('gen7')"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -697,94 +563,183 @@ h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.
 
 <script>
 // ══════════════════════════════════════════════════
-//  DATA
+//  DATA  (Capacity + Actual Load — แก้ค่าที่นี่ที่เดียว)
+//   tr  : kva/kw = Capacity, load = MDB Used KW (actual)
+//   mdb : kw = Used KW, tr = หม้อแปลงที่จ่าย
+//   emdb: kw = Used KW, mdb = ต้นทางปกติ, gen = ต้นทางฉุกเฉิน
+//   gen : kva/kw = Capacity, actual = Actual Load KW
 // ══════════════════════════════════════════════════
 const DB = {
-  tr7:  {name:'TR7',  type:'tr',  kva:2000, kw:1600, usedKva:761,  usedKw:697,  pct:38.1, area:'12'},
-  tr8:  {name:'TR8',  type:'tr',  kva:2000, kw:1600, usedKva:825,  usedKw:761,  pct:41.3, area:'12'},
-  tr1:  {name:'TR1',  type:'tr',  kva:1500, kw:1200, usedKva:463,  usedKw:463,  pct:30.9, area:'11'},
-  tr2:  {name:'TR2',  type:'tr',  kva:1500, kw:1200, usedKva:400,  usedKw:400,  pct:26.7, area:'11'},
-  tr3:  {name:'TR3',  type:'tr',  kva:1500, kw:1200, usedKva:493,  usedKw:490,  pct:32.9, area:'1314'},
-  tr5:  {name:'TR5',  type:'tr',  kva:2000, kw:1600, usedKva:899,  usedKw:843,  pct:45.0, area:'1314'},
-  tr4:  {name:'TR4',  type:'tr',  kva:1500, kw:1200, usedKva:520,  usedKw:519,  pct:34.7, area:'1314'},
-  tr6:  {name:'TR6',  type:'tr',  kva:2000, kw:1600, usedKva:635,  usedKw:608,  pct:31.8, area:'1314'},
-  mdb12a:{name:'MDB12A',type:'mdb',kw:697,  area:'12'},
-  mdb12b:{name:'MDB12B',type:'mdb',kw:761,  area:'12'},
-  mdb11a:{name:'MDB11A',type:'mdb',kw:463,  area:'11'},
-  mdb11b:{name:'MDB11B',type:'mdb',kw:400,  area:'11'},
-  mdb13a:{name:'MDB13A',type:'mdb',kw:490,  area:'1314'},
-  mdb14a:{name:'MDB14A',type:'mdb',kw:843,  area:'1314'},
-  mdb13b:{name:'MDB13B',type:'mdb',kw:519,  area:'1314'},
-  mdb14b:{name:'MDB14B',type:'mdb',kw:608,  area:'1314'},
-  emdb12a1:{name:'EMDB12A1',type:'emdb',kw:297, area:'12'},
-  emdb12a2:{name:'EMDB12A2',type:'emdb',kw:400, area:'12'},
-  emdb12b1:{name:'EMDB12B1',type:'emdb',kw:186, area:'12'},
-  emdb12b2:{name:'EMDB12B2',type:'emdb',kw:575, area:'12'},
-  emdb11a: {name:'EMDB11A', type:'emdb',kw:495, area:'11'},
-  emdb11b: {name:'EMDB11B', type:'emdb',kw:400, area:'11'},
-  emdb13a: {name:'EMDB13A', type:'emdb',kw:490, area:'1314'},
-  emdb14a1:{name:'EMDB14A1',type:'emdb',kw:400, area:'1314'},
-  emdb14a2:{name:'EMDB14A2',type:'emdb',kw:443, area:'1314'},
-  emdb13b: {name:'EMDB13B', type:'emdb',kw:519, area:'1314'},
-  emdb14b: {name:'EMDB14B', type:'emdb',kw:608, area:'1314'},
-  gen1:{name:'GEN1',type:'gen',kva:2000,kw:1600,actual:697,  pct:43.6,singlePct:91.1,brand:'Cummins',lastPM:'26 Nov 2024',covers:['emdb12a1','emdb12a2']},
-  gen2:{name:'GEN2',type:'gen',kva:2000,kw:1600,actual:761,  pct:47.6,singlePct:null, brand:'Cummins',lastPM:'02 Mar 2025',covers:['emdb12b1','emdb12b2']},
-  gen3:{name:'GEN3',type:'gen',kva:1500,kw:1200,actual:495,  pct:41.3,singlePct:72.1, brand:'MTU',    lastPM:'23 Dec 2024',covers:['emdb11a']},
-  gen4:{name:'GEN4',type:'gen',kva:1500,kw:1200,actual:370,  pct:30.8,singlePct:null, brand:'Cummins',lastPM:'26 Nov 2024',covers:['emdb11b']},
-  gen5:{name:'GEN5',type:'gen',kva:2500,kw:2000,actual:890,  pct:44.5,singlePct:92.6, brand:'Cummins',lastPM:'28 Nov 2024',covers:['emdb13a','emdb14a1']},
-  gen6:{name:'GEN6',type:'gen',kva:2500,kw:2000,actual:962,  pct:48.1,singlePct:null, brand:'Cummins',lastPM:'30 Nov 2024',covers:['emdb14a2','emdb13b']},
-  gen7:{name:'GEN7',type:'gen',kva:2000,kw:1600,actual:636,  pct:39.8,singlePct:39.8, brand:'Cummins',lastPM:'27 Nov 2024',covers:['emdb14b']},
+  // Area 11
+  tr1:  {name:'TR1', type:'tr', kva:1500, kw:1200, load:473, mdb:'mdb11a', area:'11'},
+  tr2:  {name:'TR2', type:'tr', kva:1500, kw:1200, load:389, mdb:'mdb11b', area:'11'},
+  // Area 13
+  tr3:  {name:'TR3', type:'tr', kva:1500, kw:1200, load:504, mdb:'mdb13a', area:'13'},
+  tr4:  {name:'TR4', type:'tr', kva:1500, kw:1200, load:518, mdb:'mdb13b', area:'13'},
+  // Area 14
+  tr5:  {name:'TR5', type:'tr', kva:2000, kw:1600, load:758, mdb:'mdb14a', area:'14'},
+  tr6:  {name:'TR6', type:'tr', kva:2000, kw:1600, load:709, mdb:'mdb14b', area:'14'},
+  // Area 12
+  tr7:  {name:'TR7', type:'tr', kva:2000, kw:1600, load:841, mdb:'mdb12a', area:'12'},
+  tr8:  {name:'TR8', type:'tr', kva:2000, kw:1600, load:765, mdb:'mdb12b', area:'12'},
+
+  mdb11a:{name:'MDB11A',type:'mdb',kw:473, tr:'tr1', area:'11'},
+  mdb11b:{name:'MDB11B',type:'mdb',kw:389, tr:'tr2', area:'11'},
+  mdb13a:{name:'MDB13A',type:'mdb',kw:504, tr:'tr3', area:'13'},
+  mdb13b:{name:'MDB13B',type:'mdb',kw:518, tr:'tr4', area:'13'},
+  mdb14a:{name:'MDB14A',type:'mdb',kw:758, tr:'tr5', area:'14'},
+  mdb14b:{name:'MDB14B',type:'mdb',kw:709, tr:'tr6', area:'14'},
+  mdb12a:{name:'MDB12A',type:'mdb',kw:841, tr:'tr7', area:'12'},
+  mdb12b:{name:'MDB12B',type:'mdb',kw:765, tr:'tr8', area:'12'},
+
+  emdb11a: {name:'EMDB11A', type:'emdb',kw:474, mdb:'mdb11a',gen:'gen3',area:'11'},
+  emdb11b: {name:'EMDB11B', type:'emdb',kw:396, mdb:'mdb11b',gen:'gen4',area:'11'},
+  emdb13a: {name:'EMDB13A', type:'emdb',kw:512, mdb:'mdb13a',gen:'gen5',area:'13'},
+  emdb13a2:{name:'EMDB13A2',type:'emdb',kw:102, mdb:'mdb13a',gen:'gen5',area:'13'},
+  emdb13b: {name:'EMDB13B', type:'emdb',kw:538, mdb:'mdb13b',gen:'gen6',area:'13'},
+  emdb13b2:{name:'EMDB13B2',type:'emdb',kw:100, mdb:'mdb13b',gen:'gen6',area:'13'},
+  emdb14a1:{name:'EMDB14A1',type:'emdb',kw:281, mdb:'mdb14a',gen:'gen8',area:'14'},
+  emdb14a2:{name:'EMDB14A2',type:'emdb',kw:475, mdb:'mdb14a',gen:'gen8',area:'14'},
+  emdb14b: {name:'EMDB14B', type:'emdb',kw:713, mdb:'mdb14b',gen:'gen7',area:'14'},
+  emdb12a1:{name:'EMDB12A1',type:'emdb',kw:300, mdb:'mdb12a',gen:'gen1',area:'12'},
+  emdb12a2:{name:'EMDB12A2',type:'emdb',kw:531, mdb:'mdb12a',gen:'gen1',area:'12'},
+  emdb12b1:{name:'EMDB12B1',type:'emdb',kw:186, mdb:'mdb12b',gen:'gen2',area:'12'},
+  emdb12b2:{name:'EMDB12B2',type:'emdb',kw:574, mdb:'mdb12b',gen:'gen2',area:'12'},
+
+  // actual = GEN Actual Load ตามตาราง (%Gen Load = actual / kw)
+  gen1:{name:'GEN1',type:'gen',kva:2000,kw:1600,actual:831,brand:'Cummins',lastPM:'26 Nov 2024',covers:['emdb12a1','emdb12a2'],area:'12'},
+  gen2:{name:'GEN2',type:'gen',kva:2000,kw:1600,actual:760,brand:'Cummins',lastPM:'02 Mar 2025',covers:['emdb12b1','emdb12b2'],area:'12'},
+  gen3:{name:'GEN3',type:'gen',kva:1500,kw:1200,actual:474,brand:'MTU',    lastPM:'23 Dec 2024',covers:['emdb11a'],area:'11'},
+  gen4:{name:'GEN4',type:'gen',kva:1500,kw:1200,actual:396,brand:'Cummins',lastPM:'26 Nov 2024',covers:['emdb11b'],area:'11'},
+  gen5:{name:'GEN5',type:'gen',kva:2500,kw:2000,actual:512,brand:'Cummins',lastPM:'28 Nov 2024',covers:['emdb13a','emdb13a2'],area:'13'},
+  gen6:{name:'GEN6',type:'gen',kva:2500,kw:2000,actual:538,brand:'Cummins',lastPM:'30 Nov 2024',covers:['emdb13b','emdb13b2'],area:'13'},
+  gen7:{name:'GEN7',type:'gen',kva:2000,kw:1600,actual:713,brand:'Cummins',lastPM:'27 Nov 2024',covers:['emdb14b'],area:'14'},
+  gen8:{name:'GEN8',type:'gen',kva:2000,kw:1600,actual:756,brand:'-',      lastPM:'-',          covers:['emdb14a1','emdb14a2'],area:'14'},
 };
+
+// GEN คู่ในแต่ละพื้นที่ — ใช้ประเมินกรณีเหลือ GEN เดียวรับโหลดทั้งพื้นที่
+const GEN_PAIRS = [
+  {area:'12', gens:['gen1','gen2']},
+  {area:'11', gens:['gen3','gen4']},
+  {area:'13', gens:['gen5','gen6']},
+  {area:'14', gens:['gen8','gen7']},
+];
+
+const TR_IDS   = ['tr7','tr8','tr1','tr2','tr3','tr4','tr5','tr6'];
+const MDB_IDS  = ['mdb12a','mdb12b','mdb11a','mdb11b','mdb13a','mdb13b','mdb14a','mdb14b'];
+const EMDB_IDS = Object.keys(DB).filter(k => DB[k].type === 'emdb');
+const GEN_IDS  = ['gen1','gen2','gen3','gen4','gen5','gen6','gen7','gen8'];
+
+const fmt   = n => n.toLocaleString('en-US');
+const pctOf = (v, cap) => Math.round(v / cap * 10000) / 100;
+const lvlColor = p => p >= 80 ? 'var(--red)' : p >= 70 ? 'var(--yellow)' : 'var(--green)';
+const lvlFill  = p => 'load-fill ' + (p >= 80 ? 'fill-r' : p >= 70 ? 'fill-y' : 'fill-g');
+
+// Derived: %Load ของแต่ละอุปกรณ์
+Object.values(DB).forEach(d => {
+  if (d.type === 'tr')   d.pct = pctOf(d.load, d.kw);
+  if (d.type === 'mdb')  { d.cap = DB[d.tr].kw;  d.pct = pctOf(d.kw, d.cap); }
+  if (d.type === 'emdb') { d.cap = DB[d.gen].kw; d.pct = pctOf(d.kw, d.cap); }
+  if (d.type === 'gen')  d.pct = pctOf(d.actual, d.kw);
+});
+GEN_PAIRS.forEach(p => {
+  const total = p.gens.reduce((s, g) => s + DB[g].actual, 0);
+  const cap   = Math.min(...p.gens.map(g => DB[g].kw));
+  p.pct = Math.round(total / cap * 1000) / 10;
+  p.gens.forEach(g => DB[g].singlePct = p.pct);
+});
+const RISK_PAIRS = GEN_PAIRS.filter(p => p.pct >= 80);
+const riskText = RISK_PAIRS.map(p => `Area ${p.area} (${p.pct}%)`).join(' & ');
+
+// ══════════════════════════════════════════════════
+//  RENDER  (สร้างการ์ดอุปกรณ์จาก DB)
+// ══════════════════════════════════════════════════
+function barHTML(id, pct) {
+  return `<div class="load-bar"><div class="${lvlFill(pct)}" id="${id}-bar" style="width:${Math.min(pct,100)}%"></div></div>`;
+}
+
+function renderComp(id) {
+  const d = DB[id], el = document.getElementById(id);
+  if (!el) return;
+  const led = `<span class="led ${d.type === 'gen' ? 'led-off' : 'led-on'}" id="${id}-led"></span>`;
+  let html = '';
+  if (d.type === 'tr') {
+    html = `
+      <div class="comp-head"><span class="comp-id">${led}${d.name}</span><span class="comp-cap">${fmt(d.kva)} KVA / ${fmt(d.kw)} KW</span></div>
+      <div class="comp-row2"><span>Actual: ${fmt(d.load)} KW</span><span>→ ${DB[d.mdb].name}</span></div>
+      ${barHTML(id, d.pct)}
+      <div class="load-pct" id="${id}-pct"><span style="color:${lvlColor(d.pct)}">${d.pct.toFixed(2)}%</span> Load</div>`;
+  } else if (d.type === 'mdb') {
+    html = `
+      <div class="comp-head"><span class="comp-id">${led}${d.name}</span><span class="comp-cap">Cap ${fmt(d.cap)} KW</span></div>
+      <div class="comp-row2"><span>Used: ${fmt(d.kw)} KW</span><span>${DB[d.tr].name}</span></div>
+      ${barHTML(id, d.pct)}
+      <div class="load-pct"><span style="color:${lvlColor(d.pct)}">${d.pct.toFixed(2)}%</span></div>`;
+  } else if (d.type === 'emdb') {
+    html = `
+      <div class="comp-head"><span class="comp-id">${led}${d.name}</span></div>
+      <div class="comp-row2"><span>Used: ${fmt(d.kw)} KW</span><span>${DB[d.gen].name}</span></div>
+      ${barHTML(id, d.pct)}
+      <div class="load-pct"><span style="color:${lvlColor(d.pct)}">${d.pct.toFixed(1)}%</span> of GEN</div>`;
+  } else if (d.type === 'gen') {
+    const alert = d.singlePct >= 80
+      ? `<div class="alert-badge" style="display:none" id="${id}-alert"><span class="a-dot"></span>Single: ${d.singlePct}% ⚠</div>` : '';
+    html = `
+      <div class="comp-head"><span class="comp-id">${led}${d.name}</span><span class="comp-cap">${fmt(d.kva)} KVA / ${fmt(d.kw)} KW</span></div>
+      <div class="comp-row2"><span>Actual: ${fmt(d.actual)} KW</span><span id="${id}-load-txt">Standby</span></div>
+      ${barHTML(id, 0)}
+      <div class="load-pct" id="${id}-pct"><span style="color:var(--dim)">0%</span></div>
+      <div class="gen-info-row"><span class="gen-brand">🏭 ${d.brand}</span><span class="gen-pm">🔧 PM: ${d.lastPM}</span></div>
+      ${alert}`;
+  }
+  el.innerHTML = html;
+}
+
+function renderStats() {
+  const sum = (ids, f) => ids.reduce((s, id) => s + DB[id][f], 0);
+  const set = (id, v) => document.getElementById(id).innerHTML = v;
+  const unit = u => ` <span style="font-size:11px">${u}</span>`;
+  const trKva = sum(TR_IDS, 'kva'), trKw = sum(TR_IDS, 'kw'), trLoad = sum(TR_IDS, 'load');
+  const gKva  = sum(GEN_IDS, 'kva'), gKw = sum(GEN_IDS, 'kw'), gLoad = sum(GEN_IDS, 'actual');
+  set('statTrCap',      fmt(trKva) + unit('KVA'));
+  set('statTrCapSub',   `${fmt(trKw)} KW max (${TR_IDS.length} TR)`);
+  set('statTrLoad',     fmt(trLoad) + unit('KW'));
+  set('statTrLoadSub',  `${pctOf(trLoad, trKw).toFixed(1)}% ของ ${fmt(trKw)} KW`);
+  set('statGenCap',     fmt(gKva) + unit('KVA'));
+  set('statGenCapSub',  `${fmt(gKw)} KW max (${GEN_IDS.length} GEN)`);
+  set('statGenLoad',    fmt(gLoad) + unit('KW'));
+  set('statGenLoadSub', `${pctOf(gLoad, gKw).toFixed(1)}% ของ ${fmt(gKw)} KW`);
+  set('statRisk',       RISK_PAIRS.length + unit('Areas'));
+  set('statRiskSub',    RISK_PAIRS.map(p => `A${p.area}: ${p.pct}%`).join(' | ') || 'ไม่มี');
+
+  GEN_PAIRS.forEach(p => {
+    const el = document.getElementById('note' + p.area);
+    if (!el) return;
+    const risk = p.pct >= 80;
+    el.className = 'gen-note ' + (risk ? 'risk' : 'ok');
+    el.textContent = risk
+      ? `⚠ Single GEN: ${p.pct}% — เกิน 80% (ต้องใช้ทั้งสอง GEN)`
+      : `✅ Single GEN: ${p.pct}% — ปลอดภัย (ต่ำกว่า 80%)`;
+  });
+  document.getElementById('alertMsg').textContent =
+    `Single Generator overload detected — ${riskText} exceed 80% threshold when running on single GEN.`;
+}
+
+Object.keys(DB).forEach(renderComp);
+renderStats();
 
 // ══════════════════════════════════════════════════
 //  CONNECTIONS (normal mode: PEA → TR → MDB → EMDB)
 // ══════════════════════════════════════════════════
+const PEA_OF = {'11':'pea11', '12':'pea12', '13':'pea1314', '14':'pea1314'};
 const CONNECTIONS_NORMAL = [
-  // Area 12
-  {f:'pea12',t:'tr7',   col:'#40c4ff',w:2.5,n:4},
-  {f:'pea12',t:'tr8',   col:'#40c4ff',w:2.5,n:4},
-  {f:'tr7',  t:'mdb12a',col:'#1de9b6',w:2,n:3},
-  {f:'tr8',  t:'mdb12b',col:'#1de9b6',w:2,n:3},
-  {f:'mdb12a',t:'emdb12a1',col:'#00e676',w:1.5,n:2},
-  {f:'mdb12a',t:'emdb12a2',col:'#00e676',w:1.5,n:2},
-  {f:'mdb12b',t:'emdb12b1',col:'#00e676',w:1.5,n:2},
-  {f:'mdb12b',t:'emdb12b2',col:'#00e676',w:1.5,n:2},
-  // Area 11
-  {f:'pea11',t:'tr1',   col:'#40c4ff',w:2.5,n:4},
-  {f:'pea11',t:'tr2',   col:'#40c4ff',w:2.5,n:4},
-  {f:'tr1',  t:'mdb11a',col:'#1de9b6',w:2,n:3},
-  {f:'tr2',  t:'mdb11b',col:'#1de9b6',w:2,n:3},
-  {f:'mdb11a',t:'emdb11a',col:'#00e676',w:1.5,n:2},
-  {f:'mdb11b',t:'emdb11b',col:'#00e676',w:1.5,n:2},
-  // Area 13-14
-  {f:'pea1314',t:'tr3', col:'#40c4ff',w:2.5,n:4},
-  {f:'pea1314',t:'tr5', col:'#40c4ff',w:2.5,n:4},
-  {f:'pea1314',t:'tr4', col:'#40c4ff',w:2.5,n:4},
-  {f:'pea1314',t:'tr6', col:'#40c4ff',w:2.5,n:4},
-  {f:'tr3',t:'mdb13a',  col:'#1de9b6',w:2,n:3},
-  {f:'tr5',t:'mdb14a',  col:'#1de9b6',w:2,n:3},
-  {f:'tr4',t:'mdb13b',  col:'#1de9b6',w:2,n:3},
-  {f:'tr6',t:'mdb14b',  col:'#1de9b6',w:2,n:3},
-  {f:'mdb13a',t:'emdb13a', col:'#00e676',w:1.5,n:2},
-  {f:'mdb14a',t:'emdb14a1',col:'#00e676',w:1.5,n:2},
-  {f:'mdb14a',t:'emdb14a2',col:'#00e676',w:1.5,n:2},
-  {f:'mdb13b',t:'emdb13b', col:'#00e676',w:1.5,n:2},
-  {f:'mdb14b',t:'emdb14b', col:'#00e676',w:1.5,n:2},
+  ...TR_IDS.map(id   => ({f:PEA_OF[DB[id].area], t:id, col:'#40c4ff',w:2.5,n:4})),
+  ...TR_IDS.map(id   => ({f:id, t:DB[id].mdb,       col:'#1de9b6',w:2,  n:3})),
+  ...EMDB_IDS.map(id => ({f:DB[id].mdb, t:id,       col:'#00e676',w:1.5,n:2})),
 ];
 
-const CONNECTIONS_EMERG = [
-  {f:'gen1',t:'emdb12a1',col:'#ff9800',w:2.5,n:4},
-  {f:'gen1',t:'emdb12a2',col:'#ff9800',w:2.5,n:4},
-  {f:'gen2',t:'emdb12b1',col:'#ff9800',w:2.5,n:4},
-  {f:'gen2',t:'emdb12b2',col:'#ff9800',w:2.5,n:4},
-  {f:'gen3',t:'emdb11a', col:'#ff9800',w:2.5,n:4},
-  {f:'gen4',t:'emdb11b', col:'#ff9800',w:2.5,n:4},
-  {f:'gen5',t:'emdb13a', col:'#ff9800',w:2.5,n:4},
-  {f:'gen5',t:'emdb14a1',col:'#ff9800',w:2.5,n:4},
-  {f:'gen6',t:'emdb14a2',col:'#ff9800',w:2.5,n:4},
-  {f:'gen6',t:'emdb13b', col:'#ff9800',w:2.5,n:4},
-  {f:'gen7',t:'emdb14b', col:'#ff9800',w:2.5,n:4},
-];
+// emergency mode: GEN → EMDB
+const CONNECTIONS_EMERG = EMDB_IDS.map(id => ({f:DB[id].gen, t:id, col:'#ff9800',w:2.5,n:4}));
 
 // ══════════════════════════════════════════════════
 //  CANVAS PARTICLE ANIMATION
@@ -940,12 +895,6 @@ function setMode(m) {
   document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
 
   const peaIds = ['pea12','pea11','pea1314'];
-  const trIds  = ['tr7','tr8','tr1','tr2','tr3','tr5','tr4','tr6'];
-  const mdbIds = ['mdb12a','mdb12b','mdb11a','mdb11b','mdb13a','mdb14a','mdb13b','mdb14b'];
-  const genIds = ['gen1','gen2','gen3','gen4','gen5','gen6','gen7'];
-  const allComponents = [...trIds, ...mdbIds,
-    'emdb12a1','emdb12a2','emdb12b1','emdb12b2','emdb11a','emdb11b',
-    'emdb13a','emdb14a1','emdb14a2','emdb13b','emdb14b'];
 
   document.getElementById('faultFlash').classList.remove('show');
 
@@ -962,45 +911,35 @@ function setMode(m) {
       document.getElementById(id+'-led').className = 'led led-on';
       document.getElementById(id+'-txt').textContent = 'จ่ายไฟปกติ';
     });
-    trIds.forEach(id => {
-      document.getElementById(id+'-led').className = 'led led-on';
-    });
-    mdbIds.forEach(id => {
+    [...TR_IDS, ...MDB_IDS, ...EMDB_IDS].forEach(id => {
       document.getElementById(id+'-led').className = 'led led-on';
     });
     // GEN off
-    setGenState(genIds, false);
+    setGenState(GEN_IDS, false);
     // Stop generator internal simulation
     if(window.gsControl) window.gsControl('stop');
-    // EMDBs on
-    ['emdb12a1','emdb12a2','emdb12b1','emdb12b2','emdb11a','emdb11b',
-     'emdb13a','emdb14a1','emdb14a2','emdb13b','emdb14b'].forEach(id => {
-      document.getElementById(id+'-led').className = 'led led-on';
-    });
 
   } else if (m === 'emergency') {
     document.getElementById('btnEmerg').classList.add('active');
     document.getElementById('statMode').textContent = 'GENERATOR';
     document.getElementById('statMode').className = 'stat-val s-orange';
-    document.getElementById('statModeSub').textContent = 'All 7 GENs Running';
+    document.getElementById('statModeSub').textContent = `All ${GEN_IDS.length} GENs Running`;
+    document.getElementById('alertMsg').textContent =
+      `Single Generator overload detected — ${riskText} exceed 80% threshold when running on single GEN.`;
     document.getElementById('alertStrip').classList.add('show');
 
     // PEA stays connected but GEN takes over emergency loads
     peaIds.forEach(id => {
+      document.getElementById(id).classList.remove('pea-fault');
       document.getElementById(id+'-led').className = 'led led-on';
       document.getElementById(id+'-txt').textContent = 'จ่ายไฟปกติ';
     });
-    trIds.forEach(id => { document.getElementById(id+'-led').className = 'led led-on'; });
-    mdbIds.forEach(id => { document.getElementById(id+'-led').className = 'led led-on'; });
+    [...TR_IDS, ...MDB_IDS].forEach(id => { document.getElementById(id+'-led').className = 'led led-on'; });
 
     // GEN running
-    setGenState(genIds, true);
+    setGenState(GEN_IDS, true);
     // Start generator internal simulation
     if(window.gsControl) window.gsControl('start');
-
-    // Show alerts
-    document.getElementById('gen1-alert').style.display = 'inline-flex';
-    document.getElementById('gen5-alert').style.display = 'inline-flex';
 
   } else if (m === 'fault') {
     document.getElementById('btnFault').classList.add('active');
@@ -1008,7 +947,8 @@ function setMode(m) {
     document.getElementById('statMode').className = 'stat-val s-red';
     document.getElementById('statModeSub').textContent = 'PEA ขัดข้อง — GEN Backup';
     document.getElementById('alertStrip').classList.add('show');
-    document.getElementById('alertMsg').textContent = '⚡ PEA Power Failure! Emergency Generators activated. Area 12 (91.1%) & Area 13-14 (92.6%) at critical load on single GEN!';
+    document.getElementById('alertMsg').textContent =
+      `⚡ PEA Power Failure! Emergency Generators activated. ${riskText} at critical load on single GEN!`;
     document.getElementById('faultFlash').classList.add('show');
 
     // PEA fault
@@ -1018,58 +958,43 @@ function setMode(m) {
       document.getElementById(id+'-txt').textContent = 'ขัดข้อง! (FAULT)';
     });
     // TR off
-    trIds.forEach(id => { document.getElementById(id+'-led').className = 'led led-off'; });
-    mdbIds.forEach(id => { document.getElementById(id+'-led').className = 'led led-off'; });
+    [...TR_IDS, ...MDB_IDS].forEach(id => { document.getElementById(id+'-led').className = 'led led-off'; });
 
     // GEN running
-    setGenState(genIds, true);
+    setGenState(GEN_IDS, true);
     // Start generator internal simulation
     if(window.gsControl) window.gsControl('start');
-    document.getElementById('gen1-alert').style.display = 'inline-flex';
-    document.getElementById('gen5-alert').style.display = 'inline-flex';
   }
 
   startAnimation(m);
 }
 
 function setGenState(ids, running) {
-  const data = {
-    gen1:{pct:43.6,kw:697}, gen2:{pct:47.6,kw:761},
-    gen3:{pct:41.3,kw:495}, gen4:{pct:30.8,kw:370},
-    gen5:{pct:44.5,kw:890}, gen6:{pct:48.1,kw:962},
-    gen7:{pct:39.8,kw:636}
-  };
   ids.forEach(id => {
-    const d = data[id];
+    const d = DB[id];
     const led = document.getElementById(id+'-led');
     const bar = document.getElementById(id+'-bar');
     const pct = document.getElementById(id+'-pct');
     const ltx = document.getElementById(id+'-load-txt');
     const comp= document.getElementById(id);
-
-    if (!document.getElementById(id+'-alert') || id === 'gen3' || id === 'gen4' || id === 'gen7') {
-      // Hide alert for safe ones
-    } else {
-      // keep existing
-    }
+    const alertEl = document.getElementById(id+'-alert');
 
     if (running) {
       led.className = 'led led-gen';
       comp.classList.add('running');
-      bar.style.width = d.pct + '%';
-      const c = d.pct >= 80 ? 'var(--red)' : d.pct >= 70 ? 'var(--yellow)' : 'var(--green)';
-      pct.innerHTML = `<span style="color:${c}">${d.pct}%</span>`;
-      ltx.innerHTML = `<span class="spin">⚙</span> ${d.kw} KW`;
-      bar.className = 'load-fill ' + (d.pct>=80?'fill-r':d.pct>=70?'fill-y':'fill-g');
+      bar.style.width = Math.min(d.pct, 100) + '%';
+      bar.className = lvlFill(d.pct);
+      pct.innerHTML = `<span style="color:${lvlColor(d.pct)}">${d.pct.toFixed(2)}%</span> Load`;
+      ltx.innerHTML = `<span class="spin">⚙</span> Running`;
+      if (alertEl) alertEl.style.display = 'inline-flex';
     } else {
       led.className = 'led led-off';
       comp.classList.remove('running');
       bar.style.width = '0%';
+      bar.className = 'load-fill fill-g';
       pct.innerHTML = `<span style="color:var(--dim)">0%</span>`;
       ltx.textContent = 'Standby';
-      bar.className = 'load-fill fill-g';
       // Hide alerts when not running
-      const alertEl = document.getElementById(id+'-alert');
       if (alertEl) alertEl.style.display = 'none';
     }
   });
@@ -1087,46 +1012,52 @@ function showDetail(id) {
 
   title.textContent = d.name + ' — ' + {tr:'Transformer',mdb:'Main DB',emdb:'Emergency DB',gen:'Generator'}[d.type];
 
+  const c = d.pct>=80?'#ff5252':d.pct>=70?'#ffd740':'#00e676';
+  const areaRow = `<div class="d-row"><span class="d-key">Area</span><span class="d-val">${d.area}</span></div>`;
   let html = '';
   if (d.type === 'tr') {
-    const c = d.pct>=80?'#ff5252':d.pct>=70?'#ffd740':'#00e676';
     html = `
-      <div class="d-row"><span class="d-key">Area</span><span class="d-val">${d.area === '1314' ? '13-14' : d.area}</span></div>
-      <div class="d-row"><span class="d-key">ความจุ</span><span class="d-val">${d.kva.toLocaleString()} KVA</span></div>
-      <div class="d-row"><span class="d-key">Max Power</span><span class="d-val">${d.kw.toLocaleString()} KW</span></div>
-      <div class="d-row"><span class="d-key">Used (KVA)</span><span class="d-val">${d.usedKva.toLocaleString()} KVA</span></div>
-      <div class="d-row"><span class="d-key">MDB Load</span><span class="d-val">${d.usedKw.toLocaleString()} KW</span></div>
+      ${areaRow}
+      <div class="d-row"><span class="d-key">Capacity</span><span class="d-val">${fmt(d.kva)} KVA</span></div>
+      <div class="d-row"><span class="d-key">Max Power</span><span class="d-val">${fmt(d.kw)} KW</span></div>
+      <div class="d-row"><span class="d-key">Actual Load</span><span class="d-val">${fmt(d.load)} KW</span></div>
+      <div class="d-row"><span class="d-key">จ่ายให้</span><span class="d-val">${DB[d.mdb].name}</span></div>
       <div class="d-row"><span class="d-key">แรงดัน</span><span class="d-val">22kV → 400V/230V</span></div>
-      <div class="d-row" style="border:none"><span class="d-key">%Load</span><span class="d-val" style="color:${c}">${d.pct}%</span></div>
+      <div class="d-row" style="border:none"><span class="d-key">%TR Load</span><span class="d-val" style="color:${c}">${d.pct.toFixed(2)}%</span></div>
       <div class="detail-bar"><div class="detail-fill" style="width:${d.pct}%;background:${c}"></div></div>
     `;
   } else if (d.type === 'mdb') {
+    const emdbs = EMDB_IDS.filter(x => DB[x].mdb === id).map(x => DB[x].name).join(', ');
     html = `
-      <div class="d-row"><span class="d-key">Area</span><span class="d-val">${d.area === '1314' ? '13-14' : d.area}</span></div>
-      <div class="d-row"><span class="d-key">Load</span><span class="d-val">${d.kw.toLocaleString()} KW</span></div>
-      <div class="d-row"><span class="d-key">ประเภท</span><span class="d-val">Main Distribution Board</span></div>
+      ${areaRow}
+      <div class="d-row"><span class="d-key">Source</span><span class="d-val">${DB[d.tr].name}</span></div>
+      <div class="d-row"><span class="d-key">Capacity (TR)</span><span class="d-val">${fmt(d.cap)} KW</span></div>
+      <div class="d-row"><span class="d-key">Used Load</span><span class="d-val">${fmt(d.kw)} KW</span></div>
+      <div class="d-row"><span class="d-key">%Load</span><span class="d-val" style="color:${c}">${d.pct.toFixed(2)}%</span></div>
+      <div class="d-row"><span class="d-key">EMDB</span><span class="d-val" style="font-size:10px">${emdbs}</span></div>
       <div class="d-row" style="border:none"><span class="d-key">แรงดัน</span><span class="d-val">400V / 3Ph</span></div>
+      <div class="detail-bar"><div class="detail-fill" style="width:${d.pct}%;background:${c}"></div></div>
     `;
   } else if (d.type === 'emdb') {
     html = `
-      <div class="d-row"><span class="d-key">Area</span><span class="d-val">${d.area === '1314' ? '13-14' : d.area}</span></div>
-      <div class="d-row"><span class="d-key">Load</span><span class="d-val">${d.kw.toLocaleString()} KW</span></div>
-      <div class="d-row"><span class="d-key">ประเภท</span><span class="d-val">Emergency Distribution Board</span></div>
+      ${areaRow}
+      <div class="d-row"><span class="d-key">Used Load</span><span class="d-val">${fmt(d.kw)} KW</span></div>
+      <div class="d-row"><span class="d-key">Normal Source</span><span class="d-val">${DB[d.mdb].name} (${DB[DB[d.mdb].tr].name})</span></div>
+      <div class="d-row"><span class="d-key">Backup GEN</span><span class="d-val">${DB[d.gen].name} (${fmt(d.cap)} KW)</span></div>
+      <div class="d-row"><span class="d-key">% of GEN</span><span class="d-val" style="color:${c}">${d.pct.toFixed(1)}%</span></div>
       <div class="d-row" style="border:none"><span class="d-key">Power Source</span><span class="d-val">${currentMode==='normal'?'PEA (Normal)':'Generator (Emergency)'}</span></div>
     `;
   } else if (d.type === 'gen') {
-    const c = d.pct>=80?'#ff5252':d.pct>=70?'#ffd740':'#00e676';
-    const sp = d.singlePct ? `<div class="d-row"><span class="d-key">Single GEN %</span>
-      <span class="d-val" style="color:${d.singlePct>=80?'#ff5252':'#00e676'}">${d.singlePct}% ${d.singlePct>=80?'⚠️':''}</span></div>` : '';
-    const covers = d.covers.map(x => DB[x]?.name||x).join(', ');
+    const sc = d.singlePct>=80?'#ff5252':d.singlePct>=70?'#ffd740':'#00e676';
+    const covers = d.covers.map(x => `${DB[x].name} (${fmt(DB[x].kw)})`).join(', ');
     html = `
       <div class="d-row"><span class="d-key">🏭 Brand</span><span class="d-val" style="color:var(--orange)">${d.brand}</span></div>
       <div class="d-row"><span class="d-key">🔧 Last PM</span><span class="d-val" style="color:var(--yellow)">${d.lastPM}</span></div>
-      <div class="d-row"><span class="d-key">ความจุ</span><span class="d-val">${d.kva.toLocaleString()} KVA</span></div>
-      <div class="d-row"><span class="d-key">Max Power</span><span class="d-val">${d.kw.toLocaleString()} KW</span></div>
-      <div class="d-row"><span class="d-key">Actual Load</span><span class="d-val">${d.actual.toLocaleString()} KW</span></div>
-      <div class="d-row"><span class="d-key">%Gen Load</span><span class="d-val" style="color:${c}">${d.pct}%</span></div>
-      ${sp}
+      <div class="d-row"><span class="d-key">Capacity</span><span class="d-val">${fmt(d.kva)} KVA</span></div>
+      <div class="d-row"><span class="d-key">Max Power</span><span class="d-val">${fmt(d.kw)} KW</span></div>
+      <div class="d-row"><span class="d-key">Actual Load</span><span class="d-val">${fmt(d.actual)} KW</span></div>
+      <div class="d-row"><span class="d-key">%Gen Load</span><span class="d-val" style="color:${c}">${d.pct.toFixed(2)}%</span></div>
+      <div class="d-row"><span class="d-key">Single GEN %</span><span class="d-val" style="color:${sc}">${d.singlePct}% ${d.singlePct>=80?'⚠️':''}</span></div>
       <div class="d-row" style="border:none"><span class="d-key">Covers</span><span class="d-val" style="font-size:10px">${covers}</span></div>
       <div class="detail-bar"><div class="detail-fill" style="width:${d.pct}%;background:${c}"></div></div>
       <div style="font-size:9px;opacity:.6;margin-top:3px">Type: Diesel Generator / 400V / 3Ph 50Hz</div>

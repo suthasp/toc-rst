@@ -1,0 +1,37 @@
+# ── OS ──
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+._*
+
+# ── OneDrive / Office temp files ──
+~$*
+*.tmp
+*.bak
+*.swp
+*~
+
+# ── Editors / IDE ──
+.vscode/
+.idea/
+*.code-workspace
+
+# ── Local tool settings ──
+.claude/settings.local.json
+.sixth/
+
+# ── Node (ถ้ามีการใช้ build tool ภายหลัง) ──
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# ── Logs / env ──
+*.log
+.env
+.env.*
+
+# ── Source data (Excel ต้นฉบับ) ──
+*.xlsx
+*.xls
