@@ -69,7 +69,7 @@ h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.
 
 /* ── MAIN ── */
 .main{padding:14px 18px;overflow-x:auto;}
-.sections-grid{display:grid;grid-template-columns:1fr 1fr 1.8fr;gap:12px;}
+.sections-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
 
 /* ── AREA COLUMN ── */
 .area{background:var(--panel);border:1px solid var(--border);border-radius:12px;
@@ -78,7 +78,8 @@ h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.
   border-radius:6px;display:flex;align-items:center;gap:6px;letter-spacing:.5px;}
 .a12 .area-header{background:rgba(64,196,255,.1);color:var(--blue);border:1px solid rgba(64,196,255,.25);}
 .a11 .area-header{background:rgba(0,230,118,.1);color:var(--green);border:1px solid rgba(0,230,118,.25);}
-.a1314 .area-header{background:rgba(206,147,216,.1);color:var(--purple);border:1px solid rgba(206,147,216,.25);}
+.a13 .area-header{background:rgba(206,147,216,.1);color:var(--purple);border:1px solid rgba(206,147,216,.25);}
+.a14 .area-header{background:rgba(0,229,255,.1);color:var(--cyan);border:1px solid rgba(0,229,255,.25);}
 
 /* ── PEA SOURCE ── */
 .pea-block{background:linear-gradient(135deg,#001535,#001f50);border:2px solid var(--blue);
@@ -135,9 +136,6 @@ h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.
   opacity:.7;text-align:center;margin:4px 0 6px;}
 .section-label{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);
   margin:6px 0 4px;padding-left:2px;}
-.sub-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.sub-header{font-size:10px;font-weight:700;color:var(--purple);text-align:center;
-  padding:3px 0 5px;border-bottom:1px dashed rgba(206,147,216,.3);margin-bottom:4px;}
 .gen-note{margin-bottom:4px;font-size:9px;text-align:center;}
 .gen-note.ok{color:var(--green);}
 .gen-note.risk{color:var(--red);animation:blink .8s infinite;}
@@ -205,7 +203,6 @@ h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.
 /* ── Large desktop (≤1400px) ── */
 @media (max-width:1400px){
   .sections-grid{grid-template-columns:1fr 1fr;min-width:0;}
-  .area.a1314{grid-column:1 / -1;}
 }
 
 /* ── Tablet landscape (≤1024px) ── */
@@ -225,8 +222,6 @@ h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.
 /* ── Tablet portrait (≤768px) ── */
 @media (max-width:768px){
   .sections-grid{grid-template-columns:1fr;min-width:0;}
-  .area.a1314{grid-column:auto;}
-  .sub-grid{grid-template-columns:1fr;}
   header{padding:8px 12px;}
   .logo-icon{width:34px;height:34px;font-size:18px;}
   h1{font-size:13px;}
@@ -457,84 +452,90 @@ h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.
     </div>
   </div>
 
-  <!-- ════ AREA 13-14 ════ -->
-  <div class="area a1314" id="area1314">
+  <!-- ════ AREA 13 ════ -->
+  <div class="area a13" id="area13">
     <div class="area-header">
-      <span>⚡</span> Area 13-14 (MDB 13-14)
+      <span>⚡</span> Area 13 (MDB 13)
     </div>
 
-    <div class="pea-block" id="pea1314">
+    <div class="pea-block" id="pea13">
       <div class="pea-kv">22 kV</div>
       <div class="pea-lbl">การไฟฟ้าฯ (PEA)</div>
       <div class="pea-status">
-        <span class="led led-on" id="pea1314-led"></span>
-        <span id="pea1314-txt">จ่ายไฟปกติ</span>
+        <span class="led led-on" id="pea13-led"></span>
+        <span id="pea13-txt">จ่ายไฟปกติ</span>
       </div>
     </div>
 
-    <div class="sub-grid">
-      <!-- ── Area 13 ── -->
-      <div class="sub-area">
-        <div class="sub-header">Area 13 (MDB 13)</div>
-        <div class="section-label">🔄 Transformer (22kV → 400V)</div>
-        <div class="comp-pair">
-          <div class="comp c-tr" id="tr3" onclick="showDetail('tr3')"></div>
-          <div class="comp c-tr" id="tr4" onclick="showDetail('tr4')"></div>
-        </div>
+    <div class="section-label">🔄 Transformer (Step Down: 22kV → 400V)</div>
+    <div class="comp-pair">
+      <div class="comp c-tr" id="tr3" onclick="showDetail('tr3')"></div>
+      <div class="comp c-tr" id="tr4" onclick="showDetail('tr4')"></div>
+    </div>
 
-        <div class="section-label">🔌 Main Distribution Board (400V)</div>
-        <div class="comp-pair">
-          <div class="comp c-mdb" id="mdb13a" onclick="showDetail('mdb13a')"></div>
-          <div class="comp c-mdb" id="mdb13b" onclick="showDetail('mdb13b')"></div>
-        </div>
+    <div class="section-label">🔌 Main Distribution Board (400V)</div>
+    <div class="comp-pair">
+      <div class="comp c-mdb" id="mdb13a" onclick="showDetail('mdb13a')"></div>
+      <div class="comp c-mdb" id="mdb13b" onclick="showDetail('mdb13b')"></div>
+    </div>
 
-        <div class="section-label">🏭 Emergency Distribution Board</div>
-        <div class="comp-quad">
-          <div class="comp c-emdb" id="emdb13a" onclick="showDetail('emdb13a')"></div>
-          <div class="comp c-emdb" id="emdb13a2" onclick="showDetail('emdb13a2')"></div>
-          <div class="comp c-emdb" id="emdb13b" onclick="showDetail('emdb13b')"></div>
-          <div class="comp c-emdb" id="emdb13b2" onclick="showDetail('emdb13b2')"></div>
-        </div>
+    <div class="section-label">🏭 Emergency Distribution Board</div>
+    <div class="comp-quad">
+      <div class="comp c-emdb" id="emdb13a" onclick="showDetail('emdb13a')"></div>
+      <div class="comp c-emdb" id="emdb13a2" onclick="showDetail('emdb13a2')"></div>
+      <div class="comp c-emdb" id="emdb13b" onclick="showDetail('emdb13b')"></div>
+      <div class="comp c-emdb" id="emdb13b2" onclick="showDetail('emdb13b2')"></div>
+    </div>
 
-        <hr class="divider">
-        <div class="gen-label">🔋 Emergency Generator</div>
-        <div class="gen-note" id="note13"></div>
-        <div class="comp-pair">
-          <div class="comp c-gen" id="gen5" onclick="showDetail('gen5')"></div>
-          <div class="comp c-gen" id="gen6" onclick="showDetail('gen6')"></div>
-        </div>
+    <hr class="divider">
+    <div class="gen-label">🔋 Emergency Generator (Backup Power)</div>
+    <div class="gen-note" id="note13"></div>
+    <div class="comp-pair">
+      <div class="comp c-gen" id="gen5" onclick="showDetail('gen5')"></div>
+      <div class="comp c-gen" id="gen6" onclick="showDetail('gen6')"></div>
+    </div>
+  </div>
+
+  <!-- ════ AREA 14 ════ -->
+  <div class="area a14" id="area14">
+    <div class="area-header">
+      <span>⚡</span> Area 14 (MDB 14)
+    </div>
+
+    <div class="pea-block" id="pea14">
+      <div class="pea-kv">22 kV</div>
+      <div class="pea-lbl">การไฟฟ้าฯ (PEA)</div>
+      <div class="pea-status">
+        <span class="led led-on" id="pea14-led"></span>
+        <span id="pea14-txt">จ่ายไฟปกติ</span>
       </div>
+    </div>
 
-      <!-- ── Area 14 ── -->
-      <div class="sub-area">
-        <div class="sub-header">Area 14 (MDB 14)</div>
-        <div class="section-label">🔄 Transformer (22kV → 400V)</div>
-        <div class="comp-pair">
-          <div class="comp c-tr" id="tr5" onclick="showDetail('tr5')"></div>
-          <div class="comp c-tr" id="tr6" onclick="showDetail('tr6')"></div>
-        </div>
+    <div class="section-label">🔄 Transformer (Step Down: 22kV → 400V)</div>
+    <div class="comp-pair">
+      <div class="comp c-tr" id="tr5" onclick="showDetail('tr5')"></div>
+      <div class="comp c-tr" id="tr6" onclick="showDetail('tr6')"></div>
+    </div>
 
-        <div class="section-label">🔌 Main Distribution Board (400V)</div>
-        <div class="comp-pair">
-          <div class="comp c-mdb" id="mdb14a" onclick="showDetail('mdb14a')"></div>
-          <div class="comp c-mdb" id="mdb14b" onclick="showDetail('mdb14b')"></div>
-        </div>
+    <div class="section-label">🔌 Main Distribution Board (400V)</div>
+    <div class="comp-pair">
+      <div class="comp c-mdb" id="mdb14a" onclick="showDetail('mdb14a')"></div>
+      <div class="comp c-mdb" id="mdb14b" onclick="showDetail('mdb14b')"></div>
+    </div>
 
-        <div class="section-label">🏭 Emergency Distribution Board</div>
-        <div class="comp-quad">
-          <div class="comp c-emdb" id="emdb14a1" onclick="showDetail('emdb14a1')"></div>
-          <div class="comp c-emdb" id="emdb14a2" onclick="showDetail('emdb14a2')"></div>
-          <div class="comp c-emdb" id="emdb14b" onclick="showDetail('emdb14b')" style="grid-column:span 2;"></div>
-        </div>
+    <div class="section-label">🏭 Emergency Distribution Board</div>
+    <div class="comp-quad">
+      <div class="comp c-emdb" id="emdb14a1" onclick="showDetail('emdb14a1')"></div>
+      <div class="comp c-emdb" id="emdb14a2" onclick="showDetail('emdb14a2')"></div>
+      <div class="comp c-emdb" id="emdb14b" onclick="showDetail('emdb14b')" style="grid-column:span 2;"></div>
+    </div>
 
-        <hr class="divider">
-        <div class="gen-label">🔋 Emergency Generator</div>
-        <div class="gen-note" id="note14"></div>
-        <div class="comp-pair">
-          <div class="comp c-gen" id="gen8" onclick="showDetail('gen8')"></div>
-          <div class="comp c-gen" id="gen7" onclick="showDetail('gen7')"></div>
-        </div>
-      </div>
+    <hr class="divider">
+    <div class="gen-label">🔋 Emergency Generator (Backup Power)</div>
+    <div class="gen-note" id="note14"></div>
+    <div class="comp-pair">
+      <div class="comp c-gen" id="gen8" onclick="showDetail('gen8')"></div>
+      <div class="comp c-gen" id="gen7" onclick="showDetail('gen7')"></div>
     </div>
   </div>
 
@@ -731,7 +732,7 @@ renderStats();
 // ══════════════════════════════════════════════════
 //  CONNECTIONS (normal mode: PEA → TR → MDB → EMDB)
 // ══════════════════════════════════════════════════
-const PEA_OF = {'11':'pea11', '12':'pea12', '13':'pea1314', '14':'pea1314'};
+const PEA_OF = {'11':'pea11', '12':'pea12', '13':'pea13', '14':'pea14'};
 const CONNECTIONS_NORMAL = [
   ...TR_IDS.map(id   => ({f:PEA_OF[DB[id].area], t:id, col:'#40c4ff',w:2.5,n:4})),
   ...TR_IDS.map(id   => ({f:id, t:DB[id].mdb,       col:'#1de9b6',w:2,  n:3})),
@@ -894,7 +895,7 @@ function setMode(m) {
   currentMode = m;
   document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
 
-  const peaIds = ['pea12','pea11','pea1314'];
+  const peaIds = ['pea12','pea11','pea13','pea14'];
 
   document.getElementById('faultFlash').classList.remove('show');
 
