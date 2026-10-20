@@ -110,13 +110,13 @@ function tdir(id){
   if(!ST[id].tie) return null;
   var a=ntA(id), b=ntB(id);
   if(a&&!b) return 'A to B'; if(b&&!a) return 'B to A';
-  if(a&&b) return 'Parallel'; return null;
+  if(a&&b) return 'ON TIE'; return null;
 }
 function tgenDir(id){
   if(!ST[id].tieGen) return null;
   var a=ST[id].genA, b=ST[id].genB;
   if(a&&!b) return 'A to B'; if(b&&!a) return 'B to A';
-  if(a&&b) return 'Parallel'; return null;
+  if(a&&b) return 'ON TIE'; return null;
 }
 
 // ── Global mode ──
@@ -301,10 +301,10 @@ function rSVG(cfg){
   var hvA=s.hvA, hvB=s.hvB;
   var eA_=enA(id), eB_=enB(id);
   var td_=tdir(id), tgd=tgenDir(id);
-  var tAB=s.tie&&(td_==='A to B'||td_==='Parallel');
-  var tBA=s.tie&&(td_==='B to A'||td_==='Parallel');
-  var tgAB=s.tieGen&&(tgd==='A to B'||tgd==='Parallel');
-  var tgBA=s.tieGen&&(tgd==='B to A'||tgd==='Parallel');
+  var tAB=s.tie&&(td_==='A to B'||td_==='ON TIE');
+  var tBA=s.tie&&(td_==='B to A'||td_==='ON TIE');
+  var tgAB=s.tieGen&&(tgd==='A to B'||tgd==='ON TIE');
+  var tgBA=s.tieGen&&(tgd==='B to A'||tgd==='ON TIE');
   var geA=genEnA(id), geB=genEnB(id);
 
   var eAh=20+cfg.emdbA.length*15, eBh=20+cfg.emdbB.length*15;
