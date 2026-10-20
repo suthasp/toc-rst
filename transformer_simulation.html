@@ -42,7 +42,7 @@ header .sub{font-size:.72rem;color:#aaa}
 <header>
   <div>
     <h1>&#x26A1; TRANSFORMER SYSTEM SIMULATOR &#x2014; 22kV Distribution</h1>
-    <div class="sub">8 Transformers &middot; 4 MDB Pairs &middot; 7 Generators &middot; TIE GDB between GEN pairs (except MDB14)</div>
+    <div class="sub">8 Transformers &middot; 4 MDB Pairs &middot; 8 Generators &middot; TIE GDB between GEN pairs (except MDB14)</div>
   </div>
   <div class="legrow">
     <div class="leg"><div class="led" style="background:#ff6600"></div>22kV Bus</div>
@@ -62,28 +62,36 @@ header .sub{font-size:.72rem;color:#aaa}
 
 <script>
 // ── Configuration ──
+//   tr  : kva/kw = Capacity, load = MDB Used KW (actual)
+//   emdb: kw = EMDB Used KW
+//   gen : kva/kw = Capacity, actual = GEN Actual Load KW
 var CFG = [
   {id:'m11', title:'สาย 11 — MDB11A / MDB11B', tiegen:true,
-   trA:{id:'TR1',kva:1500,kw:1200}, trB:{id:'TR2',kva:1500,kw:1200},
+   trA:{id:'TR1',kva:1500,kw:1200,load:473}, trB:{id:'TR2',kva:1500,kw:1200,load:389},
    mdbA:'MDB11A', mdbB:'MDB11B',
-   emdbA:['EMDB11A'], emdbB:['EMDB11B'],
-   genA:{id:'GEN3',kva:1500,kw:1200}, genB:{id:'GEN4',kva:1500,kw:1200}},
+   emdbA:[{id:'EMDB11A',kw:474}], emdbB:[{id:'EMDB11B',kw:396}],
+   genA:{id:'GEN3',kva:1500,kw:1200,actual:474}, genB:{id:'GEN4',kva:1500,kw:1200,actual:396}},
   {id:'m12', title:'สาย 12 — MDB12A / MDB12B', tiegen:true,
-   trA:{id:'TR7',kva:2000,kw:1600}, trB:{id:'TR8',kva:2000,kw:1600},
+   trA:{id:'TR7',kva:2000,kw:1600,load:841}, trB:{id:'TR8',kva:2000,kw:1600,load:765},
    mdbA:'MDB12A', mdbB:'MDB12B',
-   emdbA:['EMDB12A1','EMDB12A2'], emdbB:['EMDB12B1','EMDB12B2'],
-   genA:{id:'GEN1',kva:2000,kw:1600}, genB:{id:'GEN2',kva:2000,kw:1600}},
+   emdbA:[{id:'EMDB12A1',kw:300},{id:'EMDB12A2',kw:531}], emdbB:[{id:'EMDB12B1',kw:186},{id:'EMDB12B2',kw:574}],
+   genA:{id:'GEN1',kva:2000,kw:1600,actual:831}, genB:{id:'GEN2',kva:2000,kw:1600,actual:760}},
   {id:'m13', title:'สาย 13 — MDB13A / MDB13B', tiegen:true,
-   trA:{id:'TR3',kva:1500,kw:1200}, trB:{id:'TR4',kva:1500,kw:1200},
+   trA:{id:'TR3',kva:1500,kw:1200,load:504}, trB:{id:'TR4',kva:1500,kw:1200,load:518},
    mdbA:'MDB13A', mdbB:'MDB13B',
-   emdbA:['EMDB13A','EMDB13A2'], emdbB:['EMDB13B','EMDB13B2'],
-   genA:{id:'GEN5',kva:2500,kw:2000}, genB:{id:'GEN6',kva:2500,kw:2000}},
+   emdbA:[{id:'EMDB13A',kw:512},{id:'EMDB13A2',kw:102}], emdbB:[{id:'EMDB13B',kw:538},{id:'EMDB13B2',kw:100}],
+   genA:{id:'GEN5',kva:2500,kw:2000,actual:512}, genB:{id:'GEN6',kva:2500,kw:2000,actual:538}},
   {id:'m14', title:'สาย 14 — MDB14A / MDB14B', tiegen:false,
-   trA:{id:'TR5',kva:2000,kw:1600}, trB:{id:'TR6',kva:2000,kw:1600},
+   trA:{id:'TR5',kva:2000,kw:1600,load:758}, trB:{id:'TR6',kva:2000,kw:1600,load:709},
    mdbA:'MDB14A', mdbB:'MDB14B',
-   emdbA:['EMDB14A1','EMDB14A2'], emdbB:['EMDB14B'],
-   genA:{id:'GEN5+6',kva:2500,kw:2000}, genB:{id:'GEN7',kva:2000,kw:1600}}
+   emdbA:[{id:'EMDB14A1',kw:281},{id:'EMDB14A2',kw:475}], emdbB:[{id:'EMDB14B',kw:713}],
+   genA:{id:'GEN8',kva:2000,kw:1600,actual:756}, genB:{id:'GEN7',kva:2000,kw:1600,actual:713}}
 ];
+
+// ── Load helpers ──
+function fmt(n){ return n.toLocaleString('en-US'); }
+function pct(v,cap){ return (v/cap*100).toFixed(2); }
+function lvlCol(p){ return p>=80?'#ff5252':p>=70?'#ffd740':'#00ff88'; }
 
 var ST = {};
 CFG.forEach(function(c){
@@ -171,24 +179,46 @@ function trSymbol(cx,y0,live){
   o+='<line x1="'+cx+'" y1="'+(y0+50)+'" x2="'+cx+'" y2="'+(y0+56)+'" stroke="'+c+'" stroke-width="2.5"/>';
   return o;
 }
-function emdbBox(cx,cy,labels,live){
-  var h=20+labels.length*15;
+function emdbBox(cx,cy,items,live){
+  var h=20+items.length*15;
   var bc=live?'#2255cc':'#333', fc=live?'#0a1525':'#0d0d0d';
-  var o='<rect x="'+(cx-54)+'" y="'+(cy-h/2+4)+'" width="108" height="'+h+'" rx="4" fill="'+fc+'" stroke="'+bc+'" stroke-width="'+(live?1.5:1)+'"/>';
+  var o='<rect x="'+(cx-65)+'" y="'+(cy-h/2+4)+'" width="130" height="'+h+'" rx="4" fill="'+fc+'" stroke="'+bc+'" stroke-width="'+(live?1.5:1)+'"/>';
   o+='<text x="'+cx+'" y="'+(cy-h/2+18)+'" fill="'+(live?'#5577ff':'#444')+'" font-size="9" text-anchor="middle" font-weight="bold">EMDB</text>';
-  for(var i=0;i<labels.length;i++){
-    o+='<text x="'+cx+'" y="'+(cy-h/2+30+i*15)+'" fill="'+(live?'#7799ff':'#555')+'" font-size="10" text-anchor="middle">'+labels[i]+'</text>';
+  for(var i=0;i<items.length;i++){
+    var y=cy-h/2+30+i*15;
+    o+='<text x="'+(cx-58)+'" y="'+y+'" fill="'+(live?'#7799ff':'#555')+'" font-size="10">'+items[i].id+'</text>';
+    o+='<text x="'+(cx+58)+'" y="'+y+'" fill="'+(live?'#ddeeff':'#555')+'" font-size="10" text-anchor="end">'+fmt(items[i].kw)+' KW</text>';
   }
   return o;
 }
 function genBox(cx,cy,gen,run,fn){
   var bc=run?'#44cc44':'#335533', fc=run?'#091509':'#080f08', tc=run?'#88ff88':'#557755', sc=run?'#00ff44':'#ff6644';
+  var p=pct(gen.actual,gen.kw);
   var o='<g onclick="'+fn+'" style="cursor:pointer">';
-  o+='<rect x="'+(cx-54)+'" y="'+(cy-28)+'" width="108" height="56" rx="5" fill="'+fc+'" stroke="'+bc+'" stroke-width="'+(run?2:1.5)+'"/>';
-  o+='<text x="'+cx+'" y="'+(cy-11)+'" fill="'+tc+'" font-size="9" text-anchor="middle">&#x2699; '+gen.id+'</text>';
-  o+='<text x="'+cx+'" y="'+(cy+2)+'" fill="'+tc+'" font-size="9" text-anchor="middle">'+gen.kva+' KVA / '+gen.kw+' KW</text>';
-  o+='<text x="'+cx+'" y="'+(cy+15)+'" fill="'+sc+'" font-size="10" text-anchor="middle" font-weight="bold">'+(run?'&#x25B6; RUNNING':'&#x25A0; STANDBY')+'</text>';
+  o+='<rect x="'+(cx-65)+'" y="'+(cy-34)+'" width="130" height="68" rx="5" fill="'+fc+'" stroke="'+bc+'" stroke-width="'+(run?2:1.5)+'"/>';
+  o+='<text x="'+cx+'" y="'+(cy-19)+'" fill="'+tc+'" font-size="10" text-anchor="middle" font-weight="bold">&#x2699; '+gen.id+'</text>';
+  o+='<text x="'+cx+'" y="'+(cy-6)+'" fill="'+tc+'" font-size="9" text-anchor="middle">'+fmt(gen.kva)+' KVA / '+fmt(gen.kw)+' KW</text>';
+  o+='<text x="'+cx+'" y="'+(cy+7)+'" fill="'+(run?lvlCol(p):'#557755')+'" font-size="9" text-anchor="middle">Actual '+fmt(gen.actual)+' KW &middot; '+p+'%</text>';
+  o+='<text x="'+cx+'" y="'+(cy+22)+'" fill="'+sc+'" font-size="10" text-anchor="middle" font-weight="bold">'+(run?'&#x25B6; RUNNING':'&#x25A0; STANDBY')+'</text>';
   o+='</g>';
+  return o;
+}
+// MDB used load vs TR capacity (drawn on a dark pill so the bus line behind stays readable)
+function mdbLoad(cx,y,tr,live){
+  var p=pct(tr.load,tr.kw);
+  var o='<rect x="'+(cx-52)+'" y="'+(y-11)+'" width="104" height="15" rx="3" fill="#0a0a1c"/>';
+  o+='<text x="'+cx+'" y="'+y+'" fill="'+(live?lvlCol(p):'#557')+'" font-size="10" text-anchor="middle" font-weight="bold">'+fmt(tr.load)+' KW &middot; '+p+'%</text>';
+  return o;
+}
+// TR label beside symbol: side=1 → text to the right, side=-1 → to the left
+function trLabel(cx,y0,tr,live,side){
+  var x=cx+side*22, a=side>0?'start':'end', p=pct(tr.load,tr.kw);
+  var o='';
+  o+='<text x="'+x+'" y="'+(y0+9)+'" fill="'+(live?'#00bbff':'#556')+'" font-size="11" text-anchor="'+a+'" font-weight="bold">'+tr.id+'</text>';
+  o+='<text x="'+x+'" y="'+(y0+20)+'" fill="'+(live?'#5599ff':'#445')+'" font-size="9" text-anchor="'+a+'">'+fmt(tr.kva)+' KVA</text>';
+  o+='<text x="'+x+'" y="'+(y0+31)+'" fill="'+(live?'#5599ff':'#445')+'" font-size="9" text-anchor="'+a+'">Max '+fmt(tr.kw)+' KW</text>';
+  o+='<text x="'+x+'" y="'+(y0+42)+'" fill="'+(live?'#ddeeff':'#445')+'" font-size="9" text-anchor="'+a+'">Actual '+fmt(tr.load)+' KW</text>';
+  o+='<text x="'+x+'" y="'+(y0+54)+'" fill="'+(live?lvlCol(p):'#445')+'" font-size="10" text-anchor="'+a+'" font-weight="bold">'+p+'% Load</text>';
   return o;
 }
 function hvBadge(cx,cy,live,fn){
@@ -297,10 +327,8 @@ function rSVG(cfg){
   // Transformers
   o+=trSymbol(AX,trY0,hvA);
   o+=trSymbol(BX,trY0,hvB);
-  o+='<text x="'+AX+'" y="'+(trY0+62)+'" fill="'+(hvA?'#00bbff':'#556')+'" font-size="10" text-anchor="middle" font-weight="bold">'+cfg.trA.id+'</text>';
-  o+='<text x="'+AX+'" y="'+(trY0+73)+'" fill="'+(hvA?'#5599ff':'#445')+'" font-size="9" text-anchor="middle">'+cfg.trA.kva+' KVA</text>';
-  o+='<text x="'+BX+'" y="'+(trY0+62)+'" fill="'+(hvB?'#00bbff':'#556')+'" font-size="10" text-anchor="middle" font-weight="bold">'+cfg.trB.id+'</text>';
-  o+='<text x="'+BX+'" y="'+(trY0+73)+'" fill="'+(hvB?'#5599ff':'#445')+'" font-size="9" text-anchor="middle">'+cfg.trB.kva+' KVA</text>';
+  o+=trLabel(AX,trY0,cfg.trA,hvA,-1);
+  o+=trLabel(BX,trY0,cfg.trB,hvB,1);
 
   // TR → MDB top
   o+=wline(AX,trY1,AX,mTop,hvA,'#00aaff');
@@ -316,6 +344,7 @@ function rSVG(cfg){
   o+='<line x1="'+(AX-60)+'" y1="'+bY2+'" x2="'+(AX+60)+'" y2="'+bY2+'" stroke="'+(eA_?'#ffd700':'#2a2a20')+'" stroke-width="'+(eA_?4.5:2)+'"/>';
   o+=wline(AX,bY2,AX,mBot,eA_);
   o+=dot(AX,mBot,eA_);
+  o+=mdbLoad(AX,mTop+mH-49,cfg.trA,eA_);
   o+='<text x="'+AX+'" y="'+(mTop+mH-30)+'" fill="'+(eA_?'#aaaaff':'#557')+'" font-size="13" text-anchor="middle" font-weight="bold">'+cfg.mdbA+'</text>';
   o+='<text x="'+AX+'" y="'+(mTop+mH-14)+'" fill="'+(eA_?'#00ff88':'#666')+'" font-size="10" text-anchor="middle">'+(eA_?'&#x25CF; ENERGIZED':'&#x25CB; DE-ENERGIZED')+'</text>';
 
@@ -329,6 +358,7 @@ function rSVG(cfg){
   o+='<line x1="'+(BX-60)+'" y1="'+bY2+'" x2="'+(BX+60)+'" y2="'+bY2+'" stroke="'+(eB_?'#ffd700':'#2a2a20')+'" stroke-width="'+(eB_?4.5:2)+'"/>';
   o+=wline(BX,bY2,BX,mBot,eB_);
   o+=dot(BX,mBot,eB_);
+  o+=mdbLoad(BX,mTop+mH-49,cfg.trB,eB_);
   o+='<text x="'+BX+'" y="'+(mTop+mH-30)+'" fill="'+(eB_?'#aaaaff':'#557')+'" font-size="13" text-anchor="middle" font-weight="bold">'+cfg.mdbB+'</text>';
   o+='<text x="'+BX+'" y="'+(mTop+mH-14)+'" fill="'+(eB_?'#00ff88':'#666')+'" font-size="10" text-anchor="middle">'+(eB_?'&#x25CF; ENERGIZED':'&#x25CB; DE-ENERGIZED')+'</text>';
 
@@ -346,8 +376,8 @@ function rSVG(cfg){
   o+=emdbBox(BX,emdbY,cfg.emdbB,eB_);
 
   // ── EMDB → GEN ──
-  o+=wline(AX,eAb,AX,genY-28,eA_);
-  o+=wline(BX,eBb,BX,genY-28,eB_);
+  o+=wline(AX,eAb,AX,genY-34,eA_);
+  o+=wline(BX,eBb,BX,genY-34,eB_);
 
   // ── GEN boxes ──
   o+=genBox(AX,genY,cfg.genA,s.genA,onGenA);
@@ -358,8 +388,8 @@ function rSVG(cfg){
     var tgWC=(s.tieGen&&(tgAB||tgBA))?'#44ff88':'#1a3a1a';
     var tgSW=s.tieGen?3.5:2;
     // Short wires from GEN bottom down to genBusY
-    o+=wline(AX,genY+28,AX,genBusY,s.genA,'#44ff88',2.5);
-    o+=wline(BX,genY+28,BX,genBusY,s.genB,'#44ff88',2.5);
+    o+=wline(AX,genY+34,AX,genBusY,s.genA,'#44ff88',2.5);
+    o+=wline(BX,genY+34,BX,genBusY,s.genB,'#44ff88',2.5);
     // Horizontal bus lines left and right of TIE GDB
     o+='<line x1="'+AX+'" y1="'+genBusY+'" x2="'+(MX-25)+'" y2="'+genBusY+'" stroke="'+tgWC+'" stroke-width="'+tgSW+'"/>';
     o+='<line x1="'+(MX+25)+'" y1="'+genBusY+'" x2="'+BX+'" y2="'+genBusY+'" stroke="'+tgWC+'" stroke-width="'+tgSW+'"/>';
@@ -372,8 +402,8 @@ function rSVG(cfg){
   }
 
   // ── GEN reverse feed indicator (when running, dots go UP to EMDB) ──
-  if(s.genA) o+=flowDots('M'+AX+' '+(genY-28)+' L'+AX+' '+eAb,true,'gA'+id,'#44ff44','2.0');
-  if(s.genB) o+=flowDots('M'+BX+' '+(genY-28)+' L'+BX+' '+eBb,true,'gB'+id,'#44ff44','2.0');
+  if(s.genA) o+=flowDots('M'+AX+' '+(genY-34)+' L'+AX+' '+eAb,true,'gA'+id,'#44ff44','2.0');
+  if(s.genB) o+=flowDots('M'+BX+' '+(genY-34)+' L'+BX+' '+eBb,true,'gB'+id,'#44ff44','2.0');
 
   // ── TIE GDB flow dots ──
   if(cfg.tiegen){
@@ -382,8 +412,8 @@ function rSVG(cfg){
     o+=flowDots('M'+BX+' '+genBusY+' L'+MX+' '+genBusY,tgBA,'tgRL'+id,'#44ff88','1.0');
     o+=flowDots('M'+MX+' '+genBusY+' L'+AX+' '+genBusY,tgBA,'tgLL'+id,'#44ff88','1.0');
     // TIE GDB feed going UP (when TIE GDB feeds opposite side)
-    if(tgAB) o+=flowDots('M'+BX+' '+genBusY+' L'+BX+' '+(genY-28),true,'tgUp'+id,'#44ff88','2.0');
-    if(tgBA) o+=flowDots('M'+AX+' '+genBusY+' L'+AX+' '+(genY-28),true,'tgUpA'+id,'#44ff88','2.0');
+    if(tgAB) o+=flowDots('M'+BX+' '+genBusY+' L'+BX+' '+(genY-34),true,'tgUp'+id,'#44ff88','2.0');
+    if(tgBA) o+=flowDots('M'+AX+' '+genBusY+' L'+AX+' '+(genY-34),true,'tgUpA'+id,'#44ff88','2.0');
   }
 
   // ── Main flow dots (HV/TR/MDB) ──
