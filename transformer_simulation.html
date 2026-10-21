@@ -66,22 +66,22 @@ header .sub{font-size:.72rem;color:#aaa}
 //   emdb: kw = EMDB Used KW
 //   gen : kva/kw = Capacity, actual = GEN Actual Load KW
 var CFG = [
-  {id:'m11', title:'สาย 11 — MDB11A / MDB11B', tiegen:true,
+  {id:'m11', title:'MDB 11 — MDB11A / MDB11B', tiegen:true,
    trA:{id:'TR1',kva:1500,kw:1200,load:473}, trB:{id:'TR2',kva:1500,kw:1200,load:389},
    mdbA:'MDB11A', mdbB:'MDB11B',
    emdbA:[{id:'EMDB11A',kw:474}], emdbB:[{id:'EMDB11B',kw:396}],
    genA:{id:'GEN3',kva:1500,kw:1200,actual:474}, genB:{id:'GEN4',kva:1500,kw:1200,actual:396}},
-  {id:'m12', title:'สาย 12 — MDB12A / MDB12B', tiegen:true,
+  {id:'m12', title:'MDB 12 — MDB12A / MDB12B', tiegen:true,
    trA:{id:'TR7',kva:2000,kw:1600,load:841}, trB:{id:'TR8',kva:2000,kw:1600,load:765},
    mdbA:'MDB12A', mdbB:'MDB12B',
    emdbA:[{id:'EMDB12A1',kw:300},{id:'EMDB12A2',kw:531}], emdbB:[{id:'EMDB12B1',kw:186},{id:'EMDB12B2',kw:574}],
    genA:{id:'GEN1',kva:2000,kw:1600,actual:831}, genB:{id:'GEN2',kva:2000,kw:1600,actual:760}},
-  {id:'m13', title:'สาย 13 — MDB13A / MDB13B', tiegen:true,
+  {id:'m13', title:'MDB 13 — MDB13A / MDB13B', tiegen:true,
    trA:{id:'TR3',kva:1500,kw:1200,load:504}, trB:{id:'TR4',kva:1500,kw:1200,load:518},
    mdbA:'MDB13A', mdbB:'MDB13B',
    emdbA:[{id:'EMDB13A',kw:512},{id:'EMDB13A2',kw:102}], emdbB:[{id:'EMDB13B',kw:538},{id:'EMDB13B2',kw:100}],
    genA:{id:'GEN5',kva:2500,kw:2000,actual:512}, genB:{id:'GEN6',kva:2500,kw:2000,actual:538}},
-  {id:'m14', title:'สาย 14 — MDB14A / MDB14B', tiegen:true,
+  {id:'m14', title:'MDB 14 — MDB14A / MDB14B', tiegen:true,
    trA:{id:'TR5',kva:2000,kw:1600,load:758}, trB:{id:'TR6',kva:2000,kw:1600,load:709},
    mdbA:'MDB14A', mdbB:'MDB14B',
    emdbA:[{id:'EMDB14A1',kw:281},{id:'EMDB14A2',kw:475}], emdbB:[{id:'EMDB14B',kw:713}],
@@ -91,7 +91,9 @@ var CFG = [
 // ── Load helpers ──
 function fmt(n){ return n.toLocaleString('en-US'); }
 function pct(v,cap){ return (v/cap*100).toFixed(2); }
-function lvlCol(p){ return p>=80?'#ff5252':p>=70?'#ffd740':'#00ff88'; }
+// สีตาม %Load: เกิน LOAD_RED% = แดง
+var LOAD_RED = 40;
+function lvlCol(p){ return p>LOAD_RED?'#ff5252':'#00ff88'; }
 
 // Load sharing across a TIE: a source that feeds the other side through the TIE
 // carries both loads; two live sources on a closed TIE share the total by KW rating.
