@@ -546,9 +546,8 @@ h1 span{color:var(--blue);display:block;font-size:11px;font-weight:400;opacity:.
 <div class="legend">
   <div class="l-item"><div class="l-dot" style="background:var(--blue)"></div>สาย 22kV PEA (Normal)</div>
   <div class="l-item"><div class="l-dot" style="background:var(--teal)"></div>Transformer Output (400V)</div>
-  <div class="l-item"><div class="l-dot" style="background:var(--green)"></div>Distribution (Load &lt;70%)</div>
-  <div class="l-item"><div class="l-dot" style="background:var(--yellow)"></div>Distribution (Load 70-80%)</div>
-  <div class="l-item"><div class="l-dot" style="background:var(--red)"></div>Overload (&gt;80%)</div>
+  <div class="l-item"><div class="l-dot" style="background:var(--green)"></div>Load ≤ 40%</div>
+  <div class="l-item"><div class="l-dot" style="background:var(--red)"></div>Load &gt; 40%</div>
   <div class="l-item"><div class="l-dot" style="background:var(--orange)"></div>Generator (Emergency)</div>
   <div class="l-item" style="margin-left:auto;font-size:9px;color:var(--dim)">
     แหล่งข้อมูล: ไฟล์ Excel — การทำงาน Transformer and Generator.xlsx
@@ -633,8 +632,10 @@ const GEN_IDS  = ['gen1','gen2','gen3','gen4','gen5','gen6','gen7','gen8'];
 
 const fmt   = n => n.toLocaleString('en-US');
 const pctOf = (v, cap) => Math.round(v / cap * 10000) / 100;
-const lvlColor = p => p >= 80 ? 'var(--red)' : p >= 70 ? 'var(--yellow)' : 'var(--green)';
-const lvlFill  = p => 'load-fill ' + (p >= 80 ? 'fill-r' : p >= 70 ? 'fill-y' : 'fill-g');
+// สีตาม %Load: เกิน LOAD_RED% = แดง
+const LOAD_RED = 40;
+const lvlColor = p => p > LOAD_RED ? 'var(--red)' : 'var(--green)';
+const lvlFill  = p => 'load-fill ' + (p > LOAD_RED ? 'fill-r' : 'fill-g');
 
 // Derived: %Load ของแต่ละอุปกรณ์
 Object.values(DB).forEach(d => {
@@ -1013,7 +1014,7 @@ function showDetail(id) {
 
   title.textContent = d.name + ' — ' + {tr:'Transformer',mdb:'Main DB',emdb:'Emergency DB',gen:'Generator'}[d.type];
 
-  const c = d.pct>=80?'#ff5252':d.pct>=70?'#ffd740':'#00e676';
+  const c = d.pct > LOAD_RED ? '#ff5252' : '#00e676';
   const areaRow = `<div class="d-row"><span class="d-key">Area</span><span class="d-val">${d.area}</span></div>`;
   let html = '';
   if (d.type === 'tr') {
